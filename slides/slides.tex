@@ -12,6 +12,7 @@
 \usepackage{hyphenat}
 \usepackage{hyperref}
 \usepackage{booktabs}
+\usepackage{listings}
 
 \usepackage{tikz}
 
@@ -23,6 +24,8 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amsthm}
+
+\usepackage{pythonhighlight2}
 
 \title{
     Design and implementation issues \newline
@@ -195,6 +198,99 @@
     \end{align*}
 \end{frame}
 
+\begin{frame}[fragile]
+    \frametitle{}
+    \framesubtitle{}
+
+    \begin{python}
+In[1]:= Unprotect[E];
+In[2]:= E := {{1,2},{2,3},{1,4},{1,6},{1,12},{2,5},{2,7},
+{3,8},{3,10},{4,11},{4,9},{5,6},{6,7},{7,8},{8,9},{9,10},
+{10,11},{11,12},{5,12},{5,9},{6,10},{7,11},{8,12}}
+
+In[3]:= X := Table[Symbol["x" <> ToString[i]], {i,1,n}]
+In[4]:= h[{i_, j_}] := X[[i]]^2 + X[[i]] X[[j]] + X[[j]]^2
+
+In[5]:= U := Map[(#^3-1)&, X]
+In[6]:= V := Map[h, E]
+
+In[7]:= G := GroebnerBasis[Join[U, V], X]
+
+In[8]:= G != {1}
+Out[8]= True
+    \end{python}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{}
+    \framesubtitle{}
+
+    \begin{python}
+(i1) load(grobner);
+
+(i2) E: [[1,2],[2,3],[1,4],[1,6],[1,12],[2,5],[2,7],[3,8],
+[3,10],[4,11],[4,9],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],
+[11,12],[5,12],[5,9],[6,10],[7,11],[8,12]];
+
+(i3) X: makelist(concat("x", i), i, 1, 12);
+
+(i4) U: makelist(X[i]^3 - 1, i, 1, 12);
+(i5) V: [];
+
+(i6) for e in E do
+        V: endcons(X[e[1]]^2 + X[e[1]]*X[e[2]] + X[e[2]]^2, V);
+
+(i7) G: poly_reduced_grobner(append(U, V), X);
+
+(i8) is(notequal(G, [1]));
+(o8) true
+    \end{python}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{}
+    \framesubtitle{}
+
+    \begin{python}
+(1) -> E := [[1,2],[2,3],[1,4],[1,6],[1,12],[2,5],[2,7],
+[3,8],[3,10],[4,11],[4,9],[5,6],[6,7],[7,8],[8,9],[9,10],
+[10,11],[11,12],[5,12],[5,9],[6,10],[7,11],[8,12]];
+
+(2) -> X := [ concat("x", i::String)::Symbol for i in 1..12 ];
+(3) -> Z := [ [X.(e.1), X.(e.2)] for e in E ];
+
+(4) -> U := [ x**3 - 1 for x in X ];
+(5) -> V := [ z.1**2 + z.1*z.2 + z.2**2 for z in Z];
+
+(6) -> G := groebner([ w::DMP(X, INT) for w in concat(U, V) ]);
+
+(7) -> (G ~= [1]) @ Boolean
+   (7) true
+    \end{python}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{}
+    \framesubtitle{}
+
+    \begin{python}
+In [1]: V = range(1, 12+1)
+In [2]: E = [(1,2),(2,3),(1,4),(1,6),(1,12),(2,5),(2,7),
+(3,8),(3,10),(4,11),(4,9),(5,6),(6,7),(7,8),(8,9),(9,10),
+(10,11),(11,12),(5,12),(5,9),(6,10),(7,11),(8,12)]
+
+In [3]: X = [ Symbol('x' + str(i)) for i in V ]
+In [4]: Z = [ (X[i-1], X[j-1]) for i, j in E ]
+
+In [5]: U = [ x**3 - 1 for x in X ]
+In [6]: V = [ x**2 + x*y + y**2 for x, y in Z ]
+
+In [7]: G = groebner(U + V, X, order='lex')
+
+In [8]: G != [1]
+Out[8]: True
+    \end{python}
+\end{frame}
 
 \end{document}
 
