@@ -13,8 +13,7 @@
 \usepackage{hyperref}
 \usepackage{booktabs}
 
-\usepackage{pgf,tikz}
-\usepackage{pgfplots}
+\usepackage{tikz}
 
 \usetikzlibrary{arrows}
 \usetikzlibrary{automata}
@@ -169,6 +168,33 @@
         \end{tikzpicture}
     \end{center}
 \end{frame}
+
+\begin{frame}
+    \frametitle{}
+    \framesubtitle{}
+
+    \begin{equation*}
+        x_{i}^k - 1
+        x_{i}^{k-1} + x_{i}^{k-2} x_{j} + \ldots + x_{i} x_{j}^{k-2} + x_{j}^{k-1}
+        \sum_{m = 0}^{k-1} x_{i}^{k-m-1} x_{j}^{m}
+    \end{equation*}
+
+    \begin{align*}
+        & \structure{x_{1}} + x_{11} + x_{12}             \\
+        & \structure{x_{2}} - x_{11}                      \\
+        & \structure{x_{3}} - x_{12}                      \\
+        & \structure{x_{4}} - x_{12}                      \\
+        & \structure{x_{5}} + x_{11} + x_{12}             \\
+        & \structure{x_{6}} - x_{11}                      \\
+        & \structure{x_{7}} - x_{12}                      \\
+        & \structure{x_{8}} + x_{11} + x_{12}             \\
+        & \structure{x_{9}} - x_{11}                      \\
+        & \structure{x_{10}} + x_{11} + x_{12}            \\
+        & \structure{x_{11}}^2 + x_{11} x_{12} + x_{12}^2 \\
+        & \structure{x_{12}}^3 - 1
+    \end{align*}
+\end{frame}
+
 
 \end{document}
 
