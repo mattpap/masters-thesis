@@ -20,6 +20,7 @@
 @string{pub:kluwer               = {Kluwer Academic Publishers}}
 @string{pub:maa                  = {Mathematical Association of America}}
 @string{pub:mit                  = {MIT Press}}
+@string{pub:peters               = {AK Peters, Ltd.}}
 @string{pub:springer             = {Springer--Verlag}}
 @string{pub:wiley                = {Wiley}}
 @string{pub:wolfram:media        = {Wolfram Media}}
@@ -64,6 +65,7 @@
 @string{adr:vancouver            = {Vancouver, British Columbia, Canada}}
 @string{adr:victoria             = {Victoria, British Columbia, Canada}}
 @string{adr:waterloo             = {Waterloo, Ontario, Canada}}
+@string{adr:wellesley            = {Wellesley, MA, United States}}
 @string{adr:yorktown             = {Yorktown Heights, NY, United States}}
 @string{adr:zurich               = {Z\"{u}rich, Switzerland}}
 
@@ -98,7 +100,7 @@
 @string{pro:symsac:71   = {{SYMSAC~'71}: {P}roceedings of the second {ACM} {S}ymposium on {S}ymbolic and {A}lgebraic {C}omputation}}
 @string{pro:symsac:76   = {{SYMSAC~'76}: {P}roceedings of the third {ACM} {S}ymposium on {S}ymbolic and {A}lgebraic {C}omputation}}
 @string{pro:symsac:81   = {{SYMSAC~'81}: {P}roceedings of the fourth {ACM} {S}ymposium on {S}ymbolic and {A}lgebraic {C}omputation}}
-@string{pro:symsac:76   = {{SYMSAC~'86}: {P}roceedings of the fifth {ACM} {S}ymposium on {S}ymbolic and {A}lgebraic {C}omputation}}
+@string{pro:symsac:86   = {{SYMSAC~'86}: {P}roceedings of the fifth {ACM} {S}ymposium on {S}ymbolic and {A}lgebraic {C}omputation}}
 
 @string{pro:stoc:92     = {{STOC~'92}: {P}roceedings of the twenty--fourth annual {ACM} {S}ymposium on {T}heory of {C}omputing}}
 @string{pro:stoc:93     = {{STOC~'93}: {P}roceedings of the twenty--fifth annual {ACM} {S}ymposium on {T}heory of {C}omputing}}
@@ -131,6 +133,7 @@
     title         = {{A}xiom: {T}he 30 year horizon},
     pages         = {1100+},
     year          = {2003},
+    publisher     = {\url{www.axiom-developer.org}},
     url           = {\url{http://portal.axiom-developer.org/public/book2.pdf}},
     keywords      = {},
 }
@@ -164,7 +167,7 @@
 %%% factoring-polynomials-and-the-knapsack-problem.pdf
 
 @article{vanHoeij2002knapsack,
-    author        = {Mark van Hoeij}
+    author        = {Mark van Hoeij},
     title         = {{F}actoring {P}olynomials and the {K}napsack {P}roblem},
     journal       = j:number_theory,
     volume        = {95},
@@ -416,7 +419,7 @@
 
 %%% computing-in-algebraic-extensions-resultant-calculus.pdf
 
-@inbook{Loos1983algebraic,
+@booklet{Loos1983algebraic,
     author        = {Rudiger Loos},
     title         = {{C}omputing in {A}lgebraic {E}xtensions},
     editor        = {Bruno Buchberger and George E. Collins and Rudiger Loos and Rudolf Albrecht},
@@ -432,9 +435,9 @@
 
 %%% kaltofen-polynomial-factorization.pdf
 
-@inbook{Kaltofen1983factor,
+@booklet{Kaltofen1983factor,
     author        = {Erich Kaltofen},
-    title         = {{P}olynomial {F}actorization}
+    title         = {{P}olynomial {F}actorization},
     editor        = {Bruno Buchberger and George E. Collins and Rudiger Loos and Rudolf Albrecht},
     series        = {{C}omputer {A}lgebra: {S}ymbolic and {A}lgebraic {C}omputation},
     publisher     = pub:springer,
@@ -479,7 +482,7 @@
 
 %%% comparison-of-polynomial-oriented-computer-algebra-systems.pdf
 
-@article{Lewis1999comparison,
+@misc{Lewis1999comparison,
     author        = {Robert H. Lewis and Michael J. Wester},
     title         = {{C}omparison of {P}olynomial--{O}riented {C}omputer {A}lgebra {S}ystems},
     year          = {1999},
@@ -502,7 +505,7 @@
 
 %%% a-critique-of-the-mathematical-abilities-of-ca-systems.pdf
 
-@article{Wester1999critique,
+@misc{Wester1999critique,
     author        = {Michael J. Wester},
     title         = {{A} {C}ritique of the {M}athematical {A}bilities of {C}{A} {S}ystems},
     year          = {1999},
@@ -512,7 +515,7 @@
 
 %%% computer-algebra-synonyms.pdf
 
-@article{Wester1999algebra,
+@misc{Wester1999algebra,
     author        = {Michael J. Wester},
     title         = {{C}omputer {A}lgebra {S}ynonyms},
     year          = {1999},
@@ -637,7 +640,7 @@
 
 %%% can-you-save-time-in-multiplying-polynomials-by-encoding-them-as-integers.pdf
 
-@article{Fateman2005encoding,
+@misc{Fateman2005encoding,
     author        = {Richard J. Fateman},
     title         = {{C}an you save time in multiplying polynomials by encoding them as integers?},
     url           = {\url{http://www.cs.berkeley.edu/~fateman/papers/polysbyGMP.pdf}},
@@ -663,7 +666,7 @@
 @inproceedings{Monagan2009parallel,
     author        = {Michael B. Monagan and Roman Pearce},
     title         = {{P}arallel {S}parse {P}olynomial {M}ultiplication {U}sing {H}eaps},
-    booktitle     = pro:issac:09
+    booktitle     = pro:issac:09,
     pages         = {263--270},
     year          = {2009},
     publisher     = pub:acm,
@@ -692,7 +695,7 @@
 @inproceedings{Monagan2006modulo,
     author        = {Michael B. Monagan and Roman Pearce},
     title         = {{R}ational {S}implification {M}odulo a {P}olynomial {I}deal},
-    booktitle     = pro:issac:06
+    booktitle     = pro:issac:06,
     pages         = {239--245},
     year          = {2006},
     publisher     = pub:acm,
@@ -732,7 +735,7 @@
 %%% factoring-polynomials-with-rational-coefficients.pdf
 
 @article{Lenstra1982factor,
-    author        = {Lenstra, A. K.; Lenstra, H. W., Jr.; Lovász, L.},
+    author        = {A. K. Lenstra and H. W. Lenstra and L. Lov\'{a}sz},
     title         = {{F}actoring {P}olynomials with {R}ational coefficients},
     journal       = j:math_annalen,
     volume        = {261},
@@ -788,7 +791,7 @@
     number        = {1-3},
     month         = {June},
     year          = {1999},
-    pages         = {61--88}
+    pages         = {61--88},
     url           = {\url{http://www-calfor.lip6.fr/~jcf/Papers/F99a.pdf}},
     keywords      = {},
 }
@@ -1061,10 +1064,10 @@
 
 %%% polynomial-interpolation-in-several-variables.pdf
 
-@inproceedings{Gasca2000interpolation,
+@article{Gasca2000interpolation,
     author        = {Mariano Gasca and Thomas Sauer},
     title         = {{P}olynomial {I}nterpolation in {S}everal {V}ariables},
-    booktitle     = {Advances in Computational Mathematics},
+    journal       = {Advances in Computational Mathematics},
     volume        = {12},
     number        = {4},
     pages         = {377--410},
@@ -1192,7 +1195,7 @@
 %%% affine-transformations-of-algebraic-numbers.pdf
 
 @inproceedings{Jeffrey2005affine,
-    author        = {David J. Jeffrey and Pratibha, and Kelly Roach},
+    author        = {David J. Jeffrey and Pratibha and Kelly Roach},
     title         = {{A}ffine {T}ransformations of {A}lgebraic {N}umbers},
     booktitle     = pro:issac:05,
     pages         = {193--199},
@@ -1706,7 +1709,7 @@
     author        = {Dominik Gruntz},
     title         = {{O}n {C}omputing {L}imits in a {S}ymbolic {M}anipulation {S}ystem},
     year          = {1996},
-    school        = {Swiss Federal Institute of Technology}
+    school        = {Swiss Federal Institute of Technology},
     address       = adr:zurich,
     keywords      = {},
 }
@@ -1716,7 +1719,10 @@
 @book{Petkovsek1997AeqB,
     author        = {Marko Petkov\v{s}ek and Herbert S. Wilf and Doron Zeilberger},
     title         = {{A $=$ B}},
+    pages         = {222+},
     year          = {1997},
+    publisher     = pub:peters,
+    address       = adr:wellesley,
     url           = {\url{http://www.math.rutgers.edu/%7Ezeilberg/AeqB.pdf}},
     keywords      = {},
 }
@@ -1972,6 +1978,8 @@
     edition       = edt:first,
     pages         = {550+},
     year          = {1993},
+    publisher     = pub:springer,
+    address       = adr:new_york,
     series        = {Graduate Texts in Mathematics},
     volume        = {138},
     isbn          = {978-3-540-55640-4},
@@ -2128,7 +2136,7 @@
 
 %%% acm/p505-brown.pdf
 
-@inproceedings{Brown1971subresultants,
+@article{Brown1971subresultants,
     author        = {W. S. Brown and J. F. Traub},
     title         = {{O}n {E}uclid's {A}lgorithm and the {T}heory of {S}ubresultants},
     journal       = j:acm,
@@ -2318,7 +2326,7 @@
     pages         = {289+},
     month         = {July},
     year          = {1994},
-    publisher     = pub:ams
+    publisher     = pub:ams,
     address       = adr:boston,
     isbn          = {0-821-83804-0},
     keywords      = {groebner bases, introduction},
