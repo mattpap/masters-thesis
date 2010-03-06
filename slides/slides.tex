@@ -10,6 +10,7 @@
 \usepackage{hyperref}
 \usepackage{booktabs}
 \usepackage{listings}
+\usepackage{multibib}
 
 \usepackage{tikz}
 
@@ -23,6 +24,8 @@
 \usepackage{amsthm}
 
 \usepackage{pythonhighlight2}
+
+\newcites{gcd,factor,groebner,books,manuals}{GCD,Factor,Groebner,Books,Manuals}
 
 \title{
     Design and implementation issues \newline
@@ -48,10 +51,28 @@
 \frame{\titlepage}
 
 \begin{frame}
-    \frametitle{Plan prezentacji}
-    \framesubtitle{Czyli jak spędzimy kolejne 30--minut}
+    \frametitle{Wprowadzenie}
+    \framesubtitle{}
+
+    \begin{center}
+        \structure{Design} and \structure{implementation} issues \newline
+        of a \structure{computer algebra system} \newline
+        in an \structure{interpreted}, dynamically typed \newline
+        programming language.
+    \end{center}
 
     \begin{itemize}
+        \item promotor: \structure{dr inż. Krzysztof Juszczyszyn}
+        \item język realizacji pracy: \structure{angielski}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Plan prezentacji}
+    \framesubtitle{Czyli jak spędzimy kolejne 30+ minut}
+
+    \begin{itemize}
+        \item
         \item Przykład motywacyjny
             \begin{itemize}
                 \item
@@ -296,14 +317,17 @@
 
     SymPy jest to \structure{biblioteka} pisana w \structure{Pythonie} do wykonywania:
     \begin{itemize}
+        \pause
         \item obliczeń symbolicznych
             \begin{itemize}
                 \item np. wyznacznie całek, sum, granic
             \end{itemize}
+        \pause
         \item obliczeń algebraicznych
             \begin{itemize}
                 \item np. faktoryzacja wielomianów
             \end{itemize}
+        \pause
         \item obliczeń numerycznych
             \begin{itemize}
                 \item np. aproksymacja funkcji
@@ -415,6 +439,98 @@
     \frametitle{x}
     \framesubtitle{x}
 
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zadania do realizacji}
+    \framesubtitle{Dziedziny }
+
+    \begin{columns}
+        \begin{column}[l]{0.5\textwidth}
+            \begin{itemize}
+                \item ciała skończone $\mathbb{F}_q$
+                \item liczby całkowite $\mathbb{Z}$
+                \item liczby wymierne $\mathbb{Q}$
+                \item liczby ``rzeczywiste'' $\mathbb{R}$
+                    \begin{itemize}
+                        \item maszynowej precyzji
+                        \item dowolnej precyzji
+                    \end{itemize}
+                \item liczby ``zespolone'' $\mathbb{C}$
+                    \begin{itemize}
+                        \item maszynowej precyzji
+                        \item dowolnej precyzji
+                    \end{itemize}
+                \item liczby Gaussa
+                    \begin{itemize}
+                        \item liczby całkowite $\mathbb{Z}[\mathfrak{i}]$
+                        \item liczby wymierne $\mathbb{Q}(\mathfrak{i})$
+                    \end{itemize}
+            \end{itemize}
+        \end{column}
+        \begin{column}[r]{0.5\textwidth}
+            \begin{itemize}
+                \item pierścienie wielomianów
+                    \begin{itemize}
+                        \item $\mathbb{Z}[x_1,\ldots,x_n]$
+                        \item $\mathbb{Q}[x_1,\ldots,x_n]$
+                    \end{itemize}
+                \item ciała funkcji wymiernych
+                    \begin{itemize}
+                        \item $\mathbb{Z}(x_1,\ldots,x_n)$
+                        \item $\mathbb{Q}(x_1,\ldots,x_n)$
+                    \end{itemize}
+                \item ciała liczb algebraicznych
+                    \begin{itemize}
+                        \item $\mathbb{Q}(\alpha_1,\ldots,\alpha_n)$
+                    \end{itemize}
+                \item kwaterniony, \ldots
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Co dalej?}
+    \framesubtitle{x}
+
+    \begin{itemize}
+        \item ciała ilorazowe
+            \begin{itemize}
+                \item np. wielomiany trygonometryczne
+                    \begin{equation*}
+                        \mathbb{Q}[s, c] / \left\langle s^2 + c^2 - 1 \right\rangle
+                    \end{equation*}
+                    gdzie $s = sin(x)$ i $c = cos(x)$.
+            \end{itemize}
+        \item
+    \end{itemize}
+\end{frame}
+
+
+    \begin{itemize}
+        \item jednej zmiennej
+            \item reprezentacja gęsta
+            \item reprezentacja rzadka
+        \item wielu zmiennych
+            \item
+        \item
+    \end{itemize}
+    struktury danych
+        dense univaraite
+        recuriseve dense multivariate
+
+        sparse univaraite
+        recuriseve sparse multivariate
+
+        sparse distributed multivariate
+
+    dziedziny współczynników
+
+
+\begin{frame}
+    \frametitle{x}
+    \framesubtitle{x}
 
     arytmetyka
     %+, -, *, **, quo, rem, div, pquo, prem, pdiv
@@ -441,17 +557,88 @@
         Pinkert, Wilf,
         Collins, Krandick
 
-    struktury danych
-        dense univaraite
-        recuriseve dense multivariate
+\end{frame}
 
-        sparse univaraite
-        recuriseve sparse multivariate
+\begin{frame}[allowframebreaks]
+    \frametitle{Podstawowe pozycje bibliograficzne}
+    \framesubtitle{Literatura przedmiotu}
 
-        sparse distributed multivariate
+    \nocitebooks{Geddes1992algorithms}
+    \nocitebooks{Gathen1999modern}
+    \nocitebooks{Davenport1988systems}
 
-    dziedziny współczynników
+    \bibliographystylebooks{plain}
+    \bibliographybooks{slides}
+\end{frame}
 
+\begin{frame}[allowframebreaks]
+    \frametitle{Podręczniki systemów matematycznych}
+    \framesubtitle{Literatura przedmiotu}
+
+    \nocitemanuals{Souza2004book}
+    \nocitemanuals{Daly2003horizon}
+    \nocitemanuals{Wolfram2003book}
+
+    \bibliographystylemanuals{plain}
+    \bibliographymanuals{slides}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+    \frametitle{Bazy Gr\"{o}bnera, ideały, \ldots}
+    \framesubtitle{Literatura przedmiotu}
+
+    \nocitegroebner{Cox1997ideals}
+    \nocitegroebner{Ajwa95groebner}
+    \nocitegroebner{Adams1994intro}
+    \nocitegroebner{Buchberger2001introduction}
+    \nocitegroebner{Giovini1991sugar}
+    \nocitegroebner{Faugere1999f4}
+
+    \nocitegroebner{Faugere2002f5}
+
+    \bibliographystylegroebner{plain}
+    \bibliographygroebner{slides}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+    \frametitle{Faktoryzacja wielomianów}
+    \framesubtitle{Literatura przedmiotu}
+
+    \nocitefactor{Kaltofen1983factor}
+    \nocitefactor{Lenstra1982factor}
+
+    \nocitefactor{Trager1976algebraic}
+    \nocitefactor{vanHoeij2002knapsack}
+    \nocitefactor{Abbott2000searching}
+
+    \nocitefactor{Gathen1983polytime}
+    \nocitefactor{Shoup1993reality}
+    \nocitefactor{Gathen1992frobenious}
+    \nocitefactor{Shoup1995factor}
+    \nocitefactor{Kaltofen1995subquadratic}
+
+    \nocitefactor{Musser1975factor}
+    \nocitefactor{Wang1976algebraic}
+    \nocitefactor{Wang1978improved}
+
+    \bibliographystylefactor{plain}
+    \bibliographyfactor{slides}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+    \frametitle{Największy wspólny dzielnik wielomianów}
+    \framesubtitle{Literatura przedmiotu}
+
+    \nocitegcd{Brown1971gcd}
+    \nocitegcd{Moses1973ezgcd}
+    \nocitegcd{Wang1980eezgcd}
+    \nocitegcd{Gianni1985groebner}
+    \nocitegcd{Liao1995heuristic}
+    \nocitegcd{vanHoeij2002modgcd}
+    \nocitegcd{Javadi2007spmod}
+
+    \bibliographystylegcd{plain}
+    \bibliographygcd{slides}
 \end{frame}
 
 \begin{frame}
