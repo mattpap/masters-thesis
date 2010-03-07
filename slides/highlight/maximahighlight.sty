@@ -1,0 +1,79 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{maximahighlight}[]%Mateusz Paprocki <mattpap@gmail.com>]
+
+\RequirePackage{listings}
+\RequirePackage{xcolor}
+
+\definecolor{pantonexcolour}{RGB}{152,50,34}
+\definecolor{pantoneycolour}{RGB}{241,209,162}
+
+\colorlet{stringcolour}{red!60!black}
+\colorlet{commentcolour}{green!50!black}
+\colorlet{keywordcolour}{magenta!90!black}
+\colorlet{exceptioncolour}{yellow!50!red}
+\colorlet{packagecolour}{blue!60!black}
+\colorlet{functioncolour}{blue!60!green}
+\colorlet{literatecolour}{magenta!90!black}
+\colorlet{promptcolour}{green!50!black}
+\colorlet{numbercolour}{orange!90}
+
+\newcommand{\maxima@numbercolour}{\textcolor{numbercolour}}
+\newcommand{\maxima@literatecolour}{\textcolor{literatecolour}}
+
+\lstdefinelanguage{maxima}{
+    morekeywords={for,in,do},
+    sensitive=true,
+    morestring=[b]",
+    morecomment=[l]++,
+    morecomment=[l]--,
+}
+
+\lstdefinestyle{maxima}{
+    language=maxima,
+    showtabs=true,
+    tab=,
+    tabsize=2,
+    showstringspaces=false,
+    basicstyle=\ttfamily\scriptsize,
+    stringstyle=\color{stringcolour},
+    commentstyle=\color{commentcolour}\slshape,
+    keywordstyle=\color{keywordcolour}\bfseries,
+    emph={[1]true,false},
+    emphstyle=[1]\color{keywordcolour},
+    emph={[2]load,makelist,endcons,concat,append,is,notequal,poly_reduced_grobner},
+    emphstyle=[2]\color{functioncolour},
+    emph={[3]grobner},
+    emphstyle=[3]\color{packagecolour},
+    literate=*
+        {0}{{\maxima@numbercolour0}}{1}
+        {1}{{\maxima@numbercolour1}}{1}
+        {2}{{\maxima@numbercolour2}}{1}
+        {3}{{\maxima@numbercolour3}}{1}
+        {4}{{\maxima@numbercolour4}}{1}
+        {5}{{\maxima@numbercolour5}}{1}
+        {6}{{\maxima@numbercolour6}}{1}
+        {7}{{\maxima@numbercolour7}}{1}
+        {8}{{\maxima@numbercolour8}}{1}
+        {9}{{\maxima@numbercolour9}}{1}
+        {.}{{\maxima@literatecolour.}}{1}
+        {:}{{\maxima@literatecolour:}}{1}
+        {=}{{\maxima@literatecolour=}}{1}
+        {+}{{\maxima@literatecolour+}}{1}
+        {-}{{\maxima@literatecolour-}}{1}
+        {*}{{\maxima@literatecolour*}}{1}
+        {/}{{\maxima@literatecolour/}}{1}
+        {!}{{\maxima@literatecolour!}}{1}
+        {@}{{\maxima@literatecolour{\char64}}}{1}
+        {~}{{\maxima@literatecolour{\char126}}}{1}
+        {<}{{\maxima@literatecolour<}}{1}
+        {>}{{\maxima@literatecolour>}}{1}
+        {[}{{\maxima@literatecolour[}}{1}
+        {]}{{\maxima@literatecolour]}}{1},
+    frame=trbl,
+    rulecolor=\color{black!50},
+    backgroundcolor=\color{pantoneycolour!50},
+}
+
+\lstnewenvironment{maxima}
+    {\lstset{style=maxima}}{}
+
