@@ -1,0 +1,78 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{mathematicahighlight}[]%Mateusz Paprocki <mattpap@gmail.com>]
+
+\RequirePackage{listings}
+\RequirePackage{xcolor}
+
+\definecolor{pantonexcolour}{RGB}{152,50,34}
+\definecolor{pantoneycolour}{RGB}{241,209,162}
+
+\colorlet{stringcolour}{red!60!black}
+\colorlet{commentcolour}{green!50!black}
+\colorlet{keywordcolour}{magenta!90!black}
+\colorlet{exceptioncolour}{yellow!50!red}
+\colorlet{packagecolour}{blue!60!black}
+\colorlet{functioncolour}{blue!60!green}
+\colorlet{literatecolour}{magenta!90!black}
+\colorlet{numbercolour}{orange!90}
+
+\newcommand{\mathematica@numbercolour}{\textcolor{numbercolour}}
+\newcommand{\mathematica@specialcolour}{\textcolor{specialcolour}}
+\newcommand{\mathematica@literatecolour}{\textcolor{literatecolour}}
+
+\lstdefinelanguage{mathematica2}{
+    sensitive=true,
+    morestring=[b]",
+    morecomment=[s]{(*}{*)},
+}
+
+\lstdefinestyle{mathematica}{
+    language=mathematica2,
+    showtabs=true,
+    tab=,
+    tabsize=2,
+    showstringspaces=false,
+    basicstyle=\ttfamily\scriptsize,
+    stringstyle=\color{stringcolour},
+    commentstyle=\color{commentcolour}\slshape,
+    keywordstyle=\color{keywordcolour}\bfseries,
+    emph={[1]True,False},
+    emphstyle=[1]\color{keywordcolour},
+    emph={[2]Unprotect,Table,Symbol,ToString,Map,GroebnerBasis,Join},
+    emphstyle=[2]\color{functioncolour},
+    literate=*
+        {0}{{\mathematica@numbercolour0}}{1}
+        {1}{{\mathematica@numbercolour1}}{1}
+        {2}{{\mathematica@numbercolour2}}{1}
+        {3}{{\mathematica@numbercolour3}}{1}
+        {4}{{\mathematica@numbercolour4}}{1}
+        {5}{{\mathematica@numbercolour5}}{1}
+        {6}{{\mathematica@numbercolour6}}{1}
+        {7}{{\mathematica@numbercolour7}}{1}
+        {8}{{\mathematica@numbercolour8}}{1}
+        {9}{{\mathematica@numbercolour9}}{1}
+        {#}{{\mathematica@specialcolour{\char35}}}{1}
+        {.}{{\mathematica@literatecolour.}}{1}
+        {:}{{\mathematica@literatecolour:}}{1}
+        {=}{{\mathematica@literatecolour=}}{1}
+        {+}{{\mathematica@literatecolour+}}{1}
+        {-}{{\mathematica@literatecolour-}}{1}
+        {*}{{\mathematica@literatecolour*}}{1}
+        {/}{{\mathematica@literatecolour/}}{1}
+        {!}{{\mathematica@literatecolour!}}{1}
+        {&}{{\mathematica@literatecolour{\char38}}}{1}
+        {@}{{\mathematica@literatecolour{\char64}}}{1}
+        {^}{{\mathematica@literatecolour{\char94}}}{1}
+        {~}{{\mathematica@literatecolour{\char126}}}{1}
+        {<}{{\mathematica@literatecolour<}}{1}
+        {>}{{\mathematica@literatecolour>}}{1}
+        {[}{{\mathematica@literatecolour[}}{1}
+        {]}{{\mathematica@literatecolour]}}{1},
+    frame=trbl,
+    rulecolor=\color{black!50},
+    backgroundcolor=\color{pantoneycolour!50},
+}
+
+\lstnewenvironment{mathematica}
+    {\lstset{style=mathematica}}{}
+
