@@ -14,7 +14,6 @@
 \colorlet{packagecolour}{blue!60!black}
 \colorlet{functioncolour}{blue!60!green}
 \colorlet{literatecolour}{magenta!90!black}
-\colorlet{promptcolour}{green!50!black}
 \colorlet{numbercolour}{orange!90}
 
 \newcommand{\maxima@numbercolour}{\textcolor{numbercolour}}
@@ -63,7 +62,9 @@
         {*}{{\maxima@literatecolour*}}{1}
         {/}{{\maxima@literatecolour/}}{1}
         {!}{{\maxima@literatecolour!}}{1}
+        {&}{{\maxima@literatecolour{\char38}}}{1}
         {@}{{\maxima@literatecolour{\char64}}}{1}
+        {^}{{\maxima@literatecolour{\char94}}}{1}
         {~}{{\maxima@literatecolour{\char126}}}{1}
         {<}{{\maxima@literatecolour<}}{1}
         {>}{{\maxima@literatecolour>}}{1}

@@ -14,11 +14,10 @@
 \colorlet{domaincolour}{blue!60!black}
 \colorlet{functioncolour}{blue!60!green}
 \colorlet{literatecolour}{magenta!90!black}
-\colorlet{promptcolour}{green!50!black}
 \colorlet{numbercolour}{orange!90}
 
-\newcommand{\numbercolour}{\textcolor{numbercolour}}
-\newcommand{\literatecolour}{\textcolor{literatecolour}}
+\newcommand{\axiom@numbercolour}{\textcolor{numbercolour}}
+\newcommand{\axiom@literatecolour}{\textcolor{literatecolour}}
 
 \lstdefinelanguage{axiom}{
     morekeywords={for,in},
@@ -45,30 +44,32 @@
     emph={[3]Boolean,String,Symbol,DMP,INT},
     emphstyle=[3]\color{domaincolour},
     literate=*
-        {0}{{\numbercolour0}}{1}
-        {1}{{\numbercolour1}}{1}
-        {2}{{\numbercolour2}}{1}
-        {3}{{\numbercolour3}}{1}
-        {4}{{\numbercolour4}}{1}
-        {5}{{\numbercolour5}}{1}
-        {6}{{\numbercolour6}}{1}
-        {7}{{\numbercolour7}}{1}
-        {8}{{\numbercolour8}}{1}
-        {9}{{\numbercolour9}}{1}
-        {.}{{\literatecolour.}}{1}
-        {:}{{\literatecolour:}}{1}
-        {=}{{\literatecolour=}}{1}
-        {+}{{\literatecolour+}}{1}
-        {-}{{\literatecolour-}}{1}
-        {*}{{\literatecolour*}}{1}
-        {/}{{\literatecolour/}}{1}
-        {!}{{\literatecolour!}}{1}
-        {@}{{\literatecolour{\char64}}}{1}
-        {~}{{\literatecolour{\char126}}}{1}
-        {<}{{\literatecolour<}}{1}
-        {>}{{\literatecolour>}}{1}
-        {[}{{\literatecolour[}}{1}
-        {]}{{\literatecolour]}}{1},
+        {0}{{\axiom@numbercolour0}}{1}
+        {1}{{\axiom@numbercolour1}}{1}
+        {2}{{\axiom@numbercolour2}}{1}
+        {3}{{\axiom@numbercolour3}}{1}
+        {4}{{\axiom@numbercolour4}}{1}
+        {5}{{\axiom@numbercolour5}}{1}
+        {6}{{\axiom@numbercolour6}}{1}
+        {7}{{\axiom@numbercolour7}}{1}
+        {8}{{\axiom@numbercolour8}}{1}
+        {9}{{\axiom@numbercolour9}}{1}
+        {.}{{\axiom@literatecolour.}}{1}
+        {:}{{\axiom@literatecolour:}}{1}
+        {=}{{\axiom@literatecolour=}}{1}
+        {+}{{\axiom@literatecolour+}}{1}
+        {-}{{\axiom@literatecolour-}}{1}
+        {*}{{\axiom@literatecolour*}}{1}
+        {/}{{\axiom@literatecolour/}}{1}
+        {!}{{\axiom@literatecolour!}}{1}
+        {&}{{\axiom@literatecolour{\char38}}}{1}
+        {@}{{\axiom@literatecolour{\char64}}}{1}
+        {^}{{\axiom@literatecolour{\char94}}}{1}
+        {~}{{\axiom@literatecolour{\char126}}}{1}
+        {<}{{\axiom@literatecolour<}}{1}
+        {>}{{\axiom@literatecolour>}}{1}
+        {[}{{\axiom@literatecolour[}}{1}
+        {]}{{\axiom@literatecolour]}}{1},
     frame=trbl,
     rulecolor=\color{black!50},
     backgroundcolor=\color{pantoneycolour!50},
