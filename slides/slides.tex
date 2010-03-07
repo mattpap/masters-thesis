@@ -3,7 +3,9 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[OT4]{fontenc}
 
-\usetheme{pwr}
+\setbeamertemplate{navigation symbols}{}
+
+\usetheme[lang=pl,pasek=pasek2]{pwr}
 
 \usepackage{ragged2e}
 \usepackage{hyphenat}
@@ -31,9 +33,9 @@
 \newcites{gcd,factor,groebner,books,manuals}{GCD,Factor,Groebner,Books,Manuals}
 
 \title{
-    Design and implementation issues \newline
-    of a computer algebra system \newline
-    in an interpreted, dynamically typed \newline
+    Design and implementation issues \linebreak
+    of a computer algebra system \linebreak
+    in an interpreted, dynamically typed \linebreak
     programming language
 }
 
@@ -51,17 +53,19 @@
 
 \begin{document}
 
-\frame{\titlepage}
+\begin{frame}[plain,t]
+    \maketitle
+\end{frame}
 
 \begin{frame}
     \frametitle{Wprowadzenie}
     \framesubtitle{}
 
     \begin{center}
-        \structure{Design} and \structure{implementation} issues \newline
-        of a \structure{computer algebra system} \newline
-        in an \structure{interpreted}, dynamically typed \newline
-        programming language.
+        \structure{Design} and \structure{implementation} issues \linebreak
+        of a \structure{computer algebra system} \linebreak
+        in an \structure{interpreted}, dynamically typed \linebreak
+        programming language
     \end{center}
 
     \begin{itemize}
@@ -95,15 +99,16 @@
                     \item $V$ --- $\{ 1, \ldots, 12 \}$
                     \item $E$ --- zbiór krawędzi
                 \end{itemize}
-            \onslide<2->{
-                Pytanie:
-                    \begin{itemize}
-                        \item<2-> Czy da się pokolorować $G$ \structure{trzema} kolorami?
-                        \item<3-> A może wystarczy \structure{dwoma}?
-                    \end{itemize}
-            }
+            \pause
+            Pytanie:
+            \begin{itemize}
+                \item Czy da się pokolorować $G$ \structure{trzema} kolorami?
+                \pause
+                \item A może wystarczy \structure{dwoma}?
+            \end{itemize}
         \end{column}
         \begin{column}[r]{0.4\textwidth}
+            \onslide<1->
             \begin{center}
                 \input{content/graph-nocolor.tex}
             \end{center}
