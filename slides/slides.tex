@@ -79,12 +79,11 @@
     \framesubtitle{Czyli jak spędzimy kolejne 30+ minut}
 
     \begin{itemize}
-        \item
         \item Przykład motywacyjny
-            \begin{itemize}
-                \item
-            \end{itemize}
-        \item
+        \item Wprowadzenie do SymPy
+        \item Cele pracy dyplomowej
+        \item Zadania do realizacji
+        \item Przegląd literatury
     \end{itemize}
 \end{frame}
 
@@ -152,12 +151,12 @@
     gdzie
     \pause
     \begin{itemize}
-        \item $I_k$ opisuje przypisanie koloru
+        \item $I_k$ opisuje przypisanie kolorów do wierzchołków
             \begin{equation*}
                 I_k = \{ x_i^k - 1 : i \in V \}
             \end{equation*}
             \pause
-        \item $I_G$ opisuje warunek spełnialności
+        \item $I_G$ opisuje warunek dopuszczalności kolorowania
             \begin{equation*}
                 I_G = \{ x_{i}^{k-1} + x_{i}^{k-2} x_{j} + \ldots + x_{i} x_{j}^{k-2} + x_{j}^{k-1} : (i, j) \in E \}
             \end{equation*}
@@ -200,7 +199,7 @@
     \end{itemize}
     \pause
     Następnie wyznaczamy bazę Gr\"{o}bnera dla $I_{G,3}$, np. algorytmem
-    Buchbergera, \structure{$\ldots$} (to może nie być takie łatwe)
+    Buchbergera, \structure{\ldots} (to może nie być takie łatwe)
 \end{frame}
 
 \begin{frame}
@@ -260,7 +259,7 @@
             \end{itemize}
     \end{itemize}
     \pause
-    Zobaczmy jak to będzie wyglądało \structure{$\ldots$}
+    Zobaczmy jak to będzie wyglądało \structure{\ldots}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -297,7 +296,7 @@
                 \item marnujemy cenny czas
             \end{itemize}
             \pause
-        \item \structure{wyjątki:} GiNaC i Sage, ale \structure{$\ldots$}
+        \item \structure{wyjątki:} GiNaC i Sage, ale \structure{\ldots}
     \end{itemize}
     \pause
     Są też inne problemy:
@@ -308,13 +307,13 @@
                 \item \structure{hermetyczne} i niedostępne jądro systemu
                 \item biblioteki pisane w języku danego systemu
             \end{itemize}
-        \item \structure{$\ldots$}
+        \item \structure{\ldots}
     \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
     \frametitle{Jakie rozwiązanie można zaproponować?}
-    \framesubtitle{Użyjmy język prosty i dobrze znany $\ldots$}
+    \framesubtitle{Użyjmy język prosty i dobrze znany \ldots}
 
     \input{content/example-sympy.tex}
 \end{frame}
@@ -328,29 +327,29 @@
         \pause
         \item obliczeń symbolicznych
             \begin{itemize}
-                \item np. wyznacznie całek, sum, granic
+                \item np. wyznaczanie całek, sum, granic
             \end{itemize}
         \pause
-        \item obliczeń algebraicznych
+        \item \structure<5->{obliczeń algebraicznych}
             \begin{itemize}
                 \item np. faktoryzacja wielomianów
             \end{itemize}
         \pause
         \item obliczeń numerycznych
             \begin{itemize}
-                \item np. aproksymacja funkcji
+                \item np. rozwiązywanie równań nieliniowych
             \end{itemize}
     \end{itemize}
 \end{frame}
 
 \begin{frame}
     \frametitle{Co chcemy osiągnąć?}
-    \framesubtitle{Po części co już osiągnęliśmy $\ldots$}
+    \framesubtitle{Po części co już osiągnęliśmy \ldots}
 
     \begin{itemize}
         \item biblioteka pisana w Pythonie
             \begin{itemize}
-                \item bez nowego środowiska, języka, $\ldots$
+                \item bez nowego środowiska, języka, \ldots
                 \item działa od razu na dowolnej platformie
                 \item moduły nie--Pythonowe mogą być opcjonalne
             \end{itemize}
@@ -380,28 +379,6 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Odrobina historii}
-    \framesubtitle{}
-
-    \begin{description}
-        \item[2005] trudne początki, pierwsze linie kodu
-        \item[2006] proste jądro symboliczne, liczenie granic
-        \item[2007] macierze, wielomiany, wyświetlanie wyrażeń
-        \item[2008]
-        \item[2009] TODO
-        \item[2010]
-    \end{description}
-
-    \begin{itemize}
-        \item braliśmy udział w:
-            \begin{itemize}
-                \item Google Summer of Code (2007, 2008, 2009)
-                \item Google Highly Open Participation Contest (2008)
-            \end{itemize}
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
     \frametitle{Moja rola w projekcie}
     \framesubtitle{Czyli odrobina historii z moim udziałem}
 
@@ -421,7 +398,7 @@
             \begin{itemize}
                 \item algorytmy całkowania symbolicznego
                 \item struktury algebraiczne, wielomiany
-                \item upraszczanie wyrażeń, $\ldots$
+                \item upraszczanie wyrażeń, \ldots
             \end{itemize}
             \pause
         \item poza tym:
@@ -433,25 +410,26 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{x}
-    \framesubtitle{x}
+    \frametitle{Cele pracy dyplomowej}
+    \framesubtitle{Czyli co chciałbym osiągnąć}
 
+    Zbudować moduł \structure{algebry komputerowej} dla SymPy:
     \begin{itemize}
-        \item systemy matematyki symbolicznej
-        \item systemy algebry komputerowej
-        \item systemy obliczeń numerycznych
+        \item zgodnie z wymienionymi postulatami SymPy
+        \pause
+        \item wprowadzenie architektury wielowarstowej
+        \pause
+        \item wykorzystanie \structure{pure mode} Cython
+        \pause
+        \item $>99\%$ pokrycia kodu testami
+        \pause
+        \item \ldots
     \end{itemize}
 \end{frame}
 
 \begin{frame}
-    \frametitle{x}
-    \framesubtitle{x}
-
-\end{frame}
-
-\begin{frame}
     \frametitle{Zadania do realizacji}
-    \framesubtitle{Dziedziny }
+    \framesubtitle{Obsługa następujących dziedzin współczynników}
 
     \begin{columns}
         \begin{column}[l]{0.5\textwidth}
@@ -499,77 +477,142 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Co dalej?}
-    \framesubtitle{x}
+    \frametitle{Zadania do realizacji}
+    \framesubtitle{Obsługa różnych typów danych do reprezentacji współczynników}
 
     \begin{itemize}
-        \item ciała ilorazowe
+        \item liczby całkowite $\mathbb{Z}$
             \begin{itemize}
-                \item np. wielomiany trygonometryczne
-                    \begin{equation*}
-                        \mathbb{Q}[s, c] / \left\langle s^2 + c^2 - 1 \right\rangle
-                    \end{equation*}
-                    gdzie $s = sin(x)$ i $c = cos(x)$.
+                \item Python --- \texttt{int}
+                \item SymPy --- \texttt{Integer}
+                \item GMPY  --- \texttt{mpz}
+                \item \ldots
             \end{itemize}
-        \item
+        \pause
+        \item liczby wymierne $\mathbb{Q}$
+            \begin{itemize}
+                \item Python --- \texttt{Fraction}
+                \item SymPy --- \texttt{Rational}
+                \item GMPY  --- \texttt{mpq}
+                \item \ldots
+            \end{itemize}
     \end{itemize}
 \end{frame}
 
+\begin{frame}
+    \frametitle{Zadania do realizacji}
+    \framesubtitle{Przegląd i implementacja struktur danych}
 
     \begin{itemize}
-        \item jednej zmiennej
-            \item reprezentacja gęsta
-            \item reprezentacja rzadka
-        \item wielu zmiennych
-            \item
-        \item
+        \item wielomiany jednej zmiennej
+            \begin{itemize}
+                \item reprezentacja gęsta --- \structure{lista}
+                    \begin{equation*}
+                        [c_n, c_{n-1}, \ldots, c_1, c_0]
+                    \end{equation*}
+                \item reprezentacja rzadka --- \structure{słownik}
+                    \begin{equation*}
+                        \{k_n: c_n, k_{n-1}: c_{n-1}, \ldots, k_0: c_0\}
+                    \end{equation*}
+            \end{itemize}
+        \pause
+        \item wielomiany wielu zmiennych
+            \begin{itemize}
+                \item reprezentacja rekurencyjna gęsta --- \structure{lista list}
+                \item reprezentacja rekurencyjna rzadka --- \structure{słownik słowników}
+                \item reprezentacja \structure{rozproszona}
+                    \begin{equation*}
+                        [(M_n, c_n), (M_{n-1}, c_{n-1}) \ldots, (M_0, c_0)]_{ord}
+                    \end{equation*}
+            \end{itemize}
     \end{itemize}
-    struktury danych
-        dense univaraite
-        recuriseve dense multivariate
-
-        sparse univaraite
-        recuriseve sparse multivariate
-
-        sparse distributed multivariate
-
-    dziedziny współczynników
-
+\end{frame}
 
 \begin{frame}
-    \frametitle{x}
-    \framesubtitle{x}
+    \frametitle{Zadania do realizacji}
+    \framesubtitle{Przegląd i implementacja algorytmów}
 
-    arytmetyka
-    %+, -, *, **, quo, rem, div, pquo, prem, pdiv
-    %half_gcdex, gcdex, invert, gcd, lcm,
-    prs, subresultants, resultant, discriminant
-    dekompozycja funkcjonalna
-    bazy groebnera
-    faktoryzacja
-        jednej zmiennej
-            nad ciałem skończonym
-                ???
-                Cantor--Zassenhaus, Shoup--Kaltofen
-            nad liczbami wymiernymi
-                Zassenhaus, van Hoeij
-            nad liczbami algebraicznymi
-                Trager, Wang, Zhi
-        wielu zmiennych
-            nad liczbami wymiernymi
-                Musser, Wang
-    faktoryzacja bez kwadratowa
-        Yun
-    upraszczanie ułamków
-    izolacja pierwiastków
-        Pinkert, Wilf,
-        Collins, Krandick
+    \begin{itemize}
+        \item algorytmy podstawowe
+            \begin{itemize}
+                \item arytmetyka: $+, -, *, **$
+                \item dzielenie tradycyjne
+                \item pseudo dzielenie
+            \end{itemize}
+        \pause
+        \item algorytmy zaawansowane
+            \begin{itemize}
+                \item gcd, lcm, gcdex
+                \item rozkład bez kwadratowy
+                \item faktoryzacja, dekompozycja
+                \item bazy Gr\"{o}bnera
+                \item subresultants, resultant, discriminant
+                \item sekwencje ilorazowe (np. Sturm)
+                \item izolacja pierwiastków
+                \item wyznaczanie pierwiastków
+                \item \ldots
+            \end{itemize}
+    \end{itemize}
+\end{frame}
 
+\begin{frame}
+    \frametitle{Zadania do realizacji}
+    \framesubtitle{Wybór odpowiednich algorytmów nie jest prostym zadaniem}
+
+    Algorytmy faktoryzacji wielomianów:
+    \begin{itemize}
+        \item wielomiany jednej zmiennej
+            \begin{itemize}
+                \item nad ciałami skończonymi
+                    \begin{itemize}
+                        \item Berlekamp, Cantor--Zassenhaus, Shoup--Kaltofen
+                    \end{itemize}
+                \item nad liczbami wymiernymi
+                    \begin{itemize}
+                        \item Kronecker, Zassenhaus, Lenstra--Lov\'{a}sz, van Hoeij
+                    \end{itemize}
+                \item nad liczbami algebraicznymi
+                    \begin{itemize}
+                        \item Trager, Zhi
+                    \end{itemize}
+            \end{itemize}
+        \pause
+        \item wielomiany wielu zmiennych
+            \begin{itemize}
+                \item nad liczbami wymiernymi
+                    \begin{itemize}
+                        \item Kronecker, Musser, Weinberg, Wang, Gao
+                    \end{itemize}
+                \item nad liczbami algebraicznymi
+                    \begin{itemize}
+                        \item Trager, Wang, Zhi
+                    \end{itemize}
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Przegląd literatury}
+    \framesubtitle{Krótkie omówienie najważniejszych źródeł wiedzy}
+
+    \begin{itemize}
+        \item podstawowe pozycje bibliograficzne
+        \pause
+        \item podręczniki systemów matematycznych
+        \pause
+        \item algorytmy i struktury danych:
+            \begin{itemize}
+                \item bazy Gr\"{o}bnera, ideały
+                \item faktoryzacja wielomianów
+                \item GCD wielomianów
+                \item \ldots
+            \end{itemize}
+    \end{itemize}
 \end{frame}
 
 \begin{frame}[allowframebreaks]
     \frametitle{Podstawowe pozycje bibliograficzne}
-    \framesubtitle{Literatura przedmiotu}
+    \framesubtitle{Przegląd literatury}
 
     \nocitebooks{Geddes1992algorithms}
     \nocitebooks{Gathen1999modern}
@@ -581,7 +624,7 @@
 
 \begin{frame}[allowframebreaks]
     \frametitle{Podręczniki systemów matematycznych}
-    \framesubtitle{Literatura przedmiotu}
+    \framesubtitle{Przegląd literatury}
 
     \nocitemanuals{Souza2004book}
     \nocitemanuals{Daly2003horizon}
@@ -592,8 +635,8 @@
 \end{frame}
 
 \begin{frame}[allowframebreaks]
-    \frametitle{Bazy Gr\"{o}bnera, ideały, \ldots}
-    \framesubtitle{Literatura przedmiotu}
+    \frametitle{Bazy Gr\"{o}bnera, ideały}
+    \framesubtitle{Przegląd literatury}
 
     \nocitegroebner{Cox1997ideals}
     \nocitegroebner{Ajwa95groebner}
@@ -610,7 +653,7 @@
 
 \begin{frame}[allowframebreaks]
     \frametitle{Faktoryzacja wielomianów}
-    \framesubtitle{Literatura przedmiotu}
+    \framesubtitle{Przegląd literatury}
 
     \nocitefactor{Kaltofen1983factor}
     \nocitefactor{Lenstra1982factor}
@@ -634,8 +677,8 @@
 \end{frame}
 
 \begin{frame}[allowframebreaks]
-    \frametitle{Największy wspólny dzielnik wielomianów}
-    \framesubtitle{Literatura przedmiotu}
+    \frametitle{GCD wielomianów}
+    \framesubtitle{Przegląd literatury}
 
     \nocitegcd{Brown1971gcd}
     \nocitegcd{Moses1973ezgcd}
@@ -657,7 +700,6 @@
         \includegraphics[scale=0.2]{images/sympy-logo.pdf}
     \end{center}
 \end{frame}
-
 
 \end{document}
 
