@@ -9,6 +9,7 @@
 @string{j:pure_and_applied_algebra     = {Journal of Pure and Applied Algebra}}
 @string{j:sigsam_bulletin              = {SIGSAM Bulletin}}
 @string{j:symb_comp                    = {Journal of Symbolic Computation}}
+@string{j:info_proc_letters            = {Information Processing Letters}}
 
 @string{pub:academic             = {Academic Press}}
 @string{pub:acm                  = {ACM Press}}
@@ -652,7 +653,7 @@
 
 @inproceedings{Monagan1993inplace,
     author        = {Michael B. Monagan},
-    title         = {{I}n--place {A}rithmetic for {P}olinominals over {Z}_n},
+    title         = {{I}n--place {A}rithmetic for {P}olinominals over ${Z}_n$},
     booktitle     = {DISCO '92: Proceedings of the International Symposium on Design and Implementation of Symbolic Computation Systems},
     year          = {1993},
     pages         = {22--34},
@@ -776,7 +777,7 @@
 
 @manual{Aldor2000guide,
     organization  = {Aldor.org},
-    title         = {{A}ldor {U}ser {G}uide},
+    title         = {\texttt{{A}ldor} {U}ser {G}uide},
     year          = {2000},
     url           = {www.aldor.org/aldorug.pdf},
     keywords      = {},
@@ -1608,6 +1609,7 @@
     author        = {Richard J. Fateman},
     title         = {{R}ationally {S}implifying {N}on--{R}ational {E}xpressions},
     journal       = j:sigsam_bulletin,
+    volume        = {1},
     number        = {23},
     pages         = {8--9},
     year          = {1972},
@@ -2061,7 +2063,7 @@
 
 @article{Brent1975series,
     author        = {R. P. Brent and H. T. Kung},
-    title         = {{$O((n log n)^{3/2})$} {A}lgorithms for {C}omposition and {R}eversion of {P}ower {S}eries},
+    title         = {{$O((n \cdot \log n)^{3/2})$} {A}lgorithms for {C}omposition and {R}eversion of {P}ower {S}eries},
     journal       = {Analytic Computational Complexity},
     pages         = {217--225},
     year          = {1975},
@@ -2484,5 +2486,72 @@
     issn          = {0747-7171},
     doi           = {http://dx.doi.org/10.1006/jsco.1997.0158},
     keywords      = {},
+}
+
+%%% acm/p5-barnett.pdf
+
+@article{Barnett2002sciences,
+    author        = {Michael P. Barnett},
+    title         = {{C}omputer algebra in life sciences},
+    journal       = j:sigsam_bulletin,
+    volume        = {36},
+    number        = {4},
+    year          = {2002},
+    publisher     = pub:acm,
+    address       = adr:new_york,
+    keywords      = {computer algebra, applications, science},
+}
+
+%%% acm/p248-yun.pdf
+
+@inproceedings{Yun1976padic,
+    author        = {David Y. Y. Yun},
+    title         = {{A}lgebraic {A}gorithms using p--adic {C}onstructions},
+    booktitle     = pro:symsac:76,
+    pages         = {},
+    year          = {1976},
+    publisher     = pub:acm,
+    address       = adr:new_york,
+    doi           = {},
+    location      = adr:yorktown,
+    keywords      = {modular, p-adic, zassenhaus construction, gcd, factoring},
+}
+
+%%% acm/p189-lenstra.pdf
+
+% TODO
+
+%%% zero-testing-of-algebraic-functions.pdf
+
+@article{Zippel1996zero,
+    author        = {Richard Zippel},
+    title         = {{Z}ero testing of algebraic functions},
+    journal       = j:info_proc_letters,
+    volume        = {61},
+    number        = {},
+    pages         = {63-67},
+    year          = {1996},
+    publisher     = pub:elsevier,
+    address       = adr:oxford,
+    keywords      = {algebraic functions, zero equivalence, polynomials},
+}
+
+%%% introduction-to-groebner-bases.pdf
+
+@misc{Buchberger2007talk,
+    author        = {Bruno Buchberger},
+    title         = {{I}ntroduction to {G}r\"{o}bner {B}ases},
+    year          = {2007},
+    publisher     = {Emerging Topics in Cryptographic Design and Cryptanalysis},
+    address       = {Samos, Greece},
+    keywords      = {groebner bases, introduction, talk, applications, history},
+}
+
+%%% making-computer-algebra-more-symbolic.pdf
+
+@misc{Watt2006symbolic,
+    author        = {Stephen M. Watt},
+    title         = {{M}aking {C}omputer {A}lgebra {M}ore {S}ymbolic},
+    year          = {2006},
 }
 
