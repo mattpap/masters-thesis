@@ -7,7 +7,9 @@ SymPy: Master's Thesis
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 3
+
+    src/groebner.rst
 
 Indices and tables
 ==================
