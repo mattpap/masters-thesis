@@ -1,6 +1,6 @@
 .. _thesis-groebner:
 
-.. |groebner| replace:: Gröbner
+.. include:: ../globals.def
 
 =================================================
 Introduction to |groebner| bases and applications
