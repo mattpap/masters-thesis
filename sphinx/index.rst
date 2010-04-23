@@ -9,7 +9,10 @@ Contents:
 .. toctree::
     :maxdepth: 3
 
+    src/stateofart.rst
+    src/algorithms.rst
     src/groebner.rst
+    src/gcd.rst
 
 Indices and tables
 ==================
