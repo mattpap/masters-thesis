@@ -18,3 +18,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+.. [Cox1997ideals]
+
