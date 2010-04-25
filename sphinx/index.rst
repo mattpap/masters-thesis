@@ -13,6 +13,7 @@ Contents:
     src/algorithms.rst
     src/groebner.rst
     src/gcd.rst
+    src/glossary.rst
 
 Indices and tables
 ==================
