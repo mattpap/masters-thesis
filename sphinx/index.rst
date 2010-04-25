@@ -19,8 +19,6 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 .. [Cox1997ideals]
 
