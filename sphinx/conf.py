@@ -28,6 +28,7 @@ extensions = [
     'sphinx.ext.pngmath',
     'sphinx.ext.jsmath',
     'sphinx.ext.ifconfig',
+    'matplotlib.sphinxext.plot_directive',
     'math_dollar',
 ]
 
