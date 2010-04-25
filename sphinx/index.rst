@@ -14,11 +14,10 @@ Contents:
     src/groebner.rst
     src/gcd.rst
     src/glossary.rst
+    src/literature.rst
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-
-.. [Cox1997ideals]
 
