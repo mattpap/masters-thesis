@@ -1,6 +1,6 @@
-.. _thesis-algorithms:
-
 .. include:: ../globals.def
+
+.. _thesis-algorithms:
 
 ======================================================
 Introduction to polynomial related algorithms in SymPy
