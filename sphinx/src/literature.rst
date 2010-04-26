@@ -171,4 +171,5 @@ Literature
 .. [Buchberger2007talk]
 .. [Watt2006symbolic]
 .. [Sturmfels2008invariant]
+.. [Kubale2004color]
 
