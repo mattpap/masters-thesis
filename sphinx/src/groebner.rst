@@ -6,7 +6,8 @@
 Introduction to |groebner| bases and their applications
 =======================================================
 
-
+Construction of |groebner| bases
+================================
 
 Specialization of |groebner| bases
 ==================================
@@ -16,7 +17,7 @@ The |groebner| bases algorithm specializes to:
 1. *Gauss's algorithm* for linear polynomials
 2. *Euclid's algorithm* for univariate polynomials
 
-In the first case lets consider the following equation system:
+In the first case lets consider the following system of equations:
 
 .. math::
 
@@ -31,8 +32,8 @@ which can be written in Python as::
 
     >>> F = [x + 5*y - 2, -3*x + 6*y - 15]
 
-It's a simple system, so it can be solved by hand. We can, however, uses |groebner| bases
-algorithm to solve this system algorithmically::
+It's a simple system, so it can be solved by hand. We can, however, use |groebner| bases
+machinery to solve this system algorithmically::
 
     >>> groebner(F, x, y)
     [x + 3, y - 1]
@@ -163,16 +164,276 @@ Complexity of computing |groebner| bases
 ========================================
 
 ::
+
     GroebnerBasis[{x y^3 - 2 y z - z^2 + 13, y^2 - x^2 z + x z^2 + 3, z^2 x - y^2 x^2 + x y + y^3 + 12}]
 
 ::
+
     groebner([x*y**3 - 2*y*z - z**2 + 13, y**2 - x**2*z + x*z**2 + 3, z**2*x - y**2*x**2 + x*y + y**3 + 12], x, y, z)
 
-A few applications of |groebner| bases
-======================================
+Applications of |groebner| bases
+================================
 
-Solving systems of equations
-----------------------------
+|groebner| bases are
+
+* Algebraic Geometry
+* Coding Theory
+* Cryptography
+* Invariant Theory
+* Integer Optimization
+* Statistics
+* Symbolic Integration
+* Symbolic Summation
+* Differential Equations
+
+ * Boundary Value Problems
+
+* Systems Theory
+
+
+Solving systems of polynomial equations
+---------------------------------------
+
+In the previous section we showed that |groebner| bases can be used for solving systems
+of linear equations. This is an interesting, although not very useful result because we
+have specialized algorithms for the task. However, |groebner| bases can used to tackle
+much more complicated problem: finding solutions of systems of *polynomial* equations.
+
+To accomplish this we will utilize a very fruitful property of |groebner| bases, so called,
+elimination property. Following [Buchberger2001introduction]_ and [Adams1994intro]_, suppose
+$F$ is a set of polynomial equations, such that every element of $F$ belongs to $\mathbb{K}[x_1,
+\ldots, x_n]$, where $\mathbb{K}$ is a field of positive characteristic, and $G$ is its |groebner|
+computed with respect to any *elimination* ordering of terms (e.g. lexicographic ordering). We
+assume that $x_1 \succ \ldots \succ x_n$. Then $F$ and $G$ generate the same ideal, so they have
+the same set of solutions. The elimination property of |groebner| bases guarantees that if $G$ has
+only a finite number of solutions then $G$ has exactly one polynomial in $x_n$, i.e. a univariate
+polynomial which can solved. As :func:`groebner` returns a sorted basis, the univariate polynomial
+will be the last element the basis.
+
+In principle the algorithm works as follows: given a set of polynomial equations $F$ we compute
+its |groebner| basis $G$ with respect to lexicographic term order. If $G$ has only one univariate
+polynomial then we solve it, e.g. by radicals (if possible), and substitute the solutions back to
+$G$, skipping the univariate polynomial we already solved, obtaining a set of smaller polynomial
+systems. If the system doesn't have finite number of solutions we output ``failed`` or fallback
+to other methods. We continue this method recursively until we find all solutions for all variables
+of the initial system.
+
+To illustrate this process, lets consider a simple bivariate example::
+
+    >>> F = [x*y - 2*y, x**2 - 2*y**2]
+
+We compute a lexicographic |groebner| basis of $F$ assuming that $y \succ x$::
+
+    >>> G = groebner(F, wrt=y)
+
+    >>> G
+    ⎡   2                           ⎤
+    ⎢  x     2              3      2⎥
+    ⎢- ── + y , x⋅y - 2⋅y, x  - 2⋅x ⎥
+    ⎣  2                            ⎦
+
+As the last element of the basis we obtained a univariate polynomial in $x$, confirming what
+the theory predicted. We can easily solve this polynomial using :func:`roots` function::
+
+    >>> roots(_[-1])
+    {0: 2, 2: 1}
+
+We obtained three solutions: $x_1 = 0$, $x_2 = 0$ and $x_3 = 2$. We can substitute them back
+into the computed |groebner| basis $G$. We are guaranteed that the resulting polynomials in
+each new system will have a nontrivial greatest common divisor. Lets take $x_1$ (the same
+will follow for $x_2$)::
+
+    >>> [ g.subs(x, 0) for g in G ]
+    ⎡ 2         ⎤
+    ⎣y , -2⋅y, 0⎦
+
+    >>> groebner(_, y)
+    [y]
+
+So we obtained a solution of $F$, mainly $(x, y) = (0, 0)$ of multiplicity $2$, because
+$x_1 = x_2$. The necessity to specify $y$ in the above computation comes from the fact
+that currently expression parsing is done independently for each polynomial in the input
+system, so without $y$ the function would complain that it doesn't know how to construct
+a polynomial from $0$ (see <TODO> section for a detailed discussion). As we know from the
+previous section, the |groebner| basis algorithm is equivalent to GCD computation in the
+univariate case, so we could have computed GCD of ``[y**2, -2*y, 0]`` as well to obtain
+the same result.
+
+Similarly we can can substitute $x_3$ for $x$ in $G$ obtaining::
+
+    >>> [ g.subs(x, 2) for g in G ]
+    ⎡ 2          ⎤
+    ⎣y  - 2, 0, 0⎦
+
+We got a single univariate polynomial which we can solve by radicals::
+
+    >>> roots(_[0])
+    ⎧  ___        ___   ⎫
+    ⎨╲╱ 2 : 1, -╲╱ 2 : 1⎬
+    ⎩                   ⎭
+
+So the remaining two solutions are $(2, \sqrt{2})$ and $(2, -\sqrt{2})$. This way we found
+all solutions of $F$. This was simple example. In more complicated ones we would need to
+compute |groebner| bases recursively after each substitution.
+
+An algorithm for solving systems of polynomial equations was implemented in polynomials
+manipulation module in SymPy, so we can compute solutions of $F$ issuing a single command::
+
+    >>> solve(F)
+    ⎡        ⎛      ___⎞  ⎛     ___⎞⎤
+    ⎣(0, 0), ⎝2, -╲╱ 2 ⎠, ⎝2, ╲╱ 2 ⎠⎦
+
+Note that only unique solutions are returned by :func:`solve`. One should also remember that
+only systems with finite number of solutions can be handled using |groebner| bases approach.
+Suppose we form a new system of polynomial equations $G$ by multiplying $F$ element--wise by
+a third variable, say $t$, i.e. ``G = [ t*f for f in F ]``. Then $G$ has infinite number of
+solutions, because both polynomials in the system are homogeneous and if $t = 0$ then we can
+choose arbitrary values for $x$ and $y$. If $G$ was given as input to :func:`solve`, then it
+would result in :exc:`NotImplementedError` exception. Support for solving of systems of
+polynomial equations with infinite number of solutions is a subject for implementation
+in future versions of SymPy.
+
+Lets back for a moment to the point where we were computing the |groebner| basis of $F$. We
+did the computation with respect to $y$, i.e. assuming $y \succ x$. Now we will compute the
+|groebner| basis of $F$ the other way::
+
+    >>> groebner(F, wrt=x)
+    ⎡ 2      2              3      ⎤
+    ⎣x  - 2⋅y , x⋅y - 2⋅y, y  - 2⋅y⎦
+
+As expected, we got a univariate polynomial in $y$, however, a different one::
+
+    >>> roots(_[-1])
+    ⎧        ___        ___   ⎫
+    ⎨0: 1, ╲╱ 2 : 1, -╲╱ 2 : 1⎬
+    ⎩                         ⎭
+
+Previously we got three rational solutions, so after substitution we got polynomials with
+rational coefficients and, as a consequence, we could use more efficient algorithms. Now
+we run into a little trouble because we will have to carry those square roots all along
+our computations. We can't actually complain about this because this is the nature of the
+problem we are solving and we were just lucky in the previous case, where algebraic numbers
+were introduced at the very end.
+
+There is a method [Strzebonski1997computing]_ to avoid computing with algebraic numbers, which
+requires enlarging of the input polynomial system to :func:`groebner`. Instead of substituting
+an algebraic number for a variable, we can instead substitute a *dummy* variable for it and add
+the minimal polynomial of the algebraic number to the system of equations. This way we have
+simpler coefficient domain but a larger system we pass to the |groebner| basis algorithm.
+Currently this approach isn't implemented is SymPy.
+
+Algebraic relations in invariant theory
+---------------------------------------
+
+Many problems in applied algebra have symmetries or are invariant under certain natural
+transformations. In particular, all geometric magnitudes and properties are invariant with
+respect to the underlying transformation group, e.g. properties in Euclidean geometry are
+invariant under the Euclidean group of rotations (see [Sturmfels2008invariant]_). Analysis
+of this structure can give a deep insight into the studied problem.
+
+Following [Buchberger2001introduction]_ and [Sturmfels2008invariant]_ lets consider the
+group $\mathbb{Z}_4$ of rotational symmetries in the counter clockwise direction of the
+square. The invariant ring of this group is equal to:
+
+.. math::
+
+    \mathcal{I} = \left\{ f \in \mathbb{C}[x_1, x_2] : f(x_1, x_2) = f(-x_2, x_1) \right\}
+
+This ring has three fundamental invariants:
+
+.. math::
+
+    \begin{array}{ccc}
+    I_1 = x_1^2 + x_2^2, & I_2 = x_1^2 x_2^2, & I_3 = x_1^3 x_2 - x_1 x_2^3
+    \end{array}
+
+Polynomials $I_1$, $I_2$ and $I_3$ form a basis of $I$ and all other polynomials in $I$
+can be expressed in terms of them. The first question we may ask in algorithmic invariant
+theory is what algebraic dependence relation do $I_1$, $I_2$ and $I_3$ satisfy. In other
+words, we would like to find a polynomial $f(i_1, i_2, i_3)$ such that $f(I_1, I_2, I_3)
+\equiv 0$. For this purpose we can use |groebner| bases algorithm utilizing, so called,
+*slack variable* approach. We introduce three slack variables $i_1$, $i_2$ and $i_3$,
+construct a system of polynomial equations $F = \{I_1 - i_1, I_2 - i_2, I_3 - i_3\}$
+and compute |groebner| basis of $F$ with respect to lexicographic term order eliminating
+$x_1$ and $x_2$. Lets see how this can be accomplished in SymPy using polynomials
+manipulation module. First we introduce all the necessary variables and the three
+fundamental invariants of $\mathcal{I}$::
+
+    >>> var('x1,x2,i1,i2,i3')
+    (x₁, x₂, i₁, i₂, i₃)
+
+    >>> I1 = x1**2 + x2**2
+    >>> I2 = x1**2*x2**2
+    >>> I3 = x1**3*x2 - x1*x2**3
+
+Next we construct $F$, i.e. define ``F = [I1 - i1, I2 - i2, I3 - i3]``, and finally we
+compute lexicographic |groebner| basis of $F$ eliminating $x_1$ and $x_2$::
+
+    >>> G = groebner(F, wrt='x1,x2')
+
+As |groebner| bases computed by :func:`groebner` function are unique and sorted by
+decreasing leading monomials, we obtain the desired algebraic dependence relation
+between $I_1$, $I_2$ and $I_3$ as the last element of ``G``::
+
+    >>> G[-1]
+      2          2     2
+    i₁ ⋅i₂ - 4⋅i₂  - i₃
+
+We can verify that this relation is true by substitution, i.e. if we substitute the
+fundamental invariants for the slack variables, the above polynomial should vanish::
+
+    >>> _.subs({i1: I1, i2: I2, i3: I3}).expand()
+    0
+
+As the result ``G[-1]`` is correct algebraic dependence relation between the fundamental
+invariants of $\mathcal{I}$. In this example we learnt another syntax for eliminating
+variables using ``wrt`` keyword argument. In previous sections we eliminated just a single
+variable with its help, however, in general we can pass arbitrary number of variables via
+``wrt``, either by setting it to a string consisting of a sequence of comma separated
+variables separated or as on ordered container of variables (e.g. ``list`` or ``tuple``).
+
+When introducing polynomials $I_1$, $I_2$ and $I_3$ it was stated that those polynomials
+form a basis for all other polynomials in the ring of rotations of the square. So another
+question we may ask is if some polynomial, say $g$ can be expressed in terms of those three
+polynomials. Lets consider a polynomial $g = x_1^7 x_2 - x_1 x_2^7$. We want to find a
+polynomial $f(i_1, i_2, i_3)$ such that $f(I_1, I_2, I_3) = g$. For this purpose we will
+use |groebner| bases approach once again, by reusing previously computed basis $G$. What
+remains to do is to reduce the polynomial $g$ with respect to the set $G$ utilizing, as
+previously, lexicographic term order eliminating $x_1$ and $x_2$. The reduction of polynomial
+by a set of polynomials is accomplished by taking the remainder from the result given by the
+generalized multivariate polynomial division algorithm (also known as normal form algorithm)
+which is implemented in :func:`reduced` function::
+
+    >>> reduced(x1**7*x2 - x1*x2**7, G, wrt=[x1, x2])[1]
+      2
+    i₁ ⋅i₃ - i₂⋅i₃
+
+We obtained a polynomial with $x_1$ and $x_2$ eliminated which means that $g$ can be written
+in terms of the generators of $\mathcal{I}$ and the above polynomial is the representation of
+$g$. As previously, the correctness of this result can be verified by substitution::
+
+    >>> _.subs({i1: f1, i2: f2, i3: f3}).expand()
+      7           7
+    x₁ ⋅x₂ - x₁⋅x₂
+
+If we take another polynomial, e.g. $g' = x_1^6 x_2 - x_1 x_2^6$, then::
+
+    >>> _, f = reduced(x1**6*x2 - x1*x2**6, G, wrt=[x1, x2])
+
+    >>> f.has(x1, x2)
+    True
+
+which means that :func:`reduced` wasn't able to eliminate $x_1$ and/or $x_2$ from $g'$ and
+as a consequence $g'$ has no representation in terms of the generators of $\mathcal{I}$,
+i.e. $g'$ doesn't belong to $\mathcal{I}$ as $g'(x_1, x_2) \not= g'(-x_2, x_1)$.
+
+Note that in this example we used the list variant of ``wrt`` keyword argument. Likewise in the
+case of computing a |groebner| basis, :func:`reduced` assumes by default lexicographic order of
+terms, so there was no need to specify this explicitly. In following section we will see that
+other orderings, e.g. degree orderings, are also very useful.
+
+Integer programming
+-------------------
 
 Vertex-coloring of graphs
 -------------------------
