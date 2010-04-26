@@ -11,6 +11,9 @@ Glossary
     polynomial
         http://eom.springer.de/P/p073690.htm
 
+    algebraic variety
+        Is the set solutions to a system of polynomial equations.
+
     symmetric polynomial
         A polynomial $f \in \mathbb{R}[x_1, \ldots, x_n]$, where $\mathbb{R}$ is a ring,
         is called symmetric if $\sigma(f) = f$ holds for every permutation $\sigma$ of
