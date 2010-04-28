@@ -503,10 +503,13 @@ kind then the graph is colorable with $k$ colors.
 
 Lets now focus on a particular and well known instance of $k$--coloring where $k = 3$. In this
 case $F_3 = \{ x_i^3 - 1 : i = 1, \ldots, n \}$. Using SymPy's built--in multivariate polynomial
-factorization function::
+factorization routine::
+
+    >>> var('x_i, x_j')
+    (x_i, x_j)
 
     >>> factor(x_i**3 - x_j**3)
-                ⎛ 2                  2⎞
+                ⎛   2                2⎞
     (x_i - x_j)⋅⎝x_i  + x_i⋅x_j + x_j ⎠
 
 we derive the set of equations $F_{\mathcal{G}}$ describing an admissible $3$--coloring:
@@ -516,9 +519,25 @@ we derive the set of equations $F_{\mathcal{G}}$ describing an admissible $3$--c
     F_{\mathcal{G}} = \{ x_i^2 + x y + x_j^2 : (i, j) \in E \}
 
 At this point it is sufficient to compute the |groebner| basis $G$ of $F = F_3 \cup F_{\mathcal{G}}$
-to find out if a graph $\mathcal{G}$ is $3$--colorable, or not. Lets consider a graph ...
+to find out if a graph $\mathcal{G}$ is $3$--colorable, or not. Lets consider a graph ... :ref:`fig-graph-nocolor`
 
+$\{ 1, \ldots, 12 \}$
 
+.. tikz:: img/tikz/graph-nocolor.tex
+
+.. _fig-graph-nocolor:
+.. figure:: ../img/tikz/graph-nocolor.*
+    :align: center
+
+    The graph $\mathcal{G}(V, E)$.
+
+.. tikz:: img/tikz/graph-color.tex
+
+.. _fig-graph-color:
+.. figure:: ../img/tikz/graph-color.*
+    :align: center
+
+    The graph $\mathcal{G'}(V, E)$.
 
 .. [math-impl] http://reference.wolfram.com/mathematica/note/SomeNotesOnInternalImplementation.html
 
