@@ -512,16 +512,18 @@ factorization routine::
                 ⎛   2                2⎞
     (x_i - x_j)⋅⎝x_i  + x_i⋅x_j + x_j ⎠
 
-we derive the set of equations $F_{\mathcal{G}}$ describing an admissible $3$--coloring:
+we derive the set of equations $F_{\mathcal{G}}$ describing an admissible $3$--coloring of a graph:
 
 .. math::
 
     F_{\mathcal{G}} = \{ x_i^2 + x y + x_j^2 : (i, j) \in E \}
 
 At this point it is sufficient to compute the |groebner| basis $G$ of $F = F_3 \cup F_{\mathcal{G}}$
-to find out if a graph $\mathcal{G}$ is $3$--colorable, or not. Lets consider a graph ... :ref:`fig-graph-nocolor`
-
-$\{ 1, \ldots, 12 \}$
+to find out if a graph $\mathcal{G}$ is $3$--colorable, or not. After this theoretical introduction
+lets consider a graph $\mathcal{G}(V, E)$ of figure :ref:`fig-graph-nocolor` with 12 vertices and
+23 edges, to see that the described scheme works in practice. We ask if the graph is $3$--colorable.
+In this example we will first show how to answer this question SymPy and then we will compare this
+with three other symbolic manipulation systems on the market: Maxima, Axiom and Mathematica.
 
 .. tikz:: img/tikz/graph-nocolor.tex
 
@@ -531,13 +533,77 @@ $\{ 1, \ldots, 12 \}$
 
     The graph $\mathcal{G}(V, E)$.
 
+The question, if $\mathcal{G}$ is $3$--colorable or not, is easy to answer by trial and error. We
+are, however, an interested in algorithmic solution to the problem, so lets first encode $V$ and
+$E$ of the graph $\mathcal{G}$ using Python's built--in data structures::
+
+    >>> V = range(1, 12+1)
+    >>> E = [(1,2),(2,3),(1,4),(1,6),(1,12),(2,5),(2,7),(3,8),
+    ... (3,10),(4,11),(4,9),(5,6),(6,7),(7,8),(8,9),(9,10),
+    ... (10,11),(11,12),(5,12),(5,9),(6,10),(7,11),(8,12)]
+
+We encoded the set of vertices as a list of consecutive integers and the set of edges as a list
+of tuples of adjacent vertex indices. Next we will transform the graph into an algebraic form by
+mapping vertices to variables and tuples of indices into tuples of variables::
+
+    >>> Vx = [ Symbol('x' + str(i)) for i in V ]
+    >>> Ex = [ (Vx[i-1], Vx[j-1]) for i, j in E ]
+
+As the last step of this construction we write equations for $F_3$ and $F_{\mathcal{G}}$::
+
+    >>> F3 = [ x**3 - 1 for x in Vx ]
+    >>> Fg = [ x**2 + x*y + y**2 for x, y in Ex ]
+
+Everything is set following the theoretical introduction, so now we can compute the |groebner|
+basis of $F_3 \cup F_{\mathcal{G}}$ with respect to *lexicographic* ordering of terms::
+
+    >>> G = groebner(F3 + Fg, Vx)
+
+We know that if the constructed system of polynomial equations has a solution then $G$ should be
+non--trivial, i.e. $G \not= \emptyset$, which can be easily verified in SymPy::
+
+    >>> G != [1]
+    True
+
+The answer is that the graph $\mathcal{G}$ is colorable with $3$ colors. A sample coloring is shown
+in figure :ref:`fig-graph-color`. Suppose we add an edge between vertices $i = 3$ and $j = 4$. Is
+the new graph $3$--colorable? To check this it is sufficient to construct $F_{\mathcal{G'}}$ by
+extending $F_{\mathcal{G}}$ with $x_3^2 + x_3 x_4 + x_4^2$ equation and recompute the |groebner|
+basis::
+
+    >>> x3, x4 = Vx[2], Vx[3]
+
+    >>> G = groebner(F3 + Fg + [x3**2 + x3*x4 + x4**2], Vx)
+
+    >>> G != [1]
+    False
+
+We got a trivial |groebner| basis as the result, so the graph $\mathcal{G'}$ isn't $3$--colorable. We
+could continue this discussion asking if $\mathcal{G'}$ is $4$--colorable or if the number of colors
+required to color the original graph could be lowered to $2$ colors.
+
 .. tikz:: img/tikz/graph-color.tex
 
 .. _fig-graph-color:
 .. figure:: ../img/tikz/graph-color.*
     :align: center
 
-    The graph $\mathcal{G'}(V, E)$.
+    A sample $3$--coloring of the graph $\mathcal{G}(V, E)$.
 
-.. [math-impl] http://reference.wolfram.com/mathematica/note/SomeNotesOnInternalImplementation.html
+Before we compare SymPy's syntax for computing |groebner| bases with other systems, let us clarify an
+issue arousing around list indexing (e.g. why we write ``x3 = Vx[2]``). SymPy is a library built on top
+of Python, so it utilizes Python's built--in data structures and their indexing schemes. Python, as a
+general purpose programming language, uses well established zero--based indexing scheme, contrary to the
+natural way of *indexing* things, i.e. saying 1st, 2nd, 3rd etc. (to which we are accustomed in real life
+and mathematics). The zero--based indexing scheme dates back to the time of first programming languages,
+which were hardware oriented (e.g. assemblers) and an index was understood as an offset from a particular
+location in memory (the start of a container) to the requested item (for a more detailed discussion about
+this issue see [Dijkstra1982zero]_). General purpose programming languages, even those interpreted like
+Python, coherently follow this scheme. For SymPy, this is a cost of building the system on top of a general
+purpose language. As we will see in the following examples, other symbolic manipulation systems, i.e. those
+which invent their own programming language, use *natural indexing* scheme. Currently a workaround to have
+one--based indexing in SymPy, is to append a dummy element in front of a list, e.g. to index ``Vx`` this
+way we could issue ``Vx = [None] + Vx`` and then ``x3 = Vx[3]``.
+
+
 

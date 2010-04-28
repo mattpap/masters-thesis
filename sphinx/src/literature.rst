@@ -172,4 +172,6 @@ Literature
 .. [Watt2006symbolic]
 .. [Sturmfels2008invariant]
 .. [Kubale2004color]
+.. [Dijkstra1982zero] http://userweb.cs.utexas.edu/users/EWD/transcriptions/EWD08xx/EWD831.html
+.. [Mathematica2009internal] http://reference.wolfram.com/mathematica/note/SomeNotesOnInternalImplementation.html
 
