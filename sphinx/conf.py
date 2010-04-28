@@ -30,6 +30,7 @@ extensions = [
     'sphinx.ext.ifconfig',
     'matplotlib.sphinxext.plot_directive',
     'math_dollar',
+    'tikz_directive',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

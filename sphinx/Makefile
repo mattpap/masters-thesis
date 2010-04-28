@@ -31,6 +31,7 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
+	-rm -f  img/tikz/*.{pdf,png} img/tikz/.*.tex
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
