@@ -605,5 +605,71 @@ which invent their own programming language, use *natural indexing* scheme. Curr
 one--based indexing in SymPy, is to append a dummy element in front of a list, e.g. to index ``Vx`` this
 way we could issue ``Vx = [None] + Vx`` and then ``x3 = Vx[3]``.
 
+So far we showed how to solve classical vertex--coloring problem with SymPy. Lets now compare SymPy's syntax
+and semantics of |groebner| bases functionality with three commonly used mathematical software: Maxima, Axiom
+and Mathematica.
 
+::
+
+    (i1) load(grobner);
+
+    (i2) E: [[1,2],[2,3],[1,4],[1,6],[1,12],[2,5],[2,7],[3,8],
+    [3,10],[4,11],[4,9],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],
+    [11,12],[5,12],[5,9],[6,10],[7,11],[8,12]];
+
+    (i3) Vx: makelist(concat("x", i), i, 1, 12);
+
+    (i4) F3: makelist(Vx[i]^3 - 1, i, 1, 12);
+    (i5) Fg: [];
+
+    (i6) for e in E do
+            Fg: endcons(Vx[e[1]]^2 + Vx[e[1]]*Vx[e[2]] + Vx[e[2]]^2, Fg);
+
+    (i7) G: poly_reduced_grobner(append(F3, Fg), Vx);
+
+    (i8) is(notequal(G, [1]));
+    (o8) true
+
+::
+
+    (1) -> E := [[1,2],[2,3],[1,4],[1,6],[1,12],[2,5],[2,7],
+    [3,8],[3,10],[4,11],[4,9],[5,6],[6,7],[7,8],[8,9],[9,10],
+    [10,11],[11,12],[5,12],[5,9],[6,10],[7,11],[8,12]];
+
+    (2) -> Vx := [ concat("x", i::String)::Symbol for i in 1..12 ];
+    (3) -> Ex := [ [Vx.(e.1), Vx.(e.2)] for e in E ];
+
+    (4) -> F3 := [ x**3 - 1 for x in Vx ];
+    (5) -> Fg := [ e.1**2 + e.1*e.2 + e.2**2 for e in Ex];
+
+    (6) -> G := groebner([ f::DMP(Vx, INT) for f in concat(F3, Fg) ]);
+
+    (7) -> (G ~= [1]) @ Boolean
+       (7) true
+
+::
+
+    In[1]:= Unprotect[E];
+    In[2]:= E := {{1,2},{2,3},{1,4},{1,6},{1,12},{2,5},{2,7},
+    {3,8},{3,10},{4,11},{4,9},{5,6},{6,7},{7,8},{8,9},{9,10},
+    {10,11},{11,12},{5,12},{5,9},{6,10},{7,11},{8,12}}
+
+    In[3]:= Vx := Table[Symbol["x" <> ToString[i]], {i,1,12}]
+    In[4]:= h[{i_, j_}] := Vx[[i]]^2 + Vx[[i]] Vx[[j]] + Vx[[j]]^2
+
+    In[5]:= F3 := Map[(#^3-1)&, Vx]
+    In[6]:= Fg := Map[h, E]
+
+    In[7]:= G := GroebnerBasis[Join[F3, Fg], Vx]
+
+    In[8]:= G != {1}
+    Out[8]= True
+
+.. tabularcolumns:: |c|c|c|c|c|
+
++------------------+-------+--------+-------+-------------+
+|                  | SymPy | Maxima | Axiom | Mathematica |
++------------------+-------+--------+-------+-------------+
+| :math:`\tau` [s] | 15.4  | 17.6   | 3.6   | 0.34        |
++------------------+-------+--------+-------+-------------+
 
