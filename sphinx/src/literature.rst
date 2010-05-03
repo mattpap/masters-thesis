@@ -174,4 +174,14 @@ Literature
 .. [Kubale2004color]
 .. [Dijkstra1982zero] http://userweb.cs.utexas.edu/users/EWD/transcriptions/EWD08xx/EWD831.html
 .. [Mathematica2009internal] http://reference.wolfram.com/mathematica/note/SomeNotesOnInternalImplementation.html
+.. [Maxima2009groebner] http://maxima.sourceforge.net/docs/manual/en/maxima_54.html
+.. [PythonIssue1771] http://bugs.python.org/issue1771
+.. [SymPyGSoC2010] http://wiki.sympy.org/wiki/GSoC2010Ideas
+.. [Buchberder1965thesis]
+.. [Abramson2006translation]
+.. [Abramson2009history]
+.. [Traverso1991integer]
+.. [Winkler1990geometry]
+.. [Buchberger1998applications]
+.. [Sturmfels1996lectures]
 
