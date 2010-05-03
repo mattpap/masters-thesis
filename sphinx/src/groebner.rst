@@ -140,7 +140,7 @@ and $(f_2, f_3)$ (actually only two new pairs, but lets check all three for comp
 
 All reductions resulted in zero reminders, so the extended $F$ is a |groebner| basis. This simple
 observation leads to an algorithmic procedure for computing |groebner| bases, which we will fully
-describe in the part :ref:`gb-toy`.
+describe in :ref:`gb-toy`.
 
 
 
@@ -162,7 +162,7 @@ Buchberger criterion, then $G$ is a reduced |groebner| basis when the following 
 
 .. math::
 
-    \forall_{g \in G} \remainder(g, G - \{g\}) = g \vee g\;\mbox{is monic}
+    \forall_{g \in G} \remainder(g, G - \{g\}) = g \wedge g\;\mbox{is monic}
 
 Following this definition, given a |groebner| basis $G$, one can compute a reduced version of $G$
 simply by reducing each element $g \in G$ with respect to all other elements of the basis and, in
