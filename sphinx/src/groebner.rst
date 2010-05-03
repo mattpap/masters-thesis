@@ -52,14 +52,155 @@ analyzing the |groebner| basis of the constructed set of polynomial.
 Construction of |groebner| bases
 ================================
 
+Suppose we are given a finite set of polynomials $F$. The question arises: how to find another set
+of polynomials $G$, a |groebner| basis of $F$, such that $F$ and $G$ have the same sets of solutions?
+Moreover, is it possible to find $G$ in a systematic (algorithmic) way? If so, does the algorithm
+always terminate? These were tough questions as of the first half of the 20th century. However, in
+1965 Bruno Buchberger in his PhD thesis gave affirmative answer to all those questions by inventing
+an algorithm for constructing |groebner| bases.
+
 The notion of s--polynomials
 ----------------------------
+
+To introduce the algorithm for computing |groebner| bases, Buchberger first defined notion of, so
+called, s--polynomials. Given two multivariate polynomials $f$ and $g$, suppose $L$ is the least
+common multiple of the leading monomials of $f$ and $g$, i.e. $L = lcm(LM(f), LM(g))$, then:
+
+.. math::
+
+    s--polynomial(f, g) = \frac{L}{LT(f)} f - \frac{L}{LT(g)} g
+
+where $LT(\cdot)$ stands for the leading term and $LM(\cdot)$ stands for the leading monomial of a
+polynomial. The definition of s--polynomials can be directly transformed into Python::
+
+    def s_polynomial(f, g):
+        return expand((lcm(LM(f), LM(g))*(1/LT(f)*f - 1/LT(g)*g))
+
+(utilizing SymPy's built--in functions :func:`LT`, :func:`LM`, :func:`lcm` and :func:`expand`, as
+well as multivariate polynomial arithmetics).
+
+.. TODO: tell about orderings of monomials
+
+..    with PolyContext(x, y, z, order='lex'):
+..        h = s_polynomial(f, g)
+
+What is a |groebner| basis?
+---------------------------
+
+Having the definition of s--polynomials, the fundamental theorem of |groebner| bases (the
+Buchberger criteria) is as follows: a set of polynomials $G$ is a |groebner| basis if for
+all pairs $g_i$, $g_j$ of polynomials in $G$, the remainder with respect to $G$ of the
+s--polynomial of $g_i$ and $g_j$ is zero, i.e.:
+
+.. math::
+
+    \forall_{g_i, g_j \in G} remainder(s--polynomial(g_i, g_j), G) = 0
+
+(see [Adams1994intro]_ for details). The theorem is constructive, because the concept of
+s--polynomials is well defined and by the remainder procedure we can take *generalized
+division* algorithm (also known as *normal form* algorithm, see [Cox1997ideals]_). Given
+a set of polynomials $G$, one can check if $G$ is a |groebner| basis in a finite number
+of steps. In SymPy, the generalized division algorithm is implemented in :func:`reduced`
+function. As an example, lets consider the following set of polynomials::
+
+    >>> F = f1, f2 = [x*y - 2*y, x**2 - 2*y**2]
+
+There are only two polynomials in $F$ so will have to check just a single pair. Lets
+apply Buchberger criteria to $f1$ and $f2$::
+
+    >>> s_polynomial(f1, f2)
+    TODO
+
+    >>> reduced(_, F)[1]
+    TODO
+
+The resulting remainder is non--zero, so $F$ isn't a |groebner| basis. Lets see what will
+happen when we adjoin this remainder to $F$::
+
+    >>> f3 = _
+    >>> F.append(f3)
+
+Now we have three polynomials in $F$ and three pairs to check, i.e. $(f_1, f_2)$, $(f_1, f_3)$
+and $(f_2, f_3)$::
+
+    >>> s_polynomial(f1, f2)
+    TODO
+    >>> reduced(_, F)[1]
+    0
+
+    >>> s_polynomial(f1, f3)
+    TODO
+    >>> reduced(_, F)[1]
+    0
+
+    >>> s_polynomial(f2, f3)
+    TODO
+    >>> reduced(_, F)[1]
+    0
+
+This time both reductions resulted in zero reminders, so the extended $F$ is a |groebner| basis.
 
 Reduced |groebner| bases
 ------------------------
 
+.. TODO: write this
+
 Toy Buchberger algorithm
 ------------------------
+
+We are ready to describe the Buchberger algorithm. The algorithm proceeds as follows: take a
+set of polynomials $F$ and set initially $G := F$, where $G$ will be the desired |groebner|
+basis of $F$ at the and of this procedure. Next for apply the Buchberger criterion to see if
+$G$ is already a |groebner| basis. If this is the case, reduce each polynomial in $G$ with
+respect to other polynomials in $G$ and stop. Otherwise pick a pair of polynomials $f_1$ and
+$f_2$ from $G$, and compute their s--polynomial. If the s--polynomial is non--zero then add
+it to $G$. Iterate until $G$ is a |groebner| basis.
+
+This simple procedure can be easily coded in Python in just a couple of minutes using previously
+defined :func:`s_polynomial` and SymPy's built--in :func:`reduced` functions::
+
+    def buchberger(F, reduced=True):
+        """Toy implementation of Buchberger algorithm. """
+        G, pairs = list(F), set([])
+
+        for f1 in F:
+            for f2 in F:
+                pairs.add((f1, f2))
+
+        while pairs:
+            f1, f2 = pairs.popitem()
+
+            s = s_polynomial(f1, f2)
+            _, h = reduced(s, G)
+
+            if h != 0:
+                for g in G:
+                    pairs.add((g, h))
+
+                G.append(g)
+
+        if reduced:
+            for i, g in enumerate(G):
+                _, G[i] = reduced(g, G[:i] + G[i+1:])
+
+            G = map(monic, G)
+
+        return G
+
+.. TODO: analyze the algorithm (once again orderings)
+
+Termination of the algorithm
+----------------------------
+
+Although the Buchberger algorithm is very simple, its termination isn't trivial. At the startup
+of the procedure, described in the previous part, there is only a finite number of pairs of
+polynomials for which the corresponding s--polynomials have to be computed. Some of those pairs
+lead to non--zero reductions, hence $G$ is growing and the number of additional pairs, that have
+to be taken into consideration, also grows. Buchberger proved that this process ends in a finite
+number of steps. Thus we are guaranteed that for arbitrary set of polynomials we can compute a
+corresponding |groebner| basis in finite time. An interesting question is how much time is needed
+to compute such a basis? We will postpone answer to this question till the end of section, where
+we will discuss efficiency of SymPy's |groebner| bases implementation.
 
 Computing |groebner| bases with SymPy
 =====================================
@@ -78,8 +219,11 @@ a |groebner| basis. This way most divisions are just *useless* and an efficient 
 Buchberger algorithm must accommodate for this, avoiding as many of those useless divisions as possible.
 
 Several criteria were invented by the author of the |groebner| bases algorithm a few years after the
-algorithm was introduced. Later on, several more powerful criteria were developed, for example, so
-called *sugar flavour* (see [Giovini1991sugar]_ for details).
+algorithm was introduced. Later on, several more powerful elimination criteria were developed, for
+example, heuristic criteria for lexicographic ordering of monomials (see [Czapor1991heuristic]_)
+or, so called, *sugar flavour* (see [Giovini1991sugar]_ for details).
+
+.. _gb-order:
 
 Admissible orderings of monomials
 =================================
@@ -92,7 +236,7 @@ of the resulting basis. Moreover, for a particular system of polynomials, one or
 computations feasible, whereas another will make Buchberger algorithm executing for ages. In the
 following sections we will see on examples why the right choice of monomial order is so important.
 
-In SymPy there are currently three main (admissible) orderings of monomials implemented:
+There are currently three admissible orderings of monomials implemented in SymPy:
 
     **lex**
         pure lexicographic order
@@ -343,7 +487,7 @@ thought incomplete, of the major areas in which |groebner| bases were applied wi
 * Systems Theory
 
 In [Buchberger2001introduction]_ there is an even longer list of applications specific to systems
-theory. In the following subsections we will examine several practical applications of the |groebner|
+theory. In the following parts we will examine several practical applications of the |groebner|
 bases method and explain how to conduct all computations using SymPy's polynomials manipulation module.
 
 Solving systems of polynomial equations
@@ -617,8 +761,35 @@ $s_2$, and expand the expression::
      2    2
     x  + y
 
-Lets now consider a polynomial $g = x^2 - y^2$. We will compute symmetric reduction of $g$::
+Using the *slack variable* approach we can arrive with the same result using |groebner| bases. First
+we need to construct non--trivial bivariate elementary symmetric polynomials. For this task we will
+use :func:`symmetric_poly` function::
 
+    >>> S1 = symmetric_poly(1, x, y)
+    >>> S2 = symmetric_poly(2, x, y)
+
+    >>> S1, S2
+    (x + y, x⋅y)
+
+Next we introduce two auxiliary (slack) variables $s_1$ and $s_2$ and compute a |groebner| basis of
+$S_1 - s_1$ and $S_2 - s_2$ with respect to lexicographic ordering of monomials eliminating $x$ and $y$::
+
+    >>> var('s1, s2')
+    (s₁, s₂)
+
+    >>> G = groebner([S1 - s1, S2 - s2], wrt=[x, y])
+
+Finally we compute *symmetric reduction* of $x**2 + y**2$ by reducing this polynomial with respect to the
+|groebner| basis $G$ eliminating variables $x$ and $y$::
+
+    >>> reduced(x**2 + y**2, G, wrt=[x, y])[1]
+      2
+    s₁  - 2⋅s₂
+
+We obtained the same result as with :func:`symmetrize`. Note, however, that :func:`symmetrize` implements
+a specialized algorithm for computing symmetric reduction [PlanetMathSymmetric]_ and is much more efficient
+than the general |groebner| bases approach. Lets now consider a polynomial $g = x^2 - y^2$. We will compute
+symmetric reduction of $g$::
 
     >>> symmetrize(x**2 - y**2, formal=True)
     ⎛  2             2                      ⎞
@@ -632,6 +803,18 @@ result::
     >>> _[0].subs(_[2]).expand() + _[1]
      2    2
     x  - y
+
+Reusing the |groebner| basis $G$ lets compute symmetric reduction with :func:`reduced`::
+
+    >>> reduced(x**2 - y**2, G, wrt=[x, y])[1]
+      2
+    s₁  - 2⋅s₁⋅y
+
+In this case :func:`reduce` wasn't able to eliminate $y$ from its output, which tells us already
+known fact that $x^2 - y^2$ isn't a symmetric polynomial. We can see the different between the
+specialized symmetric reduction algorithm and the general algorithm, where the former one was
+able to split the input polynomial into symmetric and non--symmetric parts and compute symmetric
+reduction anyway.
 
 Integer optimization
 --------------------
@@ -871,10 +1054,17 @@ which invent their own programming language, use *natural indexing* scheme. Curr
 one--based indexing in SymPy, is to append a dummy element in front of a list, e.g. to index ``Vx`` this
 way we could issue ``Vx = [None] + Vx`` and then ``x3 = Vx[3]``.
 
-So far we showed how to solve classical vertex--coloring problem with SymPy. Lets now compare SymPy's syntax
-and semantics of |groebner| bases functionality with three commonly used mathematical software: Maxima, Axiom
-and Mathematica.
+So far we showed how to solve classical vertex--coloring problem with SymPy. Lets now compare SymPy's
+syntax and semantics of |groebner| bases functionality with three commonly used mathematical software:
+Maxima, Axiom and Mathematica.
 
+One feature that makes SymPy different from other mathematical systems is that SymPy utilizes a general
+purpose programming language, whereas Maxima, Axiom and Mathematica invent their own special languages
+for interaction with those systems. This will require us to make a few remarks on the syntactic level.
+
+.. TODO: finish this
+
+`Maxima <maxima.sourceforge.net>`_ uses a very ...
 ::
 
     (i1) load(grobner);
@@ -939,8 +1129,37 @@ and Mathematica.
 | Time [s] | 15.4  | 17.6   | 3.6   | 0.34        |
 +----------+-------+--------+-------+-------------+
 
+.. TODO: back to coloring, analyze structure of $G$
+
+Algebraic geometry
+------------------
+
+.. TODO: write this
+
+[Winkler1990geometry]_
+
 Other applications
 ------------------
+
+So far, several detailed examples of practical applications of the |groebner| bases method were
+presented, which explained most interesting features of |groebner| bases and their use patterns
+in SymPy. Following the list from the beginning of this section, there are, however, many more
+applications. We will give reference to several of them in this part.
+
+Besides the obvious application of solving systems of polynomial equations and the less obvious
+for computing LCMs and GCDs of multivariate polynomials, the |groebner| basis method is also used
+in SymPy for computing minimal polynomials of algebraic numbers, primitive elements of algebraic
+fields and isomorphisms between algebraic fields (for a detailed theoretical discussion see
+[Adams1994intro]_ and algorithms refer to [Cohen1993computational]_). For all those tasks there
+are much more efficient algorithms implemented in SymPy. However, |groebner| bases remain the
+fallback tool if any of the fast algorithms isn't suitable for a particular job. For example,
+minimal polynomials can be relatively easily computed using PSLQ algorithm (see :func:`pslq`
+function in mpmath library) but only in the case of real algebraic numbers. In the more general
+case of complex algebraic numbers the |groebner| bases method is the only choice.
+
+|groebner| bases can be also directly applicable in symbolic manipulation systems for computing
+factorizations of multivariate polynomials (see [Gianni1985groebner]_) or evaluating symbolic
+summations and integrals (see [Chyzak1998groebner]_).
 
 Complexity of computing |groebner| bases
 ========================================
@@ -988,16 +1207,18 @@ algorithms available in this field, are all applicable in SymPy. Ideas for impro
 module are listed, among other, as *Google Summer of Code* proposals at [SymPyGSoC2010]_.
 
 Currently the most promising approach for improving the Buchberger algorithm is SymPy, which is scheduled
-for implementation in near future, is algorithm F5 due to Jean Charles Faugère (see [Faugere2002f5]_). The
-algorithm has the same structure as Buchberger algorithm, however it utilizes a very powerful criteria for
-elimination of useless critical pairs, significantly reducing the number of required polynomial divisions.
-In practical cases there are *no* reductions to zero in F5 algorithm. Reductions to zero may happen in
-certain situations, however, their number is still less than in any other algorithm for computing |groebner|
-bases. Thus F5 is considered to be at least one order of magnitude faster than the fastest algorithm
-previously available.
+for implementation in near future, is algorithm F5 due to Jean Charles Faugère (see [Faugere2002f5]_ and
+[Stegers2006f5]_). The algorithm has the same structure as Buchberger algorithm, however it utilizes a very
+powerful criteria for elimination of useless critical pairs, significantly reducing the number of required
+polynomial divisions.  In practical cases there are *no* reductions to zero in F5 algorithm. Reductions to
+zero may happen in certain situations, however, their number is still less than in any other algorithm for
+computing |groebner| bases. Thus F5 is considered to be at least one order of magnitude faster than the
+fastest algorithm previously available.
 
 Notes on the internal implementation
 ====================================
+
+.. TODO: write this
 
 As SymPy is implemented in
 

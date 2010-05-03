@@ -11,8 +11,25 @@ Glossary
     polynomial
         http://eom.springer.de/P/p073690.htm
 
+    admissible ordering of monomials
+        An ordering, $>$, on $\mathbb{N}^n$ is called an admissible ordering of monomials
+        when it satisfies the following conditions:
+
+        #. $>$ is a total ordering on $\mathbb{N}^n$
+        #. $\alpha$, $\beta$, $\gamma$ are vectors in $\mathbb{N}^n$ and $\alpha > \beta$,
+           then $\alpha + \gamma > \beta + \gamma$
+        #. $\alpha >= 0$ for all $\alpha$ $\mathbb{N}^n$
+
     algebraic variety
-        Is the set solutions to a system of polynomial equations.
+        The set solutions to a system of polynomial equations.
+
+    characteristic zero
+        A property of algebraic structures. An algebraic structure is of characteristic
+        zero if it has infinite number of elements. Trivial examples are the ring of
+        integers or the field of rational numbers. Contrary, an algebraic structure
+        can be of positive characteristic, if it has finite number of elements. Then
+        the characteristic tells how many elements are in the structure. In SymPy we
+        can check if a domain has zero characteristic using :attr:`has_CharacteristicZero`.
 
     symmetric polynomial
         A polynomial $f \in \mathbb{R}[x_1, \ldots, x_n]$, where $\mathbb{R}$ is a ring,
