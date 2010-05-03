@@ -26,9 +26,9 @@ the principles of the |groebner| bases method (not including the proof of the ma
 is, on the other hand, very complicated) makes is possible to apply |groebner| bases in various
 areas of science and engineering, not only by mathematicians.
 
-To introduce the concept what we call a |groebner| bases, following [Buchberger2001introduction]_,
-lets consider a set $F$ of multivariate polynomial equations, i.e. $F = \{ f \in \mathbb{K}[x_1,
-\ldots, x_n] \}$, where $\mathbb{K}$ usually denotes a field of characteristic zero:
+To introduce the concept of |groebner| bases, following [Buchberger2001introduction]_, lets consider
+a set $F$ of multivariate polynomial equations, i.e. $F = \{ f \in \K\Xn \}$, where $\K$ usually
+denotes a field of characteristic zero:
 
 #. we transform the set of polynomials $F$ into another set $G$
 #. the obtained set $G$ is called a |groebner| basis of $F$
@@ -62,22 +62,22 @@ an algorithm for constructing |groebner| bases.
 The notion of s--polynomials
 ----------------------------
 
-To introduce the algorithm for computing |groebner| bases, Buchberger first defined notion of, so
-called, s--polynomials. Given two multivariate polynomials $f$ and $g$, suppose $L$ is the least
-common multiple of the leading monomials of $f$ and $g$, i.e. $L = lcm(LM(f), LM(g))$, then:
+To introduce the algorithm for computing |groebner| bases, Buchberger defined first the notion of,
+so called, s--polynomials. Given two multivariate polynomials $f$ and $g$, suppose that $L$ is the
+least common multiple of the leading monomials of $f$ and $g$, i.e. $L = \lcm(\LM(f), \LM(g))$, then:
 
 .. math::
 
-    s--polynomial(f, g) = \frac{L}{LT(f)} f - \frac{L}{LT(g)} g
+    \spoly(f, g) = \frac{L}{\LT(f)} f - \frac{L}{\LT(g)} g
 
-where $LT(\cdot)$ stands for the leading term and $LM(\cdot)$ stands for the leading monomial of a
-polynomial. The definition of s--polynomials can be directly transformed into Python::
+where $\LT(\cdot)$ stands for the leading term and $\LM(\cdot)$ stands for the leading monomial of
+a polynomial. The definition of s--polynomials can be directly transformed into Python::
 
     def s_polynomial(f, g):
         return expand((lcm(LM(f), LM(g))*(1/LT(f)*f - 1/LT(g)*g))
 
-(utilizing SymPy's built--in functions :func:`LT`, :func:`LM`, :func:`lcm` and :func:`expand`, as
-well as multivariate polynomial arithmetics).
+(utilizing SymPy's built--in polynomial manipulation functions :func:`LT`, :func:`LM`, :func:`lcm` and
+:func:`expand`, as well as multivariate polynomial arithmetics).
 
 .. TODO: tell about orderings of monomials
 
@@ -87,26 +87,26 @@ well as multivariate polynomial arithmetics).
 What is a |groebner| basis?
 ---------------------------
 
-Having the definition of s--polynomials, the fundamental theorem of |groebner| bases (the
-Buchberger criteria) is as follows: a set of polynomials $G$ is a |groebner| basis if for
-all pairs $g_i$, $g_j$ of polynomials in $G$, the remainder with respect to $G$ of the
-s--polynomial of $g_i$ and $g_j$ is zero, i.e.:
+Having the definition of s--polynomials, the fundamental theorem of |groebner| bases (also known as
+the Buchberger criterion) is as follows: a set of polynomials $G$ is a |groebner| basis if for all
+pairs $(g_i, g_j)$ of polynomials in $G$, the remainder with respect to $G$ of the s--polynomial
+of $g_i$ and $g_j$ is zero, i.e.:
 
 .. math::
 
-    \forall_{g_i, g_j \in G} remainder(s--polynomial(g_i, g_j), G) = 0
+    \forall_{g_i, g_j \in G} \remainder(\spoly(g_i, g_j), G) = 0
 
 (see [Adams1994intro]_ for details). The theorem is constructive, because the concept of
-s--polynomials is well defined and by the remainder procedure we can take *generalized
-division* algorithm (also known as *normal form* algorithm, see [Cox1997ideals]_). Given
-a set of polynomials $G$, one can check if $G$ is a |groebner| basis in a finite number
-of steps. In SymPy, the generalized division algorithm is implemented in :func:`reduced`
-function. As an example, lets consider the following set of polynomials::
+s--polynomials is well defined and as the remainder procedure we can take the *generalized
+division* algorithm (also known as the *normal form* algorithm, see [Cox1997ideals]_ for a
+detailed description). Given a set of polynomials $G$, one can check if $G$ is a |groebner|
+basis in a finite number of steps. In SymPy, the generalized division algorithm is implemented
+in :func:`reduced` function. As an example, lets consider the following set of polynomials::
 
-    >>> F = f1, f2 = [x*y - 2*y, x**2 - 2*y**2]
+    >>> F = [f1, f2] = [x*y - 2*y, x**2 - 2*y**2]
 
-There are only two polynomials in $F$ so will have to check just a single pair. Lets
-apply Buchberger criteria to $f1$ and $f2$::
+There are only two polynomials in $F$ so it is sufficient to check just a single pair to see
+if $F$ is a |groebner| basis or not. Lets apply Buchberger criterion to $f_1$ and $f_2$::
 
     >>> s_polynomial(f1, f2)
     TODO
@@ -114,14 +114,14 @@ apply Buchberger criteria to $f1$ and $f2$::
     >>> reduced(_, F)[1]
     TODO
 
-The resulting remainder is non--zero, so $F$ isn't a |groebner| basis. Lets see what will
-happen when we adjoin this remainder to $F$::
+We computed the s--polynomial of $f_1$ and $f_2$ and the resulting remainder is non--zero, so
+$F$ isn't a |groebner| basis. Lets see what will happen when we adjoin this remainder to $F$::
 
     >>> f3 = _
     >>> F.append(f3)
 
 Now we have three polynomials in $F$ and three pairs to check, i.e. $(f_1, f_2)$, $(f_1, f_3)$
-and $(f_2, f_3)$::
+and $(f_2, f_3)$ (actually only two new pairs, but lets check all three for completeness)::
 
     >>> s_polynomial(f1, f2)
     TODO
@@ -138,12 +138,38 @@ and $(f_2, f_3)$::
     >>> reduced(_, F)[1]
     0
 
-This time both reductions resulted in zero reminders, so the extended $F$ is a |groebner| basis.
+All reductions resulted in zero reminders, so the extended $F$ is a |groebner| basis. This simple
+observation leads to an algorithmic procedure for computing |groebner| bases, which we will fully
+describe in the part :ref:`gb-toy`.
+
+
 
 Reduced |groebner| bases
 ------------------------
 
-.. TODO: write this
+The definition of the concept of |groebner| bases, we gave so far, has one serious flaw. Suppose we
+are given two structurally distinct systems of polynomials $F$ and $F'$. We would like to know if
+those systems are equivalent. We can compute |groebner| bases $G$ and $G'$ of $F$ and $F'$ respectively.
+With the current definition of |groebner| bases we can't tell anything about the relation between $F$
+and $F'$ by looking at $G$ and $G'$. However, the |groebner| bases theory tells us that when we compute
+reduced |groebner| bases of those two systems of polynomials, then $F$ is equivalent to $F'$ if the reduced
+|groebner| bases are equal, i.e. $G = G'$. This is a very strong and important result, because it allows
+us to reason about systems of polynomial by looking only at their reduced |groebner| bases.
+
+Lets now provide the definition of the concept of reduced |groebner| bases. We will reuse the generalized
+division algorithm for this purpose. Given a set of polynomials $G$, which is a |groebner| basis by the
+Buchberger criterion, then $G$ is a reduced |groebner| basis when the following statement holds:
+
+.. math::
+
+    \forall_{g \in G} \remainder(g, G - \{g\}) = g \vee g\;\mbox{is monic}
+
+Following this definition, given a |groebner| basis $G$, one can compute a reduced version of $G$
+simply by reducing each element $g \in G$ with respect to all other elements of the basis and, in
+the end, making all polynomials in $G$ monic. In the remainder of this chapter we will focus only
+on reduced |groebner| bases.
+
+.. _gb-toy:
 
 Toy Buchberger algorithm
 ------------------------
@@ -500,14 +526,13 @@ much more complicated problem: finding solutions of systems of *polynomial* equa
 
 To accomplish this we will utilize a very fruitful property of |groebner| bases: elimination
 property. Following [Buchberger2001introduction]_ and [Adams1994intro]_, suppose $F$ is a set
-of polynomial equations, such that every element of $F$ belongs to $\mathbb{K}[x_1, \ldots, x_n]$,
-where $\mathbb{K}$ is a field of positive characteristic, and $G$ is its |groebner|
-computed with respect to any *elimination* ordering of terms (e.g. lexicographic ordering). We
-assume that $x_1 \succ \ldots \succ x_n$. Then $F$ and $G$ generate the same ideal, so they have
-the same set of solutions. The elimination property of |groebner| bases guarantees that if $G$ has
-only a finite number of solutions then $G$ has exactly one polynomial in $x_n$, i.e. a univariate
-polynomial which can solved. As :func:`groebner` returns a sorted basis, the univariate polynomial
-will be the last element the basis.
+of polynomial equations, such that every element of $F$ belongs to $\K\Xn$, where $\K$ is a field
+of positive characteristic, and $G$ is its |groebner| computed with respect to any *elimination*
+ordering of terms (e.g. lexicographic ordering). We assume that $x_1 \succ \ldots \succ x_n$. Then
+$F$ and $G$ generate the same ideal, so they have the same set of solutions. The elimination property
+of |groebner| bases guarantees that if $G$ has only a finite number of solutions then $G$ has exactly
+one polynomial in $x_n$, i.e. a univariate polynomial which can solved. As :func:`groebner` returns
+a sorted basis, the univariate polynomial will be the last element the basis.
 
 In principle the algorithm works as follows: given a set of polynomial equations $F$ we compute
 its |groebner| basis $G$ with respect to lexicographic term order. If $G$ has only one univariate
@@ -631,12 +656,12 @@ invariant under the Euclidean group of rotations (see [Sturmfels2008invariant]_)
 of this structure can give a deep insight into the studied problem.
 
 Following [Buchberger2001introduction]_ and [Sturmfels2008invariant]_ lets consider the
-group $\mathbb{Z}_4$ of rotational symmetries in the counter clockwise direction of the
-square. The invariant ring of this group is equal to:
+group $\Z_4$ of rotational symmetries in the counter clockwise direction of the square.
+The invariant ring of this group is equal to:
 
 .. math::
 
-    \mathcal{I} = \left\{ f \in \mathbb{C}[x_1, x_2] : f(x_1, x_2) = f(-x_2, x_1) \right\}
+    \mathcal{I} = \left\{ f \in \C[x_1, x_2] : f(x_1, x_2) = f(-x_2, x_1) \right\}
 
 This ring has three fundamental invariants:
 
@@ -821,7 +846,7 @@ Integer optimization
 
 Suppose we are in possession of American coins: pennies, nickels, dimes and quarters. We would like to
 compose a certain quantity out of those coins, say 117, such that the *number* of coins used is *minimal*.
-Lets forget about the minimality criteria for a moment. In this scenario it is not a big problem to
+Lets forget about the minimality criterion for a moment. In this scenario it is not a big problem to
 compose the requested value. We can simply take 117 pennies and we are done, as long as we have so
 many of them. Alternatively we can take 10 dimes, 3 nickels and 2 pennies, or 2 quarters, 3 dimes,
 5 nickels and 12 pennies, etc. There are quite a few combinations that can be generated to get the
@@ -940,15 +965,14 @@ polynomial equations:
     F_{\mathcal{G}} = \{ f(x_i, x_j) : (i, j) \in E \}
 
 We combine $F_k$ and $F_{\mathcal{G}}$ into one system of equations $F$. Let $\mathcal{I}$ be
-the ideal of $\mathbb{C}[x_1,\ldots,x_n]$ generated by $F$ and let $\mathcal{V}(\mathcal{I})$
-be an algebraic variety in $\mathbb{C}^n$. Then a graph $\mathcal{G}$ is $k$--colorable if
-$\mathcal{V}(\mathcal{I}) \not= \emptyset$. To verify this statement it is sufficient to compute
-a |groebner| basis $G$ of $F$ and check if $G \not= \{1\}$. If this is the case, then the graph
-isn't $k$--colorable. Otherwise the |groebner| basis gives us explicit information about all
-possible $k$--colorings of $\mathcal{G}$. Speaking in less formal language, given a set of
-polynomial equations $F$ which describe geometry of a graph and coloring constraints we look
-for solutions of this system of equations in $\mathbb{C}^n$. If we can find solutions of any
-kind then the graph is colorable with $k$ colors.
+the ideal of $\C\Xn$ generated by $F$ and let $\mathcal{V}(\mathcal{I})$ be an algebraic variety
+in $\C^n$. Then a graph $\mathcal{G}$ is $k$--colorable if $\mathcal{V}(\mathcal{I}) \not= \emptyset$.
+To verify this statement it is sufficient to compute a |groebner| basis $G$ of $F$ and check if
+$G \not= \{1\}$. If this is the case, then the graph isn't $k$--colorable. Otherwise the |groebner|
+basis gives us explicit information about all possible $k$--colorings of $\mathcal{G}$. Speaking in
+less formal language, given a set of polynomial equations $F$ which describe geometry of a graph and
+coloring constraints we look for solutions of this system of equations in $\C^n$. If we can find
+solutions of any kind then the graph is colorable with $k$ colors.
 
 Lets now focus on a particular and well known instance of $k$--coloring where $k = 3$. In this
 case $F_3 = \{ x_i^3 - 1 : i = 1, \ldots, n \}$. Using SymPy's built--in multivariate polynomial
