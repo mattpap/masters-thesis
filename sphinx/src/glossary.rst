@@ -12,16 +12,15 @@ Glossary
         http://eom.springer.de/P/p073690.htm
 
     admissible ordering of monomials
-        An ordering, $>$, on $\mathbb{N}^n$ is called an admissible ordering of monomials
+        An ordering, $>$, on $\N^n$ is called an admissible ordering of monomials
         when it satisfies the following conditions:
 
-        #. $>$ is a total ordering on $\mathbb{N}^n$
-        #. $\alpha$, $\beta$, $\gamma$ are vectors in $\mathbb{N}^n$ and $\alpha > \beta$,
-           then $\alpha + \gamma > \beta + \gamma$
-        #. $\alpha >= 0$ for all $\alpha$ $\mathbb{N}^n$
+        #. $>$ is a total ordering on $\N^n$
+        #. $\alpha, \beta, \gamma \in \N^n$ and $\alpha > \beta$, then $\alpha + \gamma > \beta + \gamma$
+        #. $\alpha \ge 0$ for all $\alpha \in \N^n$
 
     algebraic variety
-        The set solutions to a system of polynomial equations.
+        The set of solutions to a system of polynomial equations.
 
     characteristic zero
         A property of algebraic structures. An algebraic structure is of characteristic
@@ -32,21 +31,19 @@ Glossary
         can check if a domain has zero characteristic using :attr:`has_CharacteristicZero`.
 
     symmetric polynomial
-        A polynomial $f \in \mathbb{R}[x_1, \ldots, x_n]$, where $\mathbb{R}$ is a ring,
-        is called symmetric if $\sigma(f) = f$ holds for every permutation $\sigma$ of
-        the set $\{x_1, \ldots, x_n\}$. Every symmetric polynomial can be rewritten in
-        terms of elementary symmetric polynomials utilizing method called symmetric
-        reduction. This can can be accomplished in SymPy using :func:`symmetrize`
+        A polynomial $f \in \R\Xn$, where $\R$ is a ring, is called symmetric if $\sigma(f) = f$
+        holds for every permutation $\sigma$ of the set $\{x_1, \ldots, x_n\}$. Every symmetric
+        polynomial can be rewritten in terms of elementary symmetric polynomials utilizing method
+        called symmetric reduction. This can can be accomplished in SymPy using :func:`symmetrize`
         function.
 
     elementary symmetric polynomial
-        A polynomial $f \in \mathbb{R}[x_1, \ldots, x_n]$, where $\mathbb{R}$ is a ring,
-        is called an elementary symmetric polynomial if $f$ is symmetric and $f$ is an
-        element of the basis which generates all symmetric polynomials. The $k$--th
-        elementary symmetric polynomial in $n$ variables, i.e. a polynomial of degree
-        $k$, can be constructed by summing all different $k$--th degree monomials in
-        $\{x_1, \ldots, x_n\}$. Elementary symmetric polynomials can be generated in
-        SymPy using :func:`symmetric_poly` function.
+        A polynomial $f \in \R\Xn$, where $\R$ is a ring, is called an elementary symmetric
+        polynomial if $f$ is symmetric and $f$ is an element of the basis which generates all
+        symmetric polynomials. The $k$--th elementary symmetric polynomial in $n$ variables,
+        i.e. a polynomial of degree $k$, can be constructed by summing all different $k$--th
+        degree monomials in $\{x_1, \ldots, x_n\}$. Elementary symmetric polynomials can be
+        generated in SymPy using :func:`symmetric_poly` function.
 
     monic polynomial
 

@@ -134,9 +134,11 @@ jsMath.Easy = {
   //      }
   //
   macros: {
-      K: '\\mathbf{K}',
+      N: '\\mathbf{N}',
       Z: '\\mathbf{Z}',
+      R: '\\mathbf{R}',
       C: '\\mathbf{C}',
+      K: '\\mathbf{K}',
       Xn: '[x_1, \\ldots, x_n]',
       LM: '\\operatorname{LM}',
       LT: '\\operatorname{LT}',
