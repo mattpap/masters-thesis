@@ -26,7 +26,7 @@ the principles of the |groebner| bases method (not including the proof of the ma
 is, on the other hand, very complicated) makes is possible to apply |groebner| bases in various
 areas of science and engineering, not only by mathematicians.
 
-To introduce the concept of |groebner| bases, following [Buchberger2001introduction]_, lets consider
+To introduce the concept of |groebner| bases, following [Buchberger2001systems]_, lets consider
 a set $F$ of multivariate polynomial equations, i.e. $F = \{ f \in \K\Xn \}$, where $\K$ usually
 denotes a field of characteristic zero:
 
@@ -64,7 +64,8 @@ The notion of s--polynomials
 
 To introduce the algorithm for computing |groebner| bases, Buchberger defined first the notion of,
 so called, s--polynomials. Given two multivariate polynomials $f$ and $g$, suppose that $L$ is the
-least common multiple of the leading monomials of $f$ and $g$, i.e. $L = \lcm(\LM(f), \LM(g))$, then:
+least common multiple of the leading monomials of $f$ and $g$ with respect to a fixed ordering of
+monomials, i.e. $L = \lcm(\LM(f), \LM(g))$, then:
 
 .. math::
 
@@ -74,10 +75,10 @@ where $\LT(\cdot)$ stands for the leading term and $\LM(\cdot)$ stands for the l
 a polynomial. The definition of s--polynomials can be directly transformed into Python::
 
     def s_polynomial(f, g):
-        return expand((lcm(LM(f), LM(g))*(1/LT(f)*f - 1/LT(g)*g))
+        return expand(lcm(LM(f), LM(g))*(1/LT(f)*f - 1/LT(g)*g))
 
-(utilizing SymPy's built--in polynomial manipulation functions :func:`LT`, :func:`LM`, :func:`lcm` and
-:func:`expand`, as well as multivariate polynomial arithmetics).
+utilizing SymPy's built--in polynomial manipulation functions :func:`LT`, :func:`LM`, :func:`lcm`
+and :func:`expand`, as well as multivariate polynomial arithmetics.
 
 .. TODO: tell about orderings of monomials
 
@@ -121,7 +122,7 @@ $F$ isn't a |groebner| basis. Lets see what will happen when we adjoin this rema
     >>> F.append(f3)
 
 Now we have three polynomials in $F$ and three pairs to check, i.e. $(f_1, f_2)$, $(f_1, f_3)$
-and $(f_2, f_3)$ (actually only two new pairs, but lets check all three for completeness)::
+and $(f_2, f_3)$ (actually only the two new pairs, but lets check all three for completeness)::
 
     >>> s_polynomial(f1, f2)
     TODO
@@ -141,8 +142,6 @@ and $(f_2, f_3)$ (actually only two new pairs, but lets check all three for comp
 All reductions resulted in zero reminders, so the extended $F$ is a |groebner| basis. This simple
 observation leads to an algorithmic procedure for computing |groebner| bases, which we will fully
 describe in :ref:`gb-toy`.
-
-
 
 Reduced |groebner| bases
 ------------------------
@@ -176,11 +175,11 @@ Toy Buchberger algorithm
 
 We are ready to describe the Buchberger algorithm. The algorithm proceeds as follows: take a
 set of polynomials $F$ and set initially $G := F$, where $G$ will be the desired |groebner|
-basis of $F$ at the and of this procedure. Next for apply the Buchberger criterion to see if
+basis of $F$ at the and of this procedure. Next apply the Buchberger criterion to see if
 $G$ is already a |groebner| basis. If this is the case, reduce each polynomial in $G$ with
 respect to other polynomials in $G$ and stop. Otherwise pick a pair of polynomials $f_1$ and
-$f_2$ from $G$, and compute their s--polynomial. If the s--polynomial is non--zero then add
-it to $G$. Iterate until $G$ is a |groebner| basis.
+$f_2$ from $G$, and compute their s--polynomial. If the remainder with respect to $G$ of the
+s--polynomial is non--zero, then adjoin it to $G$. Iterate until $G$ is a |groebner| basis.
 
 This simple procedure can be easily coded in Python in just a couple of minutes using previously
 defined :func:`s_polynomial` and SymPy's built--in :func:`reduced` functions::
@@ -219,33 +218,33 @@ Termination of the algorithm
 ----------------------------
 
 Although the Buchberger algorithm is very simple, its termination isn't trivial. At the startup
-of the procedure, described in the previous part, there is only a finite number of pairs of
-polynomials for which the corresponding s--polynomials have to be computed. Some of those pairs
-lead to non--zero reductions, hence $G$ is growing and the number of additional pairs, that have
-to be taken into consideration, also grows. Buchberger proved that this process ends in a finite
-number of steps. Thus we are guaranteed that for arbitrary set of polynomials we can compute a
-corresponding |groebner| basis in finite time. An interesting question is how much time is needed
-to compute such a basis? We will postpone answer to this question till the end of section, where
-we will discuss efficiency of SymPy's |groebner| bases implementation.
+of this procedure there is only a finite number of pairs of polynomials for which the corresponding
+s--polynomials have to be computed. Some of those pairs lead to non--zero reductions, hence $G$ is
+growing and the number of additional pairs, that have to be taken into consideration, also grows.
+Buchberger proved that this process ends in a finite number of steps. Thus we are guaranteed that
+for arbitrary set of polynomials we can compute a corresponding |groebner| basis in finite time.
+An interesting question arises: how much time is actually needed to compute such a basis? We will
+postpone answer to this question till the end of chapter, where we will discuss complexity of the
+Buchberger algorithm and efficiency of SymPy's |groebner| bases implementation.
 
 Computing |groebner| bases with SymPy
 =====================================
 
-Although the toy implementation of Buchberger algorithm presented in the previous section can be
-used for experimenting with |groebner| bases, its implementation is too naive to make it useful
+Although the toy implementation of the Buchberger algorithm, presented in the previous section, can
+be used for experimenting with |groebner| bases, its implementation is too naive to make it useful
 for solving more complicated problems. For the purpose of computing reduced |groebner| bases with
 respect to various orderings of monomials, SymPy has a built--in function :func:`groebner`, which
 implements a much more efficient version of Buchberger algorithm.
 
 The main difference between those two implementations is that :func:`groebner` uses several criteria
-for reducing the number of polynomial divisions (actually reductions by a set of polynomials), which
+for cutting down the number of polynomial divisions (actually reductions by a set of polynomials), which
 are the central and most expensive part of the Buchberger algorithm. There wouldn't be nothing special
 about this, however, most divisions give zero remainder as the result and do not lead to change of
 a |groebner| basis. This way most divisions are just *useless* and an efficient implementation of the
 Buchberger algorithm must accommodate for this, avoiding as many of those useless divisions as possible.
 
-Several criteria were invented by the author of the |groebner| bases algorithm a few years after the
-algorithm was introduced. Later on, several more powerful elimination criteria were developed, for
+Several criteria were invented by the author of the |groebner| bases method a few years after the
+algorithm was introduced. Later on, other more powerful elimination criteria were developed, for
 example, heuristic criteria for lexicographic ordering of monomials (see [Czapor1991heuristic]_)
 or, so called, *sugar flavour* (see [Giovini1991sugar]_ for details).
 
@@ -255,12 +254,12 @@ Admissible orderings of monomials
 =================================
 
 The main reason for our interest in |groebner| bases is that they have *nicer* properties, compared
-to other systems of polynomial equations. Depending on what properties we actually need, we can
-compute a |groebner| basis of a given system with respect to a specific ordering of monomials. The
-choice of monomial order is significant, because different orderings will lead to different properties
-of the resulting basis. Moreover, for a particular system of polynomials, one ordering will make
-computations feasible, whereas another will make Buchberger algorithm executing for ages. In the
-following sections we will see on examples why the right choice of monomial order is so important.
+to other systems of polynomials. Depending on what properties we actually need, we can compute a
+|groebner| basis of a given system with respect to a specific ordering of monomials. The choice of
+monomial order is significant, because different orderings will lead to different properties of the
+resulting basis. Moreover, for a particular system of polynomials, one ordering will make computations
+feasible, whereas another will make Buchberger algorithm executing for ages. In the following sections
+we will give examples showing why the right choice of monomial order is so important.
 
 There are currently three admissible orderings of monomials implemented in SymPy:
 
@@ -290,11 +289,11 @@ assistance of :func:`LT` function::
        4
     x⋅y
 
-Similarly as in :func:`groebner` function, :func:`LT` assumes *lexicographic* ordering by default. We
-observe in the above example that :func:`LT` picks up different terms depending on the chosen ordering.
-This happens because in the case of ``grlex`` ordering the total degree of a monomial is more important
-than the sequence exponents. Differences between leading terms computed by :func:`LT` influence |groebner|
-basis computation::
+Similarly as in :func:`groebner` function, :func:`LT` assumes *lexicographic* ordering  of monomials by
+default. We observe, in the above example, that :func:`LT` picks up different terms depending on the
+chosen ordering. This happens, because in the case of ``grlex`` ordering the total degree of a monomial
+is more important than the sequence exponents of that monomial. Differences between leading terms computed
+by :func:`LT` influence computations of |groebner| bases::
 
     >>> groebner([f1, f2], x, y, order='lex')
     ⎡                   7    4                                          ⎤
@@ -308,14 +307,14 @@ basis computation::
 
 Originally orderings of monomials were implemented as comparison functions and passed to :func:`sorted`
 built--in function via ``cmp`` keyword argument. This approach was inefficient, because the nature of
-the sorting algorithm requires to compute ordering information (e.g. total degree) about a particular
+the sorting algorithm required to compute ordering information (e.g. total degree) about a particular
 monomial multiple times in this scheme. Eventually, ``cmp``--style sorting was dropped in Python 3.0,
 in favour of ``key``--based sorting [PythonIssue1771]_. The new implementation of orderings of monomials
-is based on the concept of ``key`` functions. When implementing user defined orderings, one must conform
+is based on the concept of ``key``--functions. When implementing user defined orderings, one must conform
 to the new approach.
 
 In principle, in the ``key``--based approach, one has to return all required ordering information about
-a particular monomial in a form of tuple (with correct order of element). In the case of *lexicographic
+a particular monomial in a form of tuple (with correct order of elements). In the case of *lexicographic
 ordering* of monomials, this information simply consists of the input monomial itself::
 
     def monomial_lex_key(monom):
@@ -330,9 +329,9 @@ the total degree of an input monomial, so the key function for ``grlex`` order i
         """Key function for sorting monomials in graded lexicographic order. """
         return (sum(monom), monom)
 
-This approach generalizes to other orderings as well. One should also note that the order variables also
-is an important factor when computing |groebner| bases, as there are $n!$ specific orderings for a given
-ordering of monomials (where $n$ is the number of variables involved in computations).
+This approach generalizes to other orderings as well. One should also note that the order variables is
+also an important factor when computing |groebner| bases, as there are $n!$ specific orderings for a
+given ordering of monomials (where $n$ is the number of variables involved in computations).
 
 Specialization of |groebner| bases
 ==================================
@@ -345,7 +344,7 @@ The |groebner| bases algorithm specializes to:
 Special case 1: Gauss' algorithm
 --------------------------------
 
-Lets consider the following system of equations:
+Lets consider the following system of linear equations:
 
 .. math::
 
@@ -376,7 +375,7 @@ algorithm::
 
 We obtained the same solution but in the dictionary form this time. It's interesting to
 notice that currently, at least for small inputs, the |groebner| bases approach is much
-faster than using a specialized solver. Lets compare efficiency of those two methods::
+efficient than a specialized solver. Lets compare those two methods::
 
     >>> %timeit groebner(F, x, y)
     100 loops, best of 3: 5.15 ms per loop
@@ -387,22 +386,21 @@ faster than using a specialized solver. Lets compare efficiency of those two met
 An explanation of this result is as follows: |groebner| bases utilize very efficient core
 of polynomials manipulation module, whereas :func:`solve` uses inefficient implementation
 of linear algebra in SymPy. This situation will change and the observed phenomenon will
-disappear in future, when linear algebra module is refactored (using similar approach
-to what was done to polynomials module).
+disappear in near future, when linear algebra module will be refactored (using similar
+approach to what was done with polynomials manipulation module).
 
 Special case 2: Euclid's algorithm
 ----------------------------------
 
-Lets now focus on the other case, i.e. on computation of the greatest common divisors. For
-this, consider two univariate polynomials ``f`` and ``g``, both in the indeterminate ``x``
+Lets now focus on the other case, i.e. on computation of greatest common divisors of polynomials.
+For this, consider two univariate polynomials ``f`` and ``g``, both in the indeterminate ``x``,
 with coefficients in the ring of integers::
 
     >>> f = expand((x - 2)**3 * (x + 3)**4 * (x + 7))
     >>> g = expand((x + 2)**3 * (x + 3)**3 * (x + 7))
 
 We can easily see that those polynomials have to factors in common (of multiplicity three
-and one respectively). Lets verify this observation using |groebner| bases algorithm once
-again::
+and one respectively). Lets verify this observation using |groebner| bases algorithm::
 
     >>> groebner([f, g])
     ⎡ 4       3       2              ⎤
@@ -416,10 +414,10 @@ the computed polynomial GCD using factorization::
            3
     (x + 3) ⋅(x + 7)
 
-Now we can clearly see the common factors of the input polynomials. Although utilization
-of |groebner| bases algorithm for computing GCDs of univariate polynomials is very fancy,
-there are much more efficient algorithm for this purpose. In SymPy we use heuristic GCD
-algorithm (over integers and rationals) and subresultants (over other domains).
+Now we can clearly see the common factors of the input polynomials. Although utilization of
+|groebner| bases algorithm for computing GCDs of univariate polynomials is very fancy, there
+are much more efficient algorithms for this purpose. In SymPy we currently use heuristic GCD
+algorithm over integers and rationals, and subresultants over other domains.
 
 Moreover, |groebner| bases can be used to compute greatest common divisors of multivariate
 polynomials (see [Cox1997ideals]_). The algorithm reduces the problem of finding the GCD of
@@ -430,7 +428,7 @@ GCD with LCM:
 .. math::
     :label: gcdlcm
 
-    \gcd(f, g) = \frac{f \cdot g}{\operatorname{lcm}(f, g)}
+    \gcd(f, g) = \frac{f \cdot g}{\lcm(f, g)}
 
 The multivariate polynomial LCM is computed as the unique generator of the intersection of
 the two ideals generated by ``f`` and ``g``. The approach is to compute a |groebner| basis
@@ -485,8 +483,7 @@ utilizes specialized algorithms for computing greatest common divisors.
 Historically this was the first algorithm for computing GCDs of multivariate polynomials
 in SymPy. Although it's not a very efficient approach to the problem, it can serve as a
 good explanation of |groebner| bases machinery. Currently we use heuristic GCD algorithm
-for the task and there are plans to implement EEZ algorithm for this task (see section
-:ref:`thesis-gcd` for more details).
+for the task and there are plans to implement EEZ algorithm for this task.
 
 Applications of |groebner| bases
 ================================
@@ -512,9 +509,9 @@ thought incomplete, of the major areas in which |groebner| bases were applied wi
 * Differential Equations
 * Systems Theory
 
-In [Buchberger2001introduction]_ there is an even longer list of applications specific to systems
-theory. In the following parts we will examine several practical applications of the |groebner|
-bases method and explain how to conduct all computations using SymPy's polynomials manipulation module.
+In [Buchberger2001systems]_ there is an even longer list of applications specific to systems theory.
+In the following subsections we will examine several practical applications of the |groebner| bases
+method and explain how to conduct all computations using SymPy's polynomials manipulation module.
 
 Solving systems of polynomial equations
 ---------------------------------------
@@ -525,8 +522,8 @@ have specialized algorithms for the task. However, |groebner| bases can used to 
 much more complicated problem: finding solutions of systems of *polynomial* equations.
 
 To accomplish this we will utilize a very fruitful property of |groebner| bases: elimination
-property. Following [Buchberger2001introduction]_ and [Adams1994intro]_, suppose $F$ is a set
-of polynomial equations, such that every element of $F$ belongs to $\K\Xn$, where $\K$ is a field
+property. Following [Buchberger2001systems]_ and [Adams1994intro]_, suppose $F$ is a set of
+polynomial equations, such that every element of $F$ belongs to $\K\Xn$, where $\K$ is a field
 of positive characteristic, and $G$ is its |groebner| computed with respect to any *elimination*
 ordering of terms (e.g. lexicographic ordering). We assume that $x_1 \succ \ldots \succ x_n$. Then
 $F$ and $G$ generate the same ideal, so they have the same set of solutions. The elimination property
@@ -655,9 +652,9 @@ respect to the underlying transformation group, e.g. properties in Euclidean geo
 invariant under the Euclidean group of rotations (see [Sturmfels2008invariant]_). Analysis
 of this structure can give a deep insight into the studied problem.
 
-Following [Buchberger2001introduction]_ and [Sturmfels2008invariant]_ lets consider the
-group $\Z_4$ of rotational symmetries in the counter clockwise direction of the square.
-The invariant ring of this group is equal to:
+Following [Buchberger2001systems]_ and [Sturmfels2008invariant]_ lets consider the group $\Z_4$
+of rotational symmetries in the counter clockwise direction of the square. The invariant ring of
+this group is equal to:
 
 .. math::
 
@@ -926,17 +923,21 @@ case (without any assumptions on the structure of the input graph) they are NP--
 i.e. there are no polynomial time algorithms for finding graph colorings (for a detailed
 discussion see [Kubale2004color]_).
 
-In the rest of this section we will show how to use SymPy for solving graph coloring problems
-using |groebner| bases. Following the discussion in [Adams1994intro]_, we will focus on is the
-classical problem of vertex--coloring. Given a graph $\mathcal{G}(V, E)$, where $V$ is the set
-of vertices of $\mathcal{G}$ and $E$ is the set of edges of $\mathcal{G}$, and a positive integer
-$k$ we ask if is possible to assign a color to every vertex from $V$, such that adjacent vertices
-have different colors assigned. Moreover, we can extend our question and ask for all possible
-$k$--colorings of $\mathcal{G}$ or just for the number of $k$--colorings.
+Classical vertex coloring
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To show how SymPy can be utilized for solving graph coloring problems using the |groebner|
+bases method, lets focus on the classical problem of vertex coloring of graphs. We follow
+[Adams1994intro]_ to give a brief theoretical introduction to this subject. Given a graph
+$\mathcal{G}(V, E)$, where $V$ is the set of vertices of $\mathcal{G}$ and $E$ is the set
+of edges of $\mathcal{G}$, and a positive integer $k$ we ask if is possible to assign a
+color to every vertex from $V$, such that adjacent vertices have different colors assigned.
+Moreover, we can extend our question and ask for all possible $k$--colorings of $\mathcal{G}$
+or just for the number of $k$--colorings.
 
 It shouldn't be that strange to use |groebner| bases for a graph theoretical problem. After
 all, |groebner| bases have intrinsic complexity at least equal to the complexity of graph
-coloring problems and allow for analysis of the structure of studied problems.
+coloring problems and allow analysis of the structure of studied problems.
 
 But how do we transform a graph and coloring constraints into an algebraic problem? First we
 need to assign a variable to each vertex. Given that $\mathcal{G}$ has $n$ vertices, i.e.
@@ -1064,7 +1065,7 @@ required to color the original graph could be lowered to $2$ colors.
     A sample $3$--coloring of the graph $\mathcal{G}(V, E)$.
 
 Before we compare SymPy's syntax for computing |groebner| bases with other systems, let us clarify an
-issue arousing around list indexing (e.g. why we write ``x3 = Vx[2]``). SymPy is a library built on top
+issue arising around list indexing (e.g. why we write ``x3 = Vx[2]``). SymPy is a library built on top
 of Python, so it utilizes Python's built--in data structures and their indexing schemes. Python, as a
 general purpose programming language, uses well established zero--based indexing scheme, contrary to the
 natural way of *indexing* things, i.e. saying 1st, 2nd, 3rd etc. (to which we are accustomed in real life
@@ -1078,15 +1079,17 @@ which invent their own programming language, use *natural indexing* scheme. Curr
 one--based indexing in SymPy, is to append a dummy element in front of a list, e.g. to index ``Vx`` this
 way we could issue ``Vx = [None] + Vx`` and then ``x3 = Vx[3]``.
 
+Vertex coloring in other systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 So far we showed how to solve classical vertex--coloring problem with SymPy. Lets now compare SymPy's
 syntax and semantics of |groebner| bases functionality with three commonly used mathematical software:
 Maxima, Axiom and Mathematica.
 
 One feature that makes SymPy different from other mathematical systems is that SymPy utilizes a general
-purpose programming language, whereas Maxima, Axiom and Mathematica invent their own special languages
-for interaction with those systems. This will require us to make a few remarks on the syntactic level.
-
-.. TODO: finish this
+purpose programming language for its core, modules and interaction with the user, whereas Maxima, Axiom
+and Mathematica invent their own special languages for interaction with those systems. This will require
+us to make a few remarks also on the syntactic level.
 
 `Maxima <maxima.sourceforge.net>`_ uses a very ...
 ::
@@ -1145,15 +1148,150 @@ for interaction with those systems. This will require us to make a few remarks o
     In[8]:= G != {1}
     Out[8]= True
 
-
-
 +----------+-------+--------+-------+-------------+
 |          | SymPy | Maxima | Axiom | Mathematica |
 +==========+=======+========+=======+=============+
 | Time [s] | 15.4  | 17.6   | 3.6   | 0.34        |
 +----------+-------+--------+-------+-------------+
 
-.. TODO: back to coloring, analyze structure of $G$
+The structure of vertex coloring
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    In [1]: V = range(1, 12+1)
+
+    In [2]: E = [(1,2),(2,3),(1,4),(1,6),(1,12),(2,5),(2,7),(3,8),(3,10),(4,11),(4,9),(5,6),(6,7),(7,8),(8,9),(9,10),(10,11),(11,12),(5,12),(5,9),(6,10),(7,11),(8,12)]
+
+    In [3]: Vx = [ Symbol('x' + str(i)) for i in V ]
+
+    In [4]: Ex = [ (Vx[i-1], Vx[j-1]) for i, j in E ]
+
+    In [5]: F3 = [ x**3 - 1 for x in Vx ]
+
+    In [6]: Fg = [ x**2 + x*y + y**2 for x, y in Ex ]
+
+    In [7]: G = groebner(F3 + Fg, Vx)
+
+    In [8]: var('x,y,red,green,blue')
+    Out[8]: (x, y, red, green, blue)
+
+    In [9]: ext = exp(2*pi*I/3).expand(complex=True)
+
+    In [10]: Basic.keep_sign = True
+
+    In [11]: factor(x**3 - 1, extension=ext)
+    Out[11]:
+             ⎛              ⎽⎽⎽⎞ ⎛              ⎽⎽⎽⎞
+             ⎜          ⅈ⋅╲╱ 3 ⎟ ⎜          ⅈ⋅╲╱ 3 ⎟
+    (-1 + x)⋅⎜1/2 + x - ───────⎟⋅⎜1/2 + x + ───────⎟
+             ⎝             2   ⎠ ⎝             2   ⎠
+
+    In [12]: [ solve(f)[0] for f in _.args ]
+    Out[12]:
+    ⎡              ⎽⎽⎽             ⎽⎽⎽⎤
+    ⎢          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3 ⎥
+    ⎢1, -1/2 + ───────, -1/2 - ───────⎥
+    ⎣             2               2   ⎦
+
+    In [15]: colors = dict([ (value, color) for (value, color) in zip(_, (red, green, blue)) ])
+
+    In [16]: colors
+    Out[16]:
+    ⎧                   ⎽⎽⎽                    ⎽⎽⎽      ⎫
+    ⎪               ⅈ⋅╲╱ 3                 ⅈ⋅╲╱ 3       ⎪
+    ⎨1: red, -1/2 + ───────: green, -1/2 - ───────: blue⎬
+    ⎪                  2                      2         ⎪
+    ⎩                                                   ⎭
+
+    In [17]: coloring = [ expand(elt, complex=True) for elt in solve(G, Vx) ]
+
+    In [18]: coloring
+    Out[18]:
+    ⎡⎡           ⎽⎽⎽             ⎽⎽⎽                   ⎽⎽⎽             ⎽⎽⎽                ⎽⎽⎽             ⎽⎽⎽             ⎽⎽⎽             ⎽⎽⎽   ⎤  ⎡
+    ⎢⎢       ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3                ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3    ⎥  ⎢       ⅈ⋅╲╱
+    ⎢⎢-1/2 + ───────, -1/2 - ───────, 1, 1, -1/2 + ───────, -1/2 - ───────, 1, -1/2 + ───────, -1/2 - ───────, -1/2 + ───────, -1/2 - ───────, 1⎥, ⎢-1/2 - ────
+    ⎣⎣          2               2                     2               2                  2               2               2               2      ⎦  ⎣          2
+
+    ⎽⎽⎽             ⎽⎽⎽                   ⎽⎽⎽             ⎽⎽⎽                ⎽⎽⎽             ⎽⎽⎽             ⎽⎽⎽             ⎽⎽⎽   ⎤  ⎡           ⎽⎽⎽
+     3          ⅈ⋅╲╱ 3                ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3    ⎥  ⎢       ⅈ⋅╲╱ 3
+    ───, -1/2 + ───────, 1, 1, -1/2 - ───────, -1/2 + ───────, 1, -1/2 - ───────, -1/2 + ───────, -1/2 - ───────, -1/2 + ───────, 1⎥, ⎢-1/2 + ───────, 1, -1/2
+                   2                     2               2                  2               2               2               2      ⎦  ⎣          2
+
+          ⎽⎽⎽             ⎽⎽⎽             ⎽⎽⎽                ⎽⎽⎽             ⎽⎽⎽                ⎽⎽⎽                ⎽⎽⎽⎤  ⎡           ⎽⎽⎽                ⎽⎽⎽
+      ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3 ⎥  ⎢       ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3
+    - ───────, -1/2 - ───────, -1/2 + ───────, 1, -1/2 - ───────, -1/2 + ───────, 1, -1/2 + ───────, 1, -1/2 - ───────⎥, ⎢-1/2 - ───────, 1, -1/2 + ───────, -1
+         2               2               2                  2               2                  2                  2   ⎦  ⎣          2                  2
+
+             ⎽⎽⎽             ⎽⎽⎽                ⎽⎽⎽             ⎽⎽⎽                ⎽⎽⎽                ⎽⎽⎽⎤  ⎡              ⎽⎽⎽             ⎽⎽⎽             ⎽⎽⎽
+         ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3 ⎥  ⎢          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3
+    /2 + ───────, -1/2 - ───────, 1, -1/2 + ───────, -1/2 - ───────, 1, -1/2 - ───────, 1, -1/2 + ───────⎥, ⎢1, -1/2 - ───────, -1/2 + ───────, -1/2 + ───────,
+            2               2                  2               2                  2                  2   ⎦  ⎣             2               2               2
+
+                   ⎽⎽⎽             ⎽⎽⎽                ⎽⎽⎽                ⎽⎽⎽             ⎽⎽⎽⎤  ⎡              ⎽⎽⎽             ⎽⎽⎽             ⎽⎽⎽
+               ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3 ⎥  ⎢          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅
+     1, -1/2 - ───────, -1/2 + ───────, 1, -1/2 - ───────, 1, -1/2 - ───────, -1/2 + ───────⎥, ⎢1, -1/2 + ───────, -1/2 - ───────, -1/2 - ───────, 1, -1/2 + ──
+                  2               2                  2                  2               2   ⎦  ⎣             2               2               2
+
+      ⎽⎽⎽             ⎽⎽⎽                ⎽⎽⎽                ⎽⎽⎽             ⎽⎽⎽⎤⎤
+    ╲╱ 3          ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3             ⅈ⋅╲╱ 3          ⅈ⋅╲╱ 3 ⎥⎥
+    ─────, -1/2 - ───────, 1, -1/2 + ───────, 1, -1/2 + ───────, -1/2 - ───────⎥⎥
+     2               2                  2                  2               2   ⎦⎦
+
+
+    In [20]: [ tuple([ sol.subs(colors) for sol in solution ]) for solution in coloring ]
+    Out[20]:
+    [(green, blue, red, red, green, blue, red, green, blue, green, blue, red), (blue, green, red, red, blue, green, red, blue, green, blue, green, red), (green
+    , red, blue, blue, green, red, blue, green, red, green, red, blue), (blue, red, green, green, blue, red, green, blue, red, blue, red, green), (red, blue, g
+    reen, green, red, blue, green, red, blue, red, blue, green), (red, green, blue, blue, red, green, blue, red, green, red, green, blue)]
+
+    In [21]: len(_)
+    Out[21]: 6
+
+    In [22]: [ tuple([ sol.subs(colors) for sol in solution ]) for solution in coloring ]
+    Out[22]:
+    [(green, blue, red, red, green, blue, red, green, blue, green, blue, red), (blue, green, red, red, blue, green, red, blue, green, blue, green, red), (green
+    , red, blue, blue, green, red, blue, green, red, green, red, blue), (blue, red, green, green, blue, red, green, blue, red, blue, red, green), (red, blue, g
+    reen, green, red, blue, green, red, blue, red, blue, green), (red, green, blue, blue, red, green, blue, red, green, red, green, blue)]
+
+    In [23]: for elt in _: print elt
+       ....:
+    (green, blue, red, red, green, blue, red, green, blue, green, blue, red)
+    (blue, green, red, red, blue, green, red, blue, green, blue, green, red)
+    (green, red, blue, blue, green, red, blue, green, red, green, red, blue)
+    (blue, red, green, green, blue, red, green, blue, red, blue, red, green)
+    (red, blue, green, green, red, blue, green, red, blue, red, blue, green)
+    (red, green, blue, blue, red, green, blue, red, green, red, green, blue)
+
+    In [24]: 2*(x + 1)
+    Out[24]: 2 + 2⋅x
+
+    In [25]: ext = exp(2*pi*I/3).expand(complex=True)
+
+    In [26]: ext
+    Out[26]:
+               ⎽⎽⎽
+           ⅈ⋅╲╱ 3
+    -1/2 + ───────
+              2
+
+    In [27]: AlgebraicNumber(ext, alias='alpha')
+    Out[27]: α
+
+    In [28]: factor(x**3 - 1, extension=_)
+    Out[28]: (-1 + x)⋅(x - α)⋅(1 + x + α)
+
+    In [29]: factor(x**3 - 1)
+    Out[29]:
+             ⎛         2⎞
+    (-1 + x)⋅⎝1 + x + x ⎠
+
+    In [30]: factor(x**3 - 1, extension=ext)
+    Out[30]:
+             ⎛              ⎽⎽⎽⎞ ⎛              ⎽⎽⎽⎞
+             ⎜          ⅈ⋅╲╱ 3 ⎟ ⎜          ⅈ⋅╲╱ 3 ⎟
+    (-1 + x)⋅⎜1/2 + x - ───────⎟⋅⎜1/2 + x + ───────⎟
+             ⎝             2   ⎠ ⎝             2   ⎠
 
 Algebraic geometry
 ------------------
@@ -1174,7 +1312,7 @@ Besides the obvious application of solving systems of polynomial equations and t
 for computing LCMs and GCDs of multivariate polynomials, the |groebner| basis method is also used
 in SymPy for computing minimal polynomials of algebraic numbers, primitive elements of algebraic
 fields and isomorphisms between algebraic fields (for a detailed theoretical discussion see
-[Adams1994intro]_ and algorithms refer to [Cohen1993computational]_). For all those tasks there
+[Adams1994intro]_ and algorithms refer to [Cohen1993course]_). For all those tasks there
 are much more efficient algorithms implemented in SymPy. However, |groebner| bases remain the
 fallback tool if any of the fast algorithms isn't suitable for a particular job. For example,
 minimal polynomials can be relatively easily computed using PSLQ algorithm (see :func:`pslq`
@@ -1202,7 +1340,7 @@ emphasised that the Buchberger algorithm is very fragile to the choice of the or
 monomials, so it often happens that a |groebner| basis, for a set of polynomials, with respect
 to one ordering is computable in relatively short time, whereas to compute it with respect to
 another ordering one would have to wait ages. Lexicographic |groebner| bases are considered to
-be the most expensive ones. In [Buchberger2001introduction]_ we can find a simple--looking system
+be the most expensive ones. In [Buchberger2001systems]_ we can find a simple--looking system
 of three polynomials in three variables:
 
 .. math::
