@@ -178,6 +178,8 @@ Literature
 .. [PythonIssue1771] http://bugs.python.org/issue1771
 .. [SymPyGSoC2010] http://wiki.sympy.org/wiki/GSoC2010Ideas
 .. [PlanetMathSymmetric] http://planetmath.org/encyclopedia/ReductionAlgorithmForSymmetricPolynomials.html
+.. [MaximaGroebner] http://maxima.sourceforge.net/docs/manual/en/maxima_54.html
+.. [MathematicaGroebner] http://reference.wolfram.com/mathematica/tutorial/ComplexPolynomialSystems.html
 .. [Buchberder1965thesis]
 .. [Abramson2006translation]
 .. [Abramson2009history]

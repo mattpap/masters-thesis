@@ -915,9 +915,10 @@ We can try another admissible solution::
          2  4
     d⋅n⋅p ⋅q
 
-but we will always arrive with the same minimal solution. This approach can be generalized for solving
-arbitrary integer optimization problems (for a detailed theoretical and algorithmic background see
-[Sturmfels1996lectures]_ or [Adams1994intro]_).
+but we will always arrive with the same minimal solution. This example might seem trivial, because we
+can easily solve the problem by hand, however it shows the approach that can be further generalized for
+solving arbitrary integer optimization problems (for a detailed theoretical and algorithmic background
+see [Sturmfels1996lectures]_ and [Adams1994intro]_).
 
 One should notice that the polynomials arising in this example are of a special, binomial form, where
 there are few terms but very large exponents. |groebner| bases of systems of polynomials of this kind
@@ -1109,10 +1110,21 @@ Axiom and Mathematica.
 One feature that makes SymPy different from other mathematical systems is that SymPy utilizes a general
 purpose programming language for its core, modules and interaction with the user, whereas Maxima, Axiom
 and Mathematica invent their own special languages for implementing their mathematical libraries and for
-user interaction. This will require us to make a few remarks also on the syntactic level.
+user interaction. This will require us to make some remarks also on the syntactic level.
 
-`Maxima <maxima.sourceforge.net>`_ uses a very ...
-::
+`Maxima <http://maxima.sourceforge.net>`_ implements |groebner| bases in an extension library. Detailed
+documentation can be found in [MaximaGroebner]_. We will reuse the same example and, as much as possible,
+the same computational approach. Maxima first requires us to load the |groebner| bases library. Note that
+we write ``grobner`` in this case. User should also remember about putting a semicolon at the end of every
+line. Next we define edges of the graph using a list of two element lists (there are no tuples in Maxima).
+Maxima uses very unusual syntax for variable assignment, utilizing colon for this purpose. In the next
+step we define the list of variables ``Vx`` and systems of polynomial equations ``F3`` and ``Fg``. Instead
+of list comprehensions we use :func:`makelist` function. One should note that Maxima uses ``^`` symbol for
+exponentiation, whereas Python uses this symbol for bitwise XOR operation. Finally we can compute the
+|groebner| basis using :func:`poly_reduced_grobner`. Maxima by default assumes *lexicographic* ordering
+of monomials. This information can be changed only by setting a global variable. As the last step we
+check if the computed basis is non--trivial, utilizing :func:`is` and :func:`notequal` functions. Lets
+see full source code for this example::
 
     (i1) load(grobner);
 
@@ -1133,7 +1145,23 @@ user interaction. This will require us to make a few remarks also on the syntact
     (i8) is(notequal(G, [1]));
     (o8) true
 
-::
+`Axiom <http://axiom-developer.org>`_ implements |groebner| bases toolkit in its core algebra library.
+The documentation on this matter, thought not very extensive, can be found in [Daly2003horizon]_. Axiom
+uses a sophisticated autoloader of its library components, so explicit package loading in not necessary.
+As previously we start with the definition of the set of edges using a list of list. On should notice
+that, this time, the assignment operator is ``:=``. Semicolons at the end of lines aren not obligatory,
+however, useful for preventing printing of the results of computations. Next we define ``Vx`` and ``Ex``
+in a way very similar to Python, as Axiom supports list comprehensions. The main difference is Axiom's
+approach to indexing lists. Axiom does not use an object oriented language, as one might presume looking
+at the source code, and it doesn't support properties. This give opportunity for reusing the dot operator
+for indexing purpose (notice also one--base indexes). Next definitions of ``F3`` and ``Fg`` are almost
+equivalent to what we wrote using SymPy. Finally we compute the |groebner| basis using :func:`groebner`
+function. Notice the ``::`` operator. It tells that the previously constructed polynomials should belong
+to the domain that is on its right hand side, i.e. distributed multivariate polynomial in symbols from
+``Vx`` with coefficients over integers. At the end we check that the basis in non--trivial using ``~=``
+operator. Note that ``~=`` is not a comparison operator by default, but returns an unequality, so we
+need to use coercion operator ``@`` to tell ``~=`` to end up with a ``Boolean`` result immediately.
+Here is the full source code for this example::
 
     (1) -> E := [[1,2],[2,3],[1,4],[1,6],[1,12],[2,5],[2,7],
     [3,8],[3,10],[4,11],[4,9],[5,6],[6,7],[7,8],[8,9],[9,10],
@@ -1149,6 +1177,12 @@ user interaction. This will require us to make a few remarks also on the syntact
 
     (7) -> (G ~= [1]) @ Boolean
        (7) true
+
+`Mathematica <http://www.wolfram.com/mathematica/>`_ has extensive built--in support for |groebner|
+bases. Detailed documentation on this matter can be found in [MathematicaGroebner]_. Mathematica
+has a very peculiar language for interaction with the user and its syntax, which was influence by
+the infix dialect of lisp (or m--lisp), is very different from other languages used in symbolic
+mathematics, so will skip detailed syntactic comparison and refer the reader to [Wolfram2003book]_.
 
 ::
 
@@ -1168,11 +1202,21 @@ user interaction. This will require us to make a few remarks also on the syntact
     In[8]:= G != {1}
     Out[8]= True
 
+We showed how to perform classical vertex coloring of a graph based on the |groebner| bases method
+using SymPy and three other mathematical systems. It is interesting to compare the times that were
+needed to compute the |groebner| basis $G$ by each of those systems. Timings (average of multiple
+runs) were stored in the following table:
+
 +----------+-------+--------+-------+-------------+
 |          | SymPy | Maxima | Axiom | Mathematica |
 +==========+=======+========+=======+=============+
 | Time [s] | 15.4  | 17.6   | 3.6   | 0.34        |
 +----------+-------+--------+-------+-------------+
+
+This shows that both SymPy and Maxima are significantly slower than Axiom and Mathematica. This is
+happens, because the implementation of |groebner| bases in both systems is done in an interpreted
+language (Python and Maxima language, respectively). Possibly they also implement less(--powerful)
+criteria for eliminating useless critical pairs.
 
 The structure of vertex coloring
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1390,7 +1434,8 @@ of three polynomials in three variables:
 
 for which a |groebner| basis with respect to lexicographic ordering can't be computed in a *reasonable*
 time in SymPy. However, if we switch to graded lexicographic ordering of monomials, SymPy requires less
-than a second to construct the basis. For comparison, Mathematica can compute both bases at glance.
+than a second to construct the basis. For comparison, Mathematica can compute both bases at glance (see
+[Mathematica2009internal]_ for a description of its implementation of Buchberger algorithm).
 
 However, as the examples showed us, there is often a lot of *structure* in the |groebner| bases found
 in practical applications, so many non--trivial and interesting |groebner| bases are relatively simple
