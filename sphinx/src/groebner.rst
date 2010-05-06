@@ -78,12 +78,10 @@ a polynomial. The definition of s--polynomials can be directly transformed into 
         return expand(lcm(LM(f), LM(g))*(1/LT(f)*f - 1/LT(g)*g))
 
 utilizing SymPy's built--in polynomial manipulation functions :func:`LT`, :func:`LM`, :func:`lcm`
-and :func:`expand`, as well as multivariate polynomial arithmetics.
-
-.. TODO: tell about orderings of monomials
-
-..    with PolyContext(x, y, z, order='lex'):
-..        h = s_polynomial(f, g)
+and :func:`expand`, as well as multivariate polynomial arithmetics. For readability purpose, we
+skipped in this definition important information about the ordering of polynomials. What is an
+ordering of monomials? For now it is sufficient to assume that it exists and is fixed. In the
+following sections we will investigate this in detail.
 
 What is a |groebner| basis?
 ---------------------------
@@ -110,10 +108,12 @@ There are only two polynomials in $F$ so it is sufficient to check just a single
 if $F$ is a |groebner| basis or not. Lets apply Buchberger criterion to $f_1$ and $f_2$::
 
     >>> s_polynomial(f1, f2)
-    TODO
+                3
+    -2⋅x⋅y + 2⋅y
 
     >>> reduced(_, F)[1]
-    TODO
+       3
+    2⋅y  - 4⋅y
 
 We computed the s--polynomial of $f_1$ and $f_2$ and the resulting remainder is non--zero, so
 $F$ isn't a |groebner| basis. Lets see what will happen when we adjoin this remainder to $F$::
@@ -125,17 +125,23 @@ Now we have three polynomials in $F$ and three pairs to check, i.e. $(f_1, f_2)$
 and $(f_2, f_3)$ (actually only the two new pairs, but lets check all three for completeness)::
 
     >>> s_polynomial(f1, f2)
-    TODO
+                3
+    -2⋅x⋅y + 2⋅y
+
     >>> reduced(_, F)[1]
     0
 
     >>> s_polynomial(f1, f3)
-    TODO
+               3
+    2⋅x⋅y - 2⋅y
+
     >>> reduced(_, F)[1]
     0
 
     >>> s_polynomial(f2, f3)
-    TODO
+         2      5
+    2⋅y⋅x  - 2⋅y
+
     >>> reduced(_, F)[1]
     0
 
@@ -188,8 +194,8 @@ defined :func:`s_polynomial` and SymPy's built--in :func:`reduced` functions::
         """Toy implementation of Buchberger algorithm. """
         G, pairs = list(F), set([])
 
-        for f1 in F:
-            for f2 in F:
+        for i, f1 in enumerate(F):
+            for f2 in F[i+1:]:
                 pairs.add((f1, f2))
 
         while pairs:
@@ -212,7 +218,21 @@ defined :func:`s_polynomial` and SymPy's built--in :func:`reduced` functions::
 
         return G
 
-.. TODO: analyze the algorithm (once again orderings)
+Lets analyze :func:`buchberger` step--by--step. As the first step we assign $G$ with the input
+system of polynomial equations $F$ and generate a set with all (unordered) pairs of polynomials
+from $F$. We will use this set to verify the Buchberger criterion for $G$. Next we enter a loop,
+which will execute until there are *critical* pairs to check. If there are no more pairs, then
+the Buchberger criterion is satisfied and $G$ is a |groebner| basis. In the loop, we take a pair
+of polynomials $f_1$ and $f_2$, and compute their s--polynomial and its reduction with respect
+to the current basis. If the reduction is non--zero, we adjoin new element to $G$ and update
+the set of *critical* pairs. When the loop terminates we obtain a |groebner| basis of $F$. In
+the final step of the algorithm, if ``reduced`` flag is set, we reduce each element of the basis
+with respect to other elements and make each element monic, obtaining a reduced |groebner| basis.
+
+As it was done with the definition of the function for computing s--polynomials, also in this case
+we simplified the implementation by skipping additional information about the ordering of monomials.
+This is not an issue, because SymPy assumes *lexicographic* ordering by default and allows to use
+*context managers* for configuring ordering post facto.
 
 Termination of the algorithm
 ----------------------------
@@ -1082,14 +1102,14 @@ way we could issue ``Vx = [None] + Vx`` and then ``x3 = Vx[3]``.
 Vertex coloring using other systems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-So far we showed how to solve classical vertex--coloring problem with SymPy. Lets now compare SymPy's
-syntax and semantics of |groebner| bases functionality with three commonly used mathematical software:
-Maxima, Axiom and Mathematica.
+We showed so far how to solve classical vertex coloring problem with SymPy. Lets now compare SymPy's
+syntax and semantics of |groebner| bases functionality with three other mathematical software: Maxima,
+Axiom and Mathematica.
 
 One feature that makes SymPy different from other mathematical systems is that SymPy utilizes a general
 purpose programming language for its core, modules and interaction with the user, whereas Maxima, Axiom
-and Mathematica invent their own special languages for interaction with those systems. This will require
-us to make a few remarks also on the syntactic level.
+and Mathematica invent their own special languages for implementing their mathematical libraries and for
+user interaction. This will require us to make a few remarks also on the syntactic level.
 
 `Maxima <maxima.sourceforge.net>`_ uses a very ...
 ::
