@@ -1,0 +1,22 @@
+
+Master's thesis about SymPy
+===========================
+
+This is the thesis I'm writing at the University of Technology of
+Wrocław in Poland. The full title is as follows:
+
+    Design and Implementation Issues of a Computer Algebra System
+          in an Interpreted, Dynamically Typed Language
+
+License
+-------
+
+Copyright (C) 2010 Mateusz Paprocki, Wrocław University of Technology
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation; with
+no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+A copy of the license is included in the section entitled "GNU Free
+Documentation License".
+
