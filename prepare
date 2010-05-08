@@ -1,0 +1,12 @@
+#!/bin/bash
+
+ROOT=sphinx
+
+rm -rf html
+cp -r $ROOT/_build/html/ html
+cd html
+sphinxtogithub --verbose .
+cd ..
+git add html
+git ci -m "Update"
+
