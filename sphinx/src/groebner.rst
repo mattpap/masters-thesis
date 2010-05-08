@@ -1579,16 +1579,12 @@ zero may happen in certain situations, however, their number is still less than 
 computing |groebner| bases. Thus F5 is considered to be at least one order of magnitude faster than the
 fastest algorithm previously available.
 
-Notes on the internal implementation
-====================================
+.. Notes on the internal implementation
+.. ====================================
 
-.. TODO: write this
+.. ::
 
-As SymPy is implemented in
-
-::
-
-    def sdp_LT(f, u, K):
-        """Returns the leading term of `f`. """
-          return sdp_LM(f, u), sdp_LC(f, K)
+..    def sdp_LT(f, u, K):
+..        """Returns the leading term of `f`. """
+..        return sdp_LM(f, u), sdp_LC(f, K)
 
