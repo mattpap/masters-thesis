@@ -1,0 +1,1604 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Gröbner bases and their applications &mdash; Polynomials Manipulation Module v1.0 documentation</title>
+    <link rel="stylesheet" href="../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/jsMath-3.6e/easy/load.js"></script>
+    <link rel="top" title="Polynomials Manipulation Module v1.0 documentation" href="../index.html" />
+    <link rel="next" title="Algorithmics of GCD and LCM computations" href="gcd.html" />
+    <link rel="prev" title="Introduction to polynomial related algorithms in SymPy" href="algorithms.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="gcd.html" title="Algorithmics of GCD and LCM computations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="algorithms.html" title="Introduction to polynomial related algorithms in SymPy"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="groebner-bases-and-their-applications">
+<span id="thesis-groebner"></span><h1>Gröbner bases and their applications<a class="headerlink" href="#groebner-bases-and-their-applications" title="Permalink to this headline">¶</a></h1>
+<p>The method of Gröbner bases is a powerful technique for solving problems in commutative
+algebra (polynomial ideal theory, algebraic geometry) that was introduced by Bruno Buchberger
+in his PhD thesis <a class="reference external" href="literature.html#buchberder1965thesis">[Buchberder1965thesis]</a> (for English translation see <a class="reference external" href="literature.html#abramson2006translation">[Abramson2006translation]</a>
+and for a historical background see <a class="reference external" href="literature.html#abramson2009history">[Abramson2009history]</a>). Gröbner bases provide a uniform
+approach for solving problems that can be expressed in terms of systems of multivariate polynomial
+equations. It happens that many practical problems, e.g.  in operational research (graph theory),
+can be transformed into sets of polynomials, thus solved using Gröbner bases method. In this
+chapter we will give a short theoretical background on Gröbner bases and then we will show,
+in a tutorial&#8211;like fashion on a series of examples, how to use Gröbner bases machinery in SymPy.</p>
+<div class="section" id="short-introduction-to-groebner-bases">
+<h2>Short introduction to Gröbner bases<a class="headerlink" href="#short-introduction-to-groebner-bases" title="Permalink to this headline">¶</a></h2>
+<p>The Gröbner bases method is a very attractive tool in computer algebra because it is a very
+simple to understand and relatively simple to implement (implementation is SymPy consists of less
+than 150 lines of code) computational method. The low overhead of the theoretical background of
+the principles of the Gröbner bases method (not including the proof of the main theorem, which
+is, on the other hand, very complicated) makes is possible to apply Gröbner bases in various
+areas of science and engineering, not only by mathematicians.</p>
+<p>To introduce the concept of Gröbner bases, following <a class="reference external" href="literature.html#buchberger2001systems">[Buchberger2001systems]</a>, lets consider
+a set <span class="math">F</span> of multivariate polynomial equations, i.e. <span class="math">F = \{ f \in \K\Xn \}</span>, where <span class="math">\K</span> usually
+denotes a field of characteristic zero:</p>
+<ol class="arabic simple">
+<li>we transform the set of polynomials <span class="math">F</span> into another set <span class="math">G</span></li>
+<li>the obtained set <span class="math">G</span> is called a Gröbner basis of <span class="math">F</span></li>
+<li><span class="math">G</span> has some <em>nice</em> properties that the set <span class="math">F</span> does not posses</li>
+<li><span class="math">F</span> and <span class="math">G</span> have exactly the same sets of solutions</li>
+</ol>
+<p>The Gröbner bases theory tells us that:</p>
+<ol class="arabic simple">
+<li>problems which are difficult to solve in terms of <span class="math">F</span>, are <em>easy</em> to solve with <span class="math">G</span></li>
+<li>there exists an algorithm for transforming arbitrary <span class="math">F</span> into an equivalent set <span class="math">G</span></li>
+</ol>
+<p>Taking advantage of this, our approach, in the following sections, will be to understand as much as
+possible about <span class="math">F</span> by inspecting the structure and properties of <span class="math">G</span>. In some cases we will be given a
+set of polynomial equations explicitly. Often, however, our problem will be stated in other <em>language</em>,
+for example in terms of graphs or matrices, and we will need first to transform the original formulation
+into a system of polynomials. Then we will be able to reason about the nature of our initial problem by
+analyzing the Gröbner basis of the constructed set of polynomial.</p>
+</div>
+<div class="section" id="construction-of-groebner-bases">
+<span id="gb-construct"></span><h2>Construction of Gröbner bases<a class="headerlink" href="#construction-of-groebner-bases" title="Permalink to this headline">¶</a></h2>
+<p>Suppose we are given a finite set of polynomials <span class="math">F</span>. The question arises: how to find another set
+of polynomials <span class="math">G</span>, a Gröbner basis of <span class="math">F</span>, such that <span class="math">F</span> and <span class="math">G</span> have the same sets of solutions?
+Moreover, is it possible to find <span class="math">G</span> in a systematic (algorithmic) way? If so, does the algorithm
+always terminate? These were tough questions as of the first half of the 20th century. However, in
+1965 Bruno Buchberger in his PhD thesis gave affirmative answer to all those questions by inventing
+an algorithm for constructing Gröbner bases.</p>
+<div class="section" id="the-notion-of-s-polynomials">
+<h3>The notion of s&#8211;polynomials<a class="headerlink" href="#the-notion-of-s-polynomials" title="Permalink to this headline">¶</a></h3>
+<p>To introduce the algorithm for computing Gröbner bases, Buchberger defined first the notion of,
+so called, s&#8211;polynomials. Given two multivariate polynomials <span class="math">f</span> and <span class="math">g</span>, suppose that <span class="math">L</span> is the
+least common multiple of the leading monomials of <span class="math">f</span> and <span class="math">g</span> with respect to a fixed ordering of
+monomials, i.e. <span class="math">L = \lcm(\LM(f), \LM(g))</span>, then:</p>
+<div class="math">
+\spoly(f, g) = \frac{L}{\LT(f)} f - \frac{L}{\LT(g)} g</div>
+<p>where <span class="math">\LT(\cdot)</span> stands for the leading term and <span class="math">\LM(\cdot)</span> stands for the leading monomial of
+a polynomial. The definition of s&#8211;polynomials can be directly transformed into Python:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">s_polynomial</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">expand</span><span class="p">(</span><span class="n">lcm</span><span class="p">(</span><span class="n">LM</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">LM</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">LT</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">*</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">LT</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">*</span><span class="n">g</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>utilizing SymPy&#8217;s built&#8211;in polynomial manipulation functions <tt class="xref docutils literal"><span class="pre">LT()</span></tt>, <tt class="xref docutils literal"><span class="pre">LM()</span></tt>, <tt class="xref docutils literal"><span class="pre">lcm()</span></tt>
+and <tt class="xref docutils literal"><span class="pre">expand()</span></tt>, as well as multivariate polynomial arithmetics. For readability purpose, we
+skipped in this definition important information about the ordering of polynomials. What is an
+ordering of monomials? For now it is sufficient to assume that it exists and is fixed. In the
+following sections we will investigate this in detail.</p>
+</div>
+<div class="section" id="what-is-a-groebner-basis">
+<h3>What is a Gröbner basis?<a class="headerlink" href="#what-is-a-groebner-basis" title="Permalink to this headline">¶</a></h3>
+<p>Having the definition of s&#8211;polynomials, the fundamental theorem of Gröbner bases (also known as
+the Buchberger criterion) is as follows: a set of polynomials <span class="math">G</span> is a Gröbner basis if for all
+pairs <span class="math">(g_i, g_j)</span> of polynomials in <span class="math">G</span>, the remainder with respect to <span class="math">G</span> of the s&#8211;polynomial
+of <span class="math">g_i</span> and <span class="math">g_j</span> is zero, i.e.:</p>
+<div class="math">
+\forall_{g_i, g_j \in G} \remainder(\spoly(g_i, g_j), G) = 0</div>
+<p>(see <a class="reference external" href="literature.html#adams1994intro">[Adams1994intro]</a> for details). The theorem is constructive, because the concept of
+s&#8211;polynomials is well defined and as the remainder procedure we can take the <em>generalized
+division</em> algorithm (also known as the <em>normal form</em> algorithm, see <a class="reference external" href="literature.html#cox1997ideals">[Cox1997ideals]</a> for a
+detailed description). Given a set of polynomials <span class="math">G</span>, one can check if <span class="math">G</span> is a Gröbner
+basis in a finite number of steps. In SymPy, the generalized division algorithm is implemented
+in <tt class="xref docutils literal"><span class="pre">reduced()</span></tt> function. As an example, lets consider the following set of polynomials:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="p">[</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>There are only two polynomials in <span class="math">F</span> so it is sufficient to check just a single pair to see
+if <span class="math">F</span> is a Gröbner basis or not. Lets apply Buchberger criterion to <span class="math">f_1</span> and <span class="math">f_2</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s_polynomial</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
+<span class="go">            3</span>
+<span class="go">-2⋅x⋅y + 2⋅y</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">F</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">   3</span>
+<span class="go">2⋅y  - 4⋅y</span>
+</pre></div>
+</div>
+<p>We computed the s&#8211;polynomial of <span class="math">f_1</span> and <span class="math">f_2</span> and the resulting remainder is non&#8211;zero, so
+<span class="math">F</span> isn&#8217;t a Gröbner basis. Lets see what will happen when we adjoin this remainder to <span class="math">F</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span> <span class="o">=</span> <span class="n">_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we have three polynomials in <span class="math">F</span> and three pairs to check, i.e. <span class="math">(f_1, f_2)</span>, <span class="math">(f_1, f_3)</span>
+and <span class="math">(f_2, f_3)</span> (actually only the two new pairs, but lets check all three for completeness):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s_polynomial</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
+<span class="go">            3</span>
+<span class="go">-2⋅x⋅y + 2⋅y</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">F</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">0</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s_polynomial</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f3</span><span class="p">)</span>
+<span class="go">           3</span>
+<span class="go">2⋅x⋅y - 2⋅y</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">F</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">0</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s_polynomial</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">)</span>
+<span class="go">     2      5</span>
+<span class="go">2⋅y⋅x  - 2⋅y</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">F</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p>All reductions resulted in zero reminders, so the extended <span class="math">F</span> is a Gröbner basis. This simple
+observation leads to an algorithmic procedure for computing Gröbner bases, which we will fully
+describe in <a class="reference internal" href="#gb-toy"><em>Toy Buchberger algorithm</em></a>.</p>
+</div>
+<div class="section" id="reduced-groebner-bases">
+<h3>Reduced Gröbner bases<a class="headerlink" href="#reduced-groebner-bases" title="Permalink to this headline">¶</a></h3>
+<p>The definition of the concept of Gröbner bases, we gave so far, has one serious flaw. Suppose we
+are given two structurally distinct systems of polynomials <span class="math">F</span> and <span class="math">F'</span>. We would like to know if
+those systems are equivalent. We can compute Gröbner bases <span class="math">G</span> and <span class="math">G'</span> of <span class="math">F</span> and <span class="math">F'</span> respectively.
+With the current definition of Gröbner bases we can&#8217;t tell anything about the relation between <span class="math">F</span>
+and <span class="math">F'</span> by looking at <span class="math">G</span> and <span class="math">G'</span>. However, the Gröbner bases theory tells us that when we compute
+reduced Gröbner bases of those two systems of polynomials, then <span class="math">F</span> is equivalent to <span class="math">F'</span> if the reduced
+Gröbner bases are equal, i.e. <span class="math">G = G'</span>. This is a very strong and important result, because it allows
+us to reason about systems of polynomial by looking only at their reduced Gröbner bases.</p>
+<p>Lets now provide the definition of the concept of reduced Gröbner bases. We will reuse the generalized
+division algorithm for this purpose. Given a set of polynomials <span class="math">G</span>, which is a Gröbner basis by the
+Buchberger criterion, then <span class="math">G</span> is a reduced Gröbner basis when the following statement holds:</p>
+<div class="math">
+\forall_{g \in G} \remainder(g, G - \{g\}) = g \wedge g\;\mbox{is monic}</div>
+<p>Following this definition, given a Gröbner basis <span class="math">G</span>, one can compute a reduced version of <span class="math">G</span>
+simply by reducing each element <span class="math">g \in G</span> with respect to all other elements of the basis and, in
+the end, making all polynomials in <span class="math">G</span> monic. In the remainder of this chapter we will focus only
+on reduced Gröbner bases.</p>
+</div>
+<div class="section" id="toy-buchberger-algorithm">
+<span id="gb-toy"></span><h3>Toy Buchberger algorithm<a class="headerlink" href="#toy-buchberger-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>We are ready to describe the Buchberger algorithm. The algorithm proceeds as follows: take a
+set of polynomials <span class="math">F</span> and set initially <span class="math">G := F</span>, where <span class="math">G</span> will be the desired Gröbner
+basis of <span class="math">F</span> at the and of this procedure. Next apply the Buchberger criterion to see if
+<span class="math">G</span> is already a Gröbner basis. If this is the case, reduce each polynomial in <span class="math">G</span> with
+respect to other polynomials in <span class="math">G</span> and stop. Otherwise pick a pair of polynomials <span class="math">f_1</span> and
+<span class="math">f_2</span> from <span class="math">G</span>, and compute their s&#8211;polynomial. If the remainder with respect to <span class="math">G</span> of the
+s&#8211;polynomial is non&#8211;zero, then adjoin it to <span class="math">G</span>. Iterate until <span class="math">G</span> is a Gröbner basis.</p>
+<p>This simple procedure can be easily coded in Python in just a couple of minutes using previously
+defined <tt class="xref docutils literal"><span class="pre">s_polynomial()</span></tt> and SymPy&#8217;s built&#8211;in <tt class="xref docutils literal"><span class="pre">reduced()</span></tt> functions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">buchberger</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Toy implementation of Buchberger algorithm. &quot;&quot;&quot;</span>
+    <span class="n">G</span><span class="p">,</span> <span class="n">pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="nb">set</span><span class="p">([])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">F</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">f2</span> <span class="ow">in</span> <span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">pairs</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">))</span>
+
+    <span class="k">while</span> <span class="n">pairs</span><span class="p">:</span>
+        <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span> <span class="o">=</span> <span class="n">pairs</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s_polynomial</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">reduced</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">h</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+                <span class="n">pairs</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">))</span>
+
+            <span class="n">G</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">reduced</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">G</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">reduced</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">G</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">G</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+
+        <span class="n">G</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">monic</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">G</span>
+</pre></div>
+</div>
+<p>Lets analyze <tt class="xref docutils literal"><span class="pre">buchberger()</span></tt> step&#8211;by&#8211;step. As the first step we assign <span class="math">G</span> with the input
+system of polynomial equations <span class="math">F</span> and generate a set with all (unordered) pairs of polynomials
+from <span class="math">F</span>. We will use this set to verify the Buchberger criterion for <span class="math">G</span>. Next we enter a loop,
+which will execute until there are <em>critical</em> pairs to check. If there are no more pairs, then
+the Buchberger criterion is satisfied and <span class="math">G</span> is a Gröbner basis. In the loop, we take a pair
+of polynomials <span class="math">f_1</span> and <span class="math">f_2</span>, and compute their s&#8211;polynomial and its reduction with respect
+to the current basis. If the reduction is non&#8211;zero, we adjoin new element to <span class="math">G</span> and update
+the set of <em>critical</em> pairs. When the loop terminates we obtain a Gröbner basis of <span class="math">F</span>. In
+the final step of the algorithm, if <tt class="docutils literal"><span class="pre">reduced</span></tt> flag is set, we reduce each element of the basis
+with respect to other elements and make each element monic, obtaining a reduced Gröbner basis.</p>
+<p>As it was done with the definition of the function for computing s&#8211;polynomials, also in this case
+we simplified the implementation by skipping additional information about the ordering of monomials.
+This is not an issue, because SymPy assumes <em>lexicographic</em> ordering by default and allows to use
+<em>context managers</em> for configuring ordering post facto.</p>
+</div>
+<div class="section" id="termination-of-the-algorithm">
+<h3>Termination of the algorithm<a class="headerlink" href="#termination-of-the-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>Although the Buchberger algorithm is very simple, its termination isn&#8217;t trivial. At the startup
+of this procedure there is only a finite number of pairs of polynomials for which the corresponding
+s&#8211;polynomials have to be computed. Some of those pairs lead to non&#8211;zero reductions, hence <span class="math">G</span> is
+growing and the number of additional pairs, that have to be taken into consideration, also grows.
+Buchberger proved that this process ends in a finite number of steps. Thus we are guaranteed that
+for arbitrary set of polynomials we can compute a corresponding Gröbner basis in finite time.
+An interesting question arises: how much time is actually needed to compute such a basis? We will
+postpone answer to this question till the end of chapter, where we will discuss complexity of the
+Buchberger algorithm and efficiency of SymPy&#8217;s Gröbner bases implementation.</p>
+</div>
+</div>
+<div class="section" id="computing-groebner-bases-with-sympy">
+<h2>Computing Gröbner bases with SymPy<a class="headerlink" href="#computing-groebner-bases-with-sympy" title="Permalink to this headline">¶</a></h2>
+<p>Although the toy implementation of the Buchberger algorithm, presented in the previous section, can
+be used for experimenting with Gröbner bases, its implementation is too naive to make it useful
+for solving more complicated problems. For the purpose of computing reduced Gröbner bases with
+respect to various orderings of monomials, SymPy has a built&#8211;in function <tt class="xref docutils literal"><span class="pre">groebner()</span></tt>, which
+implements a much more efficient version of Buchberger algorithm.</p>
+<p>The main difference between those two implementations is that <tt class="xref docutils literal"><span class="pre">groebner()</span></tt> uses several criteria
+for cutting down the number of polynomial divisions (actually reductions by a set of polynomials), which
+are the central and most expensive part of the Buchberger algorithm. There wouldn&#8217;t be nothing special
+about this, however, most divisions give zero remainder as the result and do not lead to change of
+a Gröbner basis. This way most divisions are just <em>useless</em> and an efficient implementation of the
+Buchberger algorithm must accommodate for this, avoiding as many of those useless divisions as possible.</p>
+<p>Several criteria were invented by the author of the Gröbner bases method a few years after the
+algorithm was introduced. Later on, other more powerful elimination criteria were developed, for
+example, heuristic criteria for lexicographic ordering of monomials (see <a class="reference external" href="literature.html#czapor1991heuristic">[Czapor1991heuristic]</a>)
+or, so called, <em>sugar flavour</em> (see <a class="reference external" href="literature.html#giovini1991sugar">[Giovini1991sugar]</a> for details).</p>
+</div>
+<div class="section" id="admissible-orderings-of-monomials">
+<span id="gb-order"></span><h2>Admissible orderings of monomials<a class="headerlink" href="#admissible-orderings-of-monomials" title="Permalink to this headline">¶</a></h2>
+<p>The main reason for our interest in Gröbner bases is that they have <em>nicer</em> properties, compared
+to other systems of polynomials. Depending on what properties we actually need, we can compute a
+Gröbner basis of a given system with respect to a specific ordering of monomials. The choice of
+monomial order is significant, because different orderings will lead to different properties of the
+resulting basis. Moreover, for a particular system of polynomials, one ordering will make computations
+feasible, whereas another will make Buchberger algorithm executing for ages. In the following sections
+we will give examples showing why the right choice of monomial order is so important.</p>
+<p>There are currently three admissible orderings of monomials implemented in SymPy:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>lex</strong></dt>
+<dd>pure lexicographic order</dd>
+<dt><strong>grlex</strong></dt>
+<dd>total degree order with ties broken by lexicographic order</dd>
+<dt><strong>grevlex</strong></dt>
+<dd>total degree order with ties broken by reversed lexicographic order</dd>
+</dl>
+</blockquote>
+<p>Ordering of monomials can be given to <tt class="xref docutils literal"><span class="pre">groebner()</span></tt> using <tt class="docutils literal"><span class="pre">order</span></tt> keyword argument. The default
+is <tt class="docutils literal"><span class="pre">lex</span></tt> order, as it is the most frequently used monomial order, because it leads to, so called,
+<em>elimination</em> property. The specification of the required ordering of monomials can be passed as a
+string via <tt class="docutils literal"><span class="pre">order</span></tt> keyword or as a single argument function. The other option gives the possibility
+of inventing our own orderings of monomials. In this case, however, SymPy won&#8217;t check if the given
+function defines an admissible ordering or not.</p>
+<p>Suppose we have a system of two bivariate polynomials <tt class="docutils literal"><span class="pre">f1,</span> <span class="pre">f2</span> <span class="pre">=</span> <span class="pre">[2*x**2*y</span> <span class="pre">+</span> <span class="pre">x*y**4,</span> <span class="pre">x**2</span> <span class="pre">+</span> <span class="pre">y</span> <span class="pre">+</span> <span class="pre">1]</span></tt>.
+We can inspect the leading terms with respect two different orderings of monomials of a polynomial with
+assistance of <tt class="xref docutils literal"><span class="pre">LT()</span></tt> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">LT</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;lex&#39;</span><span class="p">)</span>
+<span class="go">   2</span>
+<span class="go">2⋅x ⋅y</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LT</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;grlex&#39;</span><span class="p">)</span>
+<span class="go">   4</span>
+<span class="go">x⋅y</span>
+</pre></div>
+</div>
+<p>Similarly as in <tt class="xref docutils literal"><span class="pre">groebner()</span></tt> function, <tt class="xref docutils literal"><span class="pre">LT()</span></tt> assumes <em>lexicographic</em> ordering  of monomials by
+default. We observe, in the above example, that <tt class="xref docutils literal"><span class="pre">LT()</span></tt> picks up different terms depending on the
+chosen ordering. This happens, because in the case of <tt class="docutils literal"><span class="pre">grlex</span></tt> ordering the total degree of a monomial
+is more important than the sequence exponents of that monomial. Differences between leading terms computed
+by <tt class="xref docutils literal"><span class="pre">LT()</span></tt> influence computations of Gröbner bases:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groebner</span><span class="p">([</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;lex&#39;</span><span class="p">)</span>
+<span class="go">⎡                   7    4                                          ⎤</span>
+<span class="go">⎢ 2                y    y       2         8    7      3      2      ⎥</span>
+<span class="go">⎢x  + y + 1, x⋅y + ── + ── + 2⋅y  + 2⋅y, y  + y  + 4⋅y  + 8⋅y  + 4⋅y⎥</span>
+<span class="go">⎣                  2    2                                           ⎦</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groebner</span><span class="p">([</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;grlex&#39;</span><span class="p">)</span>
+<span class="go">⎡   4      2             2            5    4   2        ⎤</span>
+<span class="go">⎣x⋅y  - 2⋅y  - 2⋅y, 2⋅x⋅y  + 2⋅x⋅y + y  + y , x  + y + 1⎦</span>
+</pre></div>
+</div>
+<p>Originally orderings of monomials were implemented as comparison functions and passed to <a title="(in Python v2.6)" class="reference external" href="http://docs.python.org/library/functions.html#sorted"><tt class="xref docutils literal"><span class="pre">sorted()</span></tt></a>
+built&#8211;in function via <tt class="docutils literal"><span class="pre">cmp</span></tt> keyword argument. This approach was inefficient, because the nature of
+the sorting algorithm required to compute ordering information (e.g. total degree) about a particular
+monomial multiple times in this scheme. Eventually, <tt class="docutils literal"><span class="pre">cmp</span></tt>&#8211;style sorting was dropped in Python 3.0,
+in favour of <tt class="docutils literal"><span class="pre">key</span></tt>&#8211;based sorting <a class="reference external" href="literature.html#pythonissue1771">[PythonIssue1771]</a>. The new implementation of orderings of monomials
+is based on the concept of <tt class="docutils literal"><span class="pre">key</span></tt>&#8211;functions. When implementing user defined orderings, one must conform
+to the new approach.</p>
+<p>In principle, in the <tt class="docutils literal"><span class="pre">key</span></tt>&#8211;based approach, one has to return all required ordering information about
+a particular monomial in a form of tuple (with correct order of elements). In the case of <em>lexicographic
+ordering</em> of monomials, this information simply consists of the input monomial itself:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">monomial_lex_key</span><span class="p">(</span><span class="n">monom</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Key function for sorting monomials in lexicographic order. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">monom</span>
+</pre></div>
+</div>
+<p>The above is an exact excerpt from <tt class="docutils literal"><span class="pre">sympy/polys/monomialtools.py</span></tt>, where orderings of monomials are
+implemented. In the case of <em>graded lexicographic ordering</em> we have an additional information, which is
+the total degree of an input monomial, so the key function for <tt class="docutils literal"><span class="pre">grlex</span></tt> order is defined as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">monomial_grlex_key</span><span class="p">(</span><span class="n">monom</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Key function for sorting monomials in graded lexicographic order. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">monom</span><span class="p">),</span> <span class="n">monom</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This approach generalizes to other orderings as well. One should also note that the order variables is
+also an important factor when computing Gröbner bases, as there are <span class="math">n!</span> specific orderings for a
+given ordering of monomials (where <span class="math">n</span> is the number of variables involved in computations).</p>
+</div>
+<div class="section" id="specialization-of-groebner-bases">
+<h2>Specialization of Gröbner bases<a class="headerlink" href="#specialization-of-groebner-bases" title="Permalink to this headline">¶</a></h2>
+<p>The Gröbner bases algorithm specializes to:</p>
+<ol class="arabic simple">
+<li><em>Gauss&#8217; algorithm</em> for linear polynomials</li>
+<li><em>Euclid&#8217;s algorithm</em> for univariate polynomials</li>
+</ol>
+<div class="section" id="special-case-1-gauss-algorithm">
+<h3>Special case 1: Gauss&#8217; algorithm<a class="headerlink" href="#special-case-1-gauss-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>Lets consider the following system of linear equations:</p>
+<div class="math">
+\begin{split}\left\{
+\begin{array}{rcl}
+   x + 5 y &amp;=&amp; 2    \\
+-3 x + 6 y &amp;=&amp; 15
+\end{array}
+\right.\end{split}</div>
+<p>which can be written in Python as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">5</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">6</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="mi">15</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>It&#8217;s a simple system, so it can be solved by hand. We can, however, use Gröbner bases
+machinery to solve this system algorithmically:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groebner</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">[x + 3, y - 1]</span>
+</pre></div>
+</div>
+<p>As the result we got a list of two polynomials. From te list we can obtain the solution
+of the system, which is <span class="math">x = -3</span> and <span class="math">y = 1</span> in this case. The same can be computed using
+a much more traditional tool in the field of linear algebra, mainly using Gauss&#8211;Jordan
+algorithm:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">solve</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">{x: -3, y: 1}</span>
+</pre></div>
+</div>
+<p>We obtained the same solution but in the dictionary form this time. It&#8217;s interesting to
+notice that currently, at least for small inputs, the Gröbner bases approach is much
+efficient than a specialized solver. Lets compare those two methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">groebner</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">100 loops, best of 3: 5.15 ms per loop</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">solve</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">10 loops, best of 3: 22.7 ms per loop</span>
+</pre></div>
+</div>
+<p>An explanation of this result is as follows: Gröbner bases utilize very efficient core
+of polynomials manipulation module, whereas <tt class="xref docutils literal"><span class="pre">solve()</span></tt> uses inefficient implementation
+of linear algebra in SymPy. This situation will change and the observed phenomenon will
+disappear in near future, when linear algebra module will be refactored (using similar
+approach to what was done with polynomials manipulation module).</p>
+</div>
+<div class="section" id="special-case-2-euclid-s-algorithm">
+<h3>Special case 2: Euclid&#8217;s algorithm<a class="headerlink" href="#special-case-2-euclid-s-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>Lets now focus on the other case, i.e. on computation of greatest common divisors of polynomials.
+For this, consider two univariate polynomials <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>, both in the indeterminate <tt class="docutils literal"><span class="pre">x</span></tt>,
+with coefficients in the ring of integers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">expand</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">7</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">expand</span><span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">7</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>We can easily see that those polynomials have to factors in common (of multiplicity three
+and one respectively). Lets verify this observation using Gröbner bases algorithm:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groebner</span><span class="p">([</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">])</span>
+<span class="go">⎡ 4       3       2              ⎤</span>
+<span class="go">⎣x  + 16⋅x  + 90⋅x  + 216⋅x + 189⎦</span>
+</pre></div>
+</div>
+<p>We obtained a polynomial of degree four which clearly verifies observation concerning
+multiplicities of the commons factors of <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>. Lets add more structure to
+the computed polynomial GCD using factorization:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">factor</span><span class="p">(</span><span class="n">_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">       3</span>
+<span class="go">(x + 3) ⋅(x + 7)</span>
+</pre></div>
+</div>
+<p>Now we can clearly see the common factors of the input polynomials. Although utilization of
+Gröbner bases algorithm for computing GCDs of univariate polynomials is very fancy, there
+are much more efficient algorithms for this purpose. In SymPy we currently use heuristic GCD
+algorithm over integers and rationals, and subresultants over other domains.</p>
+<p>Moreover, Gröbner bases can be used to compute greatest common divisors of multivariate
+polynomials (see <a class="reference external" href="literature.html#cox1997ideals">[Cox1997ideals]</a>). The algorithm reduces the problem of finding the GCD of
+two multivariate polynomials, say <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>, into the problem of finding their least
+common multiple. The final result is obtained using the well known formula that relates
+GCD with LCM:</p>
+<span class="eqno">(1)</span><div class="math" id="equation-gcdlcm">
+\gcd(f, g) = \frac{f \cdot g}{\lcm(f, g)}</div>
+<p>The multivariate polynomial LCM is computed as the unique generator of the intersection of
+the two ideals generated by <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>. The approach is to compute a Gröbner basis
+of <span class="math">t \cdot f</span> and <span class="math">(1 - t) \cdot g</span>, where <span class="math">t</span> is an unrelated variable, with respect to
+lexicographic order of terms which eliminates <span class="math">t</span>. The polynomial LCM of <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>
+is the last element of the computed Gröbner basis.</p>
+<p>As an example consider the following two bivariate polynomials over integers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">expand</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">expand</span><span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>To compute the GCD of <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt> we will introduce new variable <span class="math">t</span> and then we will
+find a Gröbner basis of <span class="math">t \cdot f</span> and <span class="math">(1 - t) \cdot g</span> which eliminates <span class="math">t</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">([</span><span class="n">t</span><span class="o">*</span><span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">g</span><span class="p">],</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the order of variables is significant. We chose <span class="math">t</span> to be of higher rank than
+<span class="math">x</span> or <span class="math">y</span> to allow Gröbner basis algorithm to eliminate it from the last element of
+the basis. As the relative rank of <span class="math">x</span> and <span class="math">y</span> is not important in this case, we can
+rewrite the above expression in a slightly different form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">([</span><span class="n">t</span><span class="o">*</span><span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">g</span><span class="p">],</span> <span class="n">wrt</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This syntax signifies that the only important knowledge here is that <span class="math">t</span> comes before
+any other variable. This approach is also far more general because we could use input
+polynomials with more variables without changing the algorithm, as long as there is no
+clash of variables with <span class="math">t</span>. We can guarantee that this won&#8217;t happen by declaring <span class="math">t</span>
+as a <em>dummy</em> variable, i.e. <tt class="docutils literal"><span class="pre">t</span> <span class="pre">=</span> <span class="pre">Symbol('t',</span> <span class="pre">dummy=True)</span></tt>.</p>
+<p>Also one should note that we didn&#8217;t specify the order of terms in Gröbner basis
+computation. As we use <em>lexicographic</em> order for computing the LCM of <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>
+we need to provide no further information, because all algorithms in polynomials
+manipulation module use <em>lexicographic</em> order of terms by default.</p>
+<p>Given a Gröbner basis of the ideal generated by <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>, the last element
+of this basis is the desired LCM. By using formula <a href="#equation-gcdlcm">(1)</a> we can compute the
+greatest common divisor of the input polynomials:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">quo</span><span class="p">(</span><span class="n">f</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">basis</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="go"> 4        3        3    4</span>
+<span class="go">x  + 2⋅y⋅x  - 2⋅x⋅y  - y</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">factor</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">       3</span>
+<span class="go">(x + y) ⋅(x - y)</span>
+</pre></div>
+</div>
+<p>We obtained the correct GCD of <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>. As in the univariate case, the same
+result can computed, thought much more efficiently, using <tt class="xref docutils literal"><span class="pre">gcd()</span></tt> function, which
+utilizes specialized algorithms for computing greatest common divisors.</p>
+<p>Historically this was the first algorithm for computing GCDs of multivariate polynomials
+in SymPy. Although it&#8217;s not a very efficient approach to the problem, it can serve as a
+good explanation of Gröbner bases machinery. Currently we use heuristic GCD algorithm
+for the task and there are plans to implement EEZ algorithm for this task.</p>
+</div>
+</div>
+<div class="section" id="applications-of-groebner-bases">
+<h2>Applications of Gröbner bases<a class="headerlink" href="#applications-of-groebner-bases" title="Permalink to this headline">¶</a></h2>
+<p>In the previous section we saw a few examples of applications of Gröbner bases, which one may
+consider a little artificial. This was, however, just a short prelude to the true importance of
+the Gröbner bases method. Over the years, Gröbner bases theory gained a lot of attention
+outside the mathematical community and applications for it have been found in many areas of science
+and engineering. Bruno Buchberger, the inventor of Gröbner bases algorithm, deserves a lot of
+credit for this state of art, because of his many publications and books which popularized the method
+in scientific and engineering communities. Below is a list (following <a class="reference external" href="literature.html#buchberger1998applications">[Buchberger1998applications]</a>),
+thought incomplete, of the major areas in which Gröbner bases were applied with great success:</p>
+<ul class="simple">
+<li>Algebraic Geometry</li>
+<li>Coding Theory</li>
+<li>Cryptography</li>
+<li>Invariant Theory</li>
+<li>Integer Programming</li>
+<li>Graph Theory</li>
+<li>Statistics</li>
+<li>Symbolic Integration</li>
+<li>Symbolic Summation</li>
+<li>Differential Equations</li>
+<li>Systems Theory</li>
+</ul>
+<p>In <a class="reference external" href="literature.html#buchberger2001systems">[Buchberger2001systems]</a> there is an even longer list of applications specific to systems theory.
+In the following subsections we will examine several practical applications of the Gröbner bases
+method and explain how to conduct all computations using SymPy&#8217;s polynomials manipulation module.</p>
+<div class="section" id="solving-systems-of-polynomial-equations">
+<h3>Solving systems of polynomial equations<a class="headerlink" href="#solving-systems-of-polynomial-equations" title="Permalink to this headline">¶</a></h3>
+<p>In the previous section we showed that Gröbner bases can be used for solving systems
+of linear equations. This is an interesting, although not very useful result because we
+have specialized algorithms for the task. However, Gröbner bases can used to tackle
+much more complicated problem: finding solutions of systems of <em>polynomial</em> equations.</p>
+<p>To accomplish this we will utilize a very fruitful property of Gröbner bases: elimination
+property. Following <a class="reference external" href="literature.html#buchberger2001systems">[Buchberger2001systems]</a> and <a class="reference external" href="literature.html#adams1994intro">[Adams1994intro]</a>, suppose <span class="math">F</span> is a set of
+polynomial equations, such that every element of <span class="math">F</span> belongs to <span class="math">\K\Xn</span>, where <span class="math">\K</span> is a field
+of positive characteristic, and <span class="math">G</span> is its Gröbner computed with respect to any <em>elimination</em>
+ordering of terms (e.g. lexicographic ordering). We assume that <span class="math">x_1 \succ \ldots \succ x_n</span>. Then
+<span class="math">F</span> and <span class="math">G</span> generate the same ideal, so they have the same set of solutions. The elimination property
+of Gröbner bases guarantees that if <span class="math">G</span> has only a finite number of solutions then <span class="math">G</span> has exactly
+one polynomial in <span class="math">x_n</span>, i.e. a univariate polynomial which can solved. As <tt class="xref docutils literal"><span class="pre">groebner()</span></tt> returns
+a sorted basis, the univariate polynomial will be the last element the basis.</p>
+<p>In principle the algorithm works as follows: given a set of polynomial equations <span class="math">F</span> we compute
+its Gröbner basis <span class="math">G</span> with respect to lexicographic term order. If <span class="math">G</span> has only one univariate
+polynomial then we solve it, e.g. by radicals (if possible), and substitute the solutions back to
+<span class="math">G</span>, skipping the univariate polynomial we already solved, obtaining a set of smaller polynomial
+systems. If the system doesn&#8217;t have finite number of solutions we output <tt class="docutils literal"><span class="pre">failed</span></tt> or fallback
+to other methods. We continue this method recursively until we find all solutions for all variables
+of the initial system.</p>
+<p>To illustrate this process, lets consider a simple bivariate example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We compute a lexicographic Gröbner basis of <span class="math">F</span> assuming that <span class="math">y \succ x</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span>
+<span class="go">⎡   2                           ⎤</span>
+<span class="go">⎢  x     2              3      2⎥</span>
+<span class="go">⎢- ── + y , x⋅y - 2⋅y, x  - 2⋅x ⎥</span>
+<span class="go">⎣  2                            ⎦</span>
+</pre></div>
+</div>
+<p>As the last element of the basis we obtained a univariate polynomial in <span class="math">x</span>, confirming what
+the theory predicted. We can easily solve this polynomial using <tt class="xref docutils literal"><span class="pre">roots()</span></tt> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">roots</span><span class="p">(</span><span class="n">_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">{0: 2, 2: 1}</span>
+</pre></div>
+</div>
+<p>We obtained three solutions: <span class="math">x_1 = 0</span>, <span class="math">x_2 = 0</span> and <span class="math">x_3 = 2</span>. We can substitute them back
+into the computed Gröbner basis <span class="math">G</span>. We are guaranteed that the resulting polynomials in
+each new system will have a nontrivial greatest common divisor. Lets take <span class="math">x_1</span> (the same
+will follow for <span class="math">x_2</span>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">g</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">G</span> <span class="p">]</span>
+<span class="go">⎡ 2         ⎤</span>
+<span class="go">⎣y , -2⋅y, 0⎦</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groebner</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">[y]</span>
+</pre></div>
+</div>
+<p>So we obtained a solution of <span class="math">F</span>, mainly <span class="math">(x, y) = (0, 0)</span> of multiplicity <span class="math">2</span>, because
+<span class="math">x_1 = x_2</span>. The necessity to specify <span class="math">y</span> in the above computation comes from the fact
+that currently expression parsing is done independently for each polynomial in the input
+system, so without <span class="math">y</span> the function would complain that it doesn&#8217;t know how to construct
+a polynomial from <span class="math">0</span>. As we know from the previous section, the Gröbner basis algorithm
+is equivalent to GCD computation in the univariate case, so we could have computed GCD of
+<tt class="docutils literal"><span class="pre">[y**2,</span> <span class="pre">-2*y,</span> <span class="pre">0]</span></tt> as well to obtain the same result.</p>
+<p>Similarly we can can substitute <span class="math">x_3</span> for <span class="math">x</span> in <span class="math">G</span> obtaining:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">g</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">G</span> <span class="p">]</span>
+<span class="go">⎡ 2          ⎤</span>
+<span class="go">⎣y  - 2, 0, 0⎦</span>
+</pre></div>
+</div>
+<p>We got a single univariate polynomial which we can solve by radicals:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">roots</span><span class="p">(</span><span class="n">_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">⎧  ___        ___   ⎫</span>
+<span class="go">⎨╲╱ 2 : 1, -╲╱ 2 : 1⎬</span>
+<span class="go">⎩                   ⎭</span>
+</pre></div>
+</div>
+<p>So the remaining two solutions are <span class="math">(2, \sqrt{2})</span> and <span class="math">(2, -\sqrt{2})</span>. This way we found
+all solutions of <span class="math">F</span>. This was simple example. In more complicated ones we would need to
+compute Gröbner bases recursively after each substitution.</p>
+<p>An algorithm for solving systems of polynomial equations was implemented in polynomials
+manipulation module in SymPy, so we can compute solutions of <span class="math">F</span> issuing a single command:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">solve</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+<span class="go">⎡        ⎛      ___⎞  ⎛     ___⎞⎤</span>
+<span class="go">⎣(0, 0), ⎝2, -╲╱ 2 ⎠, ⎝2, ╲╱ 2 ⎠⎦</span>
+</pre></div>
+</div>
+<p>Note that only unique solutions are returned by <tt class="xref docutils literal"><span class="pre">solve()</span></tt>. One should also remember that
+only systems with finite number of solutions can be handled using Gröbner bases approach.
+Suppose we form a new system of polynomial equations <span class="math">G</span> by multiplying <span class="math">F</span> element&#8211;wise by
+a third variable, say <span class="math">t</span>, i.e. <tt class="docutils literal"><span class="pre">G</span> <span class="pre">=</span> <span class="pre">[</span> <span class="pre">t*f</span> <span class="pre">for</span> <span class="pre">f</span> <span class="pre">in</span> <span class="pre">F</span> <span class="pre">]</span></tt>. Then <span class="math">G</span> has infinite number of
+solutions, because both polynomials in the system are homogeneous and if <span class="math">t = 0</span> then we can
+choose arbitrary values for <span class="math">x</span> and <span class="math">y</span>. If <span class="math">G</span> was given as input to <tt class="xref docutils literal"><span class="pre">solve()</span></tt>, then it
+would result in <a title="(in Python v2.6)" class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.NotImplementedError"><tt class="xref docutils literal"><span class="pre">NotImplementedError</span></tt></a> exception. Support for solving of systems of
+polynomial equations with infinite number of solutions is a subject for implementation
+in future versions of SymPy.</p>
+<p>Lets back for a moment to the point where we were computing the Gröbner basis of <span class="math">F</span>. We
+did the computation with respect to <span class="math">y</span>, i.e. assuming <span class="math">y \succ x</span>. Now we will compute the
+Gröbner basis of <span class="math">F</span> the other way:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groebner</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+<span class="go">⎡ 2      2              3      ⎤</span>
+<span class="go">⎣x  - 2⋅y , x⋅y - 2⋅y, y  - 2⋅y⎦</span>
+</pre></div>
+</div>
+<p>As expected, we got a univariate polynomial in <span class="math">y</span>, however, a different one:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">roots</span><span class="p">(</span><span class="n">_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">⎧        ___        ___   ⎫</span>
+<span class="go">⎨0: 1, ╲╱ 2 : 1, -╲╱ 2 : 1⎬</span>
+<span class="go">⎩                         ⎭</span>
+</pre></div>
+</div>
+<p>Previously we got three rational solutions, so after substitution we got polynomials with
+rational coefficients and, as a consequence, we could use more efficient algorithms. Now
+we run into a little trouble because we will have to carry those square roots all along
+our computations. We can&#8217;t actually complain about this because this is the nature of the
+problem we are solving and we were just lucky in the previous case, where algebraic numbers
+were introduced at the very end.</p>
+<p>There is a method <a class="reference external" href="literature.html#strzebonski1997computing">[Strzebonski1997computing]</a> to avoid computing with algebraic numbers, which
+requires enlarging of the input polynomial system to <tt class="xref docutils literal"><span class="pre">groebner()</span></tt>. Instead of substituting
+an algebraic number for a variable, we can instead substitute a <em>dummy</em> variable for it and add
+the minimal polynomial of the algebraic number to the system of equations. This way we have
+a simpler coefficient domain but a larger system we pass to the Gröbner basis algorithm.
+Currently this approach isn&#8217;t implemented is SymPy although seems promising for future use.</p>
+</div>
+<div class="section" id="algebraic-relations-in-invariant-theory">
+<h3>Algebraic relations in invariant theory<a class="headerlink" href="#algebraic-relations-in-invariant-theory" title="Permalink to this headline">¶</a></h3>
+<p>Many problems in applied algebra have symmetries or are invariant under certain natural
+transformations. In particular, all geometric magnitudes and properties are invariant with
+respect to the underlying transformation group, e.g. properties in Euclidean geometry are
+invariant under the Euclidean group of rotations (see <a class="reference external" href="literature.html#sturmfels2008invariant">[Sturmfels2008invariant]</a>). Analysis
+of this structure can give a deep insight into the studied problem.</p>
+<p>Following <a class="reference external" href="literature.html#buchberger2001systems">[Buchberger2001systems]</a> and <a class="reference external" href="literature.html#sturmfels2008invariant">[Sturmfels2008invariant]</a> lets consider the group <span class="math">\Z_4</span>
+of rotational symmetries in the counter clockwise direction of the square. The invariant ring of
+this group is equal to:</p>
+<div class="math">
+\mathcal{I} = \left\{ f \in \C[x_1, x_2] : f(x_1, x_2) = f(-x_2, x_1) \right\}</div>
+<p>This ring has three fundamental invariants:</p>
+<div class="math">
+\begin{split}\begin{array}{ccc}
+I_1 = x_1^2 + x_2^2, &amp; I_2 = x_1^2 x_2^2, &amp; I_3 = x_1^3 x_2 - x_1 x_2^3
+\end{array}\end{split}</div>
+<p>Polynomials <span class="math">I_1</span>, <span class="math">I_2</span> and <span class="math">I_3</span> form a basis of <span class="math">I</span> and all other polynomials in <span class="math">I</span>
+can be expressed in terms of them. The first question we may ask in algorithmic invariant
+theory is what algebraic dependence relation do <span class="math">I_1</span>, <span class="math">I_2</span> and <span class="math">I_3</span> satisfy. In other
+words, we would like to find a polynomial <span class="math">f(i_1, i_2, i_3)</span> such that <span class="math">f(I_1, I_2, I_3)
+\equiv 0</span>. For this purpose we can use Gröbner bases algorithm utilizing, so called,
+<em>slack variable</em> approach. We introduce three slack variables <span class="math">i_1</span>, <span class="math">i_2</span> and <span class="math">i_3</span>,
+construct a system of polynomial equations <span class="math">F = \{I_1 - i_1, I_2 - i_2, I_3 - i_3\}</span>
+and compute Gröbner basis of <span class="math">F</span> with respect to lexicographic term order eliminating
+<span class="math">x_1</span> and <span class="math">x_2</span>. Lets see how this can be accomplished in SymPy using polynomials
+manipulation module. First we introduce all the necessary variables and the three
+fundamental invariants of <span class="math">\mathcal{I}</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s">&#39;x1,x2,i1,i2,i3&#39;</span><span class="p">)</span>
+<span class="go">(x₁, x₂, i₁, i₂, i₃)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">I1</span> <span class="o">=</span> <span class="n">x1</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x2</span><span class="o">**</span><span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">I2</span> <span class="o">=</span> <span class="n">x1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">x2</span><span class="o">**</span><span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">I3</span> <span class="o">=</span> <span class="n">x1</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="o">*</span><span class="n">x2</span><span class="o">**</span><span class="mi">3</span>
+</pre></div>
+</div>
+<p>Next we construct <span class="math">F</span>, i.e. define <tt class="docutils literal"><span class="pre">F</span> <span class="pre">=</span> <span class="pre">[I1</span> <span class="pre">-</span> <span class="pre">i1,</span> <span class="pre">I2</span> <span class="pre">-</span> <span class="pre">i2,</span> <span class="pre">I3</span> <span class="pre">-</span> <span class="pre">i3]</span></tt>, and finally we
+compute lexicographic Gröbner basis of <span class="math">F</span> eliminating <span class="math">x_1</span> and <span class="math">x_2</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="s">&#39;x1,x2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As Gröbner bases computed by <tt class="xref docutils literal"><span class="pre">groebner()</span></tt> function are unique and sorted by
+decreasing leading monomials, we obtain the desired algebraic dependence relation
+between <span class="math">I_1</span>, <span class="math">I_2</span> and <span class="math">I_3</span> as the last element of <tt class="docutils literal"><span class="pre">G</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">  2          2     2</span>
+<span class="go">i₁ ⋅i₂ - 4⋅i₂  - i₃</span>
+</pre></div>
+</div>
+<p>We can verify that this relation is true by substitution, i.e. if we substitute the
+fundamental invariants for the slack variables, the above polynomial should vanish:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">i1</span><span class="p">:</span> <span class="n">I1</span><span class="p">,</span> <span class="n">i2</span><span class="p">:</span> <span class="n">I2</span><span class="p">,</span> <span class="n">i3</span><span class="p">:</span> <span class="n">I3</span><span class="p">})</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p>As the result <tt class="docutils literal"><span class="pre">G[-1]</span></tt> is correct algebraic dependence relation between the fundamental
+invariants of <span class="math">\mathcal{I}</span>. In this example we learnt another syntax for eliminating
+variables using <tt class="docutils literal"><span class="pre">wrt</span></tt> keyword argument. In previous sections we eliminated just a single
+variable with its help, however, in general we can pass arbitrary number of variables via
+<tt class="docutils literal"><span class="pre">wrt</span></tt>, either by setting it to a string consisting of a sequence of comma separated
+variables separated or as on ordered container of variables (e.g. <tt class="docutils literal"><span class="pre">list</span></tt> or <tt class="docutils literal"><span class="pre">tuple</span></tt>).</p>
+<p>When introducing polynomials <span class="math">I_1</span>, <span class="math">I_2</span> and <span class="math">I_3</span> it was stated that those polynomials
+form a basis for all other polynomials in the ring of rotations of the square. So another
+question we may ask is if some polynomial, say <span class="math">g</span> can be expressed in terms of those three
+polynomials. Lets consider a polynomial <span class="math">g = x_1^7 x_2 - x_1 x_2^7</span>. We want to find a
+polynomial <span class="math">f(i_1, i_2, i_3)</span> such that <span class="math">f(I_1, I_2, I_3) = g</span>. For this purpose we will
+use Gröbner bases approach once again, by reusing previously computed basis <span class="math">G</span>. What
+remains to do is to reduce the polynomial <span class="math">g</span> with respect to the set <span class="math">G</span> utilizing, as
+previously, lexicographic term order eliminating <span class="math">x_1</span> and <span class="math">x_2</span>. The reduction of polynomial
+by a set of polynomials is accomplished by taking the remainder from the result given by the
+generalized multivariate polynomial division algorithm (also known as normal form algorithm)
+which is implemented in <tt class="xref docutils literal"><span class="pre">reduced()</span></tt> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">x1</span><span class="o">**</span><span class="mi">7</span><span class="o">*</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="o">*</span><span class="n">x2</span><span class="o">**</span><span class="mi">7</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="p">[</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">  2</span>
+<span class="go">i₁ ⋅i₃ - i₂⋅i₃</span>
+</pre></div>
+</div>
+<p>We obtained a polynomial with <span class="math">x_1</span> and <span class="math">x_2</span> eliminated which means that <span class="math">g</span> can be written
+in terms of the generators of <span class="math">\mathcal{I}</span> and the above polynomial is the representation of
+<span class="math">g</span>. As previously, the correctness of this result can be verified by substitution:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">i1</span><span class="p">:</span> <span class="n">f1</span><span class="p">,</span> <span class="n">i2</span><span class="p">:</span> <span class="n">f2</span><span class="p">,</span> <span class="n">i3</span><span class="p">:</span> <span class="n">f3</span><span class="p">})</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+<span class="go">  7           7</span>
+<span class="go">x₁ ⋅x₂ - x₁⋅x₂</span>
+</pre></div>
+</div>
+<p>If we take another polynomial, e.g. <span class="math">g' = x_1^6 x_2 - x_1 x_2^6</span>, then:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">reduced</span><span class="p">(</span><span class="n">x1</span><span class="o">**</span><span class="mi">6</span><span class="o">*</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="o">*</span><span class="n">x2</span><span class="o">**</span><span class="mi">6</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="p">[</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>which means that <tt class="xref docutils literal"><span class="pre">reduced()</span></tt> wasn&#8217;t able to eliminate <span class="math">x_1</span> and/or <span class="math">x_2</span> from <span class="math">g'</span> and,
+as a consequence, <span class="math">g'</span> has no representation in terms of the generators of <span class="math">\mathcal{I}</span>,
+i.e. <span class="math">g'</span> doesn&#8217;t belong to <span class="math">\mathcal{I}</span> as <span class="math">g'(x_1, x_2) \not= g'(-x_2, x_1)</span>.</p>
+<p>Note that in this example we used the list variant of <tt class="docutils literal"><span class="pre">wrt</span></tt> keyword argument. Likewise in the
+case of computing a Gröbner basis, <tt class="xref docutils literal"><span class="pre">reduced()</span></tt> assumes by default lexicographic order of
+terms, so there was no need to specify this explicitly. In the following section we will see that
+other orderings, e.g. degree orderings, are also very useful.</p>
+<p>Gröbner bases proved useful for finding algebraic relations between polynomials in the general
+case. There is, however, a special case for which usage of the Gröbner bases method would be an
+overkill. Given a symmetric polynomial we ask if it is possible to express this polynomial in terms
+of elementary symmetric polynomials. For this task, called symmetric reduction, <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt>
+function was implemented. <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt> takes a polynomial <span class="math">f</span> (not necessarily symmetric) and
+returns a tuple consisting of the symmetric part of <span class="math">f</span>, which is expressed as a combination of
+elementary symmetric polynomials, and the non&#8211;symmetric part (called remainder). Consider a
+bivariate polynomial <span class="math">f = x^2 + y^2</span>. Lets compute symmetric reduction of <span class="math">f</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">symmetrize</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">⎛                2   ⎞</span>
+<span class="go">⎝-2⋅x⋅y + (x + y) , 0⎠</span>
+</pre></div>
+</div>
+<p>As the resulting remainder is zero, we proved that <span class="math">f</span> is a symmetric polynomial. <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt>
+was also able to rewrite <span class="math">f</span> in terms of bivariate elementary symmetric polynomials <span class="math">s_1 = x + y</span> and
+<span class="math">s_2 = x⋅y</span>. To make this more visible, we can force <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt> to return results in a <em>formal</em>
+form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">symmetrize</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">formal</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">⎛  2                                ⎞</span>
+<span class="go">⎝s₁  - 2⋅s₂, 0, {s₁: x + y, s₂: x⋅y}⎠</span>
+</pre></div>
+</div>
+<p>This way we can clearly see the two elementary symmetric polynomials in the result. To show that the
+result from <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt> is correct, it is sufficient to substitute polynomials for <span class="math">s_1</span> and
+<span class="math">s_2</span>, and expand the expression:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">_</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+<span class="go"> 2    2</span>
+<span class="go">x  + y</span>
+</pre></div>
+</div>
+<p>Using the <em>slack variable</em> approach we can arrive with the same result using Gröbner bases. First
+we need to construct non&#8211;trivial bivariate elementary symmetric polynomials. For this task we will
+use <tt class="xref docutils literal"><span class="pre">symmetric_poly()</span></tt> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">S1</span> <span class="o">=</span> <span class="n">symmetric_poly</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">S2</span> <span class="o">=</span> <span class="n">symmetric_poly</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">S1</span><span class="p">,</span> <span class="n">S2</span>
+<span class="go">(x + y, x⋅y)</span>
+</pre></div>
+</div>
+<p>Next we introduce two auxiliary (slack) variables <span class="math">s_1</span> and <span class="math">s_2</span> and compute a Gröbner basis of
+<span class="math">S_1 - s_1</span> and <span class="math">S_2 - s_2</span> with respect to lexicographic ordering of monomials eliminating <span class="math">x</span> and <span class="math">y</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s">&#39;s1, s2&#39;</span><span class="p">)</span>
+<span class="go">(s₁, s₂)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">([</span><span class="n">S1</span> <span class="o">-</span> <span class="n">s1</span><span class="p">,</span> <span class="n">S2</span> <span class="o">-</span> <span class="n">s2</span><span class="p">],</span> <span class="n">wrt</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Finally we compute <em>symmetric reduction</em> of <span class="math">x**2 + y**2</span> by reducing this polynomial with respect to the
+Gröbner basis <span class="math">G</span> eliminating variables <span class="math">x</span> and <span class="math">y</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">  2</span>
+<span class="go">s₁  - 2⋅s₂</span>
+</pre></div>
+</div>
+<p>We obtained the same result as with <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt>. Note, however, that <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt> implements
+a specialized algorithm for computing symmetric reduction <a class="reference external" href="literature.html#planetmathsymmetric">[PlanetMathSymmetric]</a> and is much more efficient
+than the general Gröbner bases approach. Lets now consider a polynomial <span class="math">g = x^2 - y^2</span>. We will compute
+symmetric reduction of <span class="math">g</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">symmetrize</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">formal</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">⎛  2             2                      ⎞</span>
+<span class="go">⎝s₁  - 2⋅s₂, -2⋅y , {s₁: x + y, s₂: x⋅y}⎠</span>
+</pre></div>
+</div>
+<p>This time the remainder is non&#8211;zero, telling us that <span class="math">g</span> is not a symmetric polynomial. Nevertheless
+<tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt> expressed the symmetric part of <span class="math">g</span>, not so surprisingly <span class="math">x^2 + y^2</span>, in terms of
+elementary symmetric polynomials, giving <span class="math">-2 y^2</span> as the remainder. As previously we can verify this
+result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">_</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span> <span class="o">+</span> <span class="n">_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go"> 2    2</span>
+<span class="go">x  - y</span>
+</pre></div>
+</div>
+<p>Reusing the Gröbner basis <span class="math">G</span> lets compute symmetric reduction with <tt class="xref docutils literal"><span class="pre">reduced()</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">  2</span>
+<span class="go">s₁  - 2⋅s₁⋅y</span>
+</pre></div>
+</div>
+<p>In this case <a title="(in Python v2.6)" class="reference external" href="http://docs.python.org/library/functions.html#reduce"><tt class="xref docutils literal"><span class="pre">reduce()</span></tt></a> wasn&#8217;t able to eliminate <span class="math">y</span> from its output, which tells us already
+known fact that <span class="math">x^2 - y^2</span> isn&#8217;t a symmetric polynomial. We can see the different between the
+specialized symmetric reduction algorithm and the general algorithm, where the former one was
+able to split the input polynomial into symmetric and non&#8211;symmetric parts and compute symmetric
+reduction anyway.</p>
+</div>
+<div class="section" id="integer-optimization">
+<h3>Integer optimization<a class="headerlink" href="#integer-optimization" title="Permalink to this headline">¶</a></h3>
+<p>Suppose we are in possession of American coins: pennies, nickels, dimes and quarters. We would like to
+compose a certain quantity out of those coins, say 117, such that the <em>number</em> of coins used is <em>minimal</em>.
+Lets forget about the minimality criterion for a moment. In this scenario it is not a big problem to
+compose the requested value. We can simply take 117 pennies and we are done, as long as we have so
+many of them. Alternatively we can take 10 dimes, 3 nickels and 2 pennies, or 2 quarters, 3 dimes,
+5 nickels and 12 pennies, etc. There are quite a few combinations that can be generated to get the
+desired value. But which of those combinations leads to the minimal number of necessary coins? To
+answer this question we will take advantage of Gröbner bases computed with respect to <em>total degree</em>
+ordering of monomials (see <a class="reference external" href="literature.html#buchberger2007talk">[Buchberger2007talk]</a>).</p>
+<p>First we should note that there are relations between values of particular coins, i.e. a nickel is
+equivalent to 5 pennies, a dime has the same value as 10 pennies and a quarter consists of 25 pennies.
+Those relations can be encoded as a system of polynomials. Lets introduce four variables <span class="math">p</span>, <span class="math">n</span>, <span class="math">d</span>
+and <span class="math">q</span>, representing pennies, nickels, dimes and quarters respectively:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s">&#39;p, n, d, q&#39;</span><span class="p">)</span>
+<span class="go">(p, n, d, q)</span>
+</pre></div>
+</div>
+<p>Now we write a system of polynomials representing relations between values of different coins:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">**</span><span class="mi">5</span> <span class="o">-</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">**</span><span class="mi">10</span> <span class="o">-</span> <span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="o">**</span><span class="mi">25</span> <span class="o">-</span> <span class="n">q</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We encoded values of nickels, dimes and quarters in terms of pennies, by putting their values into
+exponents of <span class="math">p</span> in consecutive polynomials. It would be perfectly valid to encode this in several
+different ways, as long as we keep exponents as integers. As the next step we compute a Gröbner
+bases of <span class="math">F</span> with respect to <em>graded lexicographic</em> (total degree) ordering of monomials:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;grlex&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In previous examples we solved the given problems by elimination of variables, so we had to use
+<em>lexicographic</em> ordering of monomials. This time our problem is a minimisation problem, so we take
+advantage of <em>total degree</em> ordering. This is a correct choice because total degree ordering <em>takes</em>
+monomials with smaller sums of exponents first and we can observe that the smaller the sum of exponents
+in a solution to our coins problem will be, the less coins will be needed. So, the chosen ordering of
+monomials encodes the cost function of our problem.</p>
+<p>How to get the minimal number of required coins? Suppose we take any admissible solution to the studied
+problem. This can be the trivial solution in which we take <span class="math">117</span> pennies or any other such that the
+total value of coins is equal to <span class="math">117</span>. We encode the chosen solution as a binomial with numbers of
+particular coins as exponents of <span class="math">p</span>, <span class="math">n</span>, <span class="math">d</span> and <span class="math">q</span>, and we reduce this binomial with respect to
+the Gröbner basis <span class="math">G</span> utilizing, as previously, <em>graded lexicographic</em> ordering of monomials:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">117</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;grlex&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">     2  4</span>
+<span class="go">d⋅n⋅p ⋅q</span>
+</pre></div>
+</div>
+<p>The answer, that we were able to compute with SymPy, is 4 quarters, 1 dime, 1 nickel and 2 pennies,
+which altogether give the requested value of <span class="math">117</span>. This is also the minimal solution to our problem.
+We can try another admissible solution:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">17</span><span class="o">*</span><span class="n">n</span><span class="o">**</span><span class="mi">10</span><span class="o">*</span><span class="n">d</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;grlex&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">     2  4</span>
+<span class="go">d⋅n⋅p ⋅q</span>
+</pre></div>
+</div>
+<p>but we will always arrive with the same minimal solution. This example might seem trivial, because we
+can easily solve the problem by hand, however it shows the approach that can be further generalized for
+solving arbitrary integer optimization problems (for a detailed theoretical and algorithmic background
+see <a class="reference external" href="literature.html#sturmfels1996lectures">[Sturmfels1996lectures]</a> and <a class="reference external" href="literature.html#adams1994intro">[Adams1994intro]</a>).</p>
+<p>One should notice that the polynomials arising in this example are of a special, binomial form, where
+there are few terms but very large exponents. Gröbner bases of systems of polynomials of this kind
+are called toric Gröbner bases and there are modifications to the Buchberger algorithm, which can
+make computations much more efficient in this special case (see <a class="reference external" href="literature.html#traverso1991integer">[Traverso1991integer]</a>). Implementation
+of algorithms for toric Gröbner bases is currently a work in progress in SymPy.</p>
+<p>This example showed us significance of other, than <em>pure lexicographic</em>, orderings of monomials. One
+should note that in this particular case we were able to reuse <em>total degree</em> ordering. However, in
+the general case of integer optimization, one has to invent a problem specific ordering with encodes
+the cost function of the problem. This can be easily done in SymPy by using <tt class="docutils literal"><span class="pre">key</span></tt>&#8211;functions.</p>
+</div>
+<div class="section" id="coloring-of-graphs">
+<h3>Coloring of graphs<a class="headerlink" href="#coloring-of-graphs" title="Permalink to this headline">¶</a></h3>
+<p>Graph coloring, which is one of the oldest and best&#8211;known subfields of graph theory, is an
+assigning values from a finite set, traditionally called colors, to elements (e.g. vertices,
+edges) of a graph. The assignment is a subject to various constraints. Coloring of graphs is
+a powerful technique for solving many practical discrete optimization problems, e.g. in
+operational research, like scheduling, resource allocation and many other. Graph colorings
+are also very interesting on their own due to their intrinsic complexity, as in the general
+case (without any assumptions on the structure of the input graph) they are NP&#8211;hard problems,
+i.e. there are no polynomial time algorithms for finding graph colorings (for a detailed
+discussion see <a class="reference external" href="literature.html#kubale2004color">[Kubale2004color]</a>).</p>
+<div class="section" id="classical-vertex-coloring">
+<h4>Classical vertex coloring<a class="headerlink" href="#classical-vertex-coloring" title="Permalink to this headline">¶</a></h4>
+<p>To show how SymPy can be utilized for solving graph coloring problems using the Gröbner
+bases method, lets focus on the classical problem of vertex coloring of graphs. We follow
+<a class="reference external" href="literature.html#adams1994intro">[Adams1994intro]</a> to give a brief theoretical introduction to this subject. Given a graph
+<span class="math">\mathcal{G}(V, E)</span>, where <span class="math">V</span> is the set of vertices of <span class="math">\mathcal{G}</span> and <span class="math">E</span> is the set
+of edges of <span class="math">\mathcal{G}</span>, and a positive integer <span class="math">k</span> we ask if is possible to assign a
+color to every vertex from <span class="math">V</span>, such that adjacent vertices have different colors assigned.
+Moreover, we can extend our question and ask for all possible <span class="math">k</span>&#8211;colorings of <span class="math">\mathcal{G}</span>
+or just for the number of <span class="math">k</span>&#8211;colorings.</p>
+<p>It shouldn&#8217;t be that strange to use Gröbner bases for a graph theoretical problem. After
+all, Gröbner bases have intrinsic complexity at least equal to the complexity of graph
+coloring problems and allow analysis of the structure of studied problems.</p>
+<p>But how do we transform a graph and coloring constraints into an algebraic problem? First we
+need to assign a variable to each vertex. Given that <span class="math">\mathcal{G}</span> has <span class="math">n</span> vertices, i.e.
+<span class="math">|V| = n</span>, then we will have variables <span class="math">x_1, x_2, \ldots, x_n</span>. Next we will write a set of
+equations describing the fact that we allow an assignment of one of <span class="math">k</span> possible colors to every
+vertex.  The currently best known approach to this problem is to map colors to primitive <span class="math">k</span>&#8211;th
+roots of unity. Let <span class="math">\zeta = \exp(\frac{2\pi\I}{k})</span> be a root of unity so that <span class="math">\zeta^k = 1</span>. We
+map colors <span class="math">1, 2, \ldots, k</span> to <span class="math">k</span> distinct roots of unity <span class="math">1, \zeta, \ldots, \zeta^{k-1}</span>. As
+<span class="math">k</span>&#8211;th roots of unity are solutions to equation of the form <span class="math">x_i^k - 1</span> then the statement
+that every vertex has to be assigned a color is equivalent to writing a set of polynomial
+equations:</p>
+<div class="math">
+F_k = \{ x_i^k - 1 : i = 1, 2, \ldots, n \}</div>
+<p>We also require that two adjacent vertices <span class="math">x_i</span> and <span class="math">x_j</span> are assigned different colors.
+From the previous discussion we know that <span class="math">x_i^k = 1</span> and <span class="math">x_j^k = 1</span>, so <span class="math">x_i^k = x_j^k</span>
+or, equivalently, <span class="math">x_i^k - x_j^k = 0</span>. By factorization we can obtain that <span class="math">x_i^k - x_j^k
+= (x_i - x_j) \cdot f(x_i, x_j) = 0</span>. Since we require that <span class="math">x_i \not= x_j</span> then <span class="math">x_i^k -
+x_j^k</span> can vanish only when <span class="math">f(x_i, x_j) = 0</span>. This allows us to write another set of
+polynomial equations:</p>
+<div class="math">
+F_{\mathcal{G}} = \{ f(x_i, x_j) : (i, j) \in E \}</div>
+<p>We combine <span class="math">F_k</span> and <span class="math">F_{\mathcal{G}}</span> into one system of equations <span class="math">F</span>. Let <span class="math">\mathcal{I}</span> be
+the ideal of <span class="math">\C\Xn</span> generated by <span class="math">F</span> and let <span class="math">\mathcal{V}(\mathcal{I})</span> be an algebraic variety
+in <span class="math">\C^n</span>. Then a graph <span class="math">\mathcal{G}</span> is <span class="math">k</span>&#8211;colorable if <span class="math">\mathcal{V}(\mathcal{I}) \not= \emptyset</span>.
+To verify this statement it is sufficient to compute a Gröbner basis <span class="math">G</span> of <span class="math">F</span> and check if
+<span class="math">G \not= \{1\}</span>. If this is the case, then the graph isn&#8217;t <span class="math">k</span>&#8211;colorable. Otherwise the Gröbner
+basis gives us explicit information about all possible <span class="math">k</span>&#8211;colorings of <span class="math">\mathcal{G}</span>. Speaking in
+less formal language, given a set of polynomial equations <span class="math">F</span> which describe geometry of a graph and
+coloring constraints we look for solutions of this system of equations in <span class="math">\C^n</span>. If we can find
+solutions of any kind then the graph is colorable with <span class="math">k</span> colors.</p>
+<p>Lets now focus on a particular and well known instance of <span class="math">k</span>&#8211;coloring where <span class="math">k = 3</span>. In this
+case <span class="math">F_3 = \{ x_i^3 - 1 : i = 1, \ldots, n \}</span>. Using SymPy&#8217;s built&#8211;in multivariate polynomial
+factorization routine:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s">&#39;x_i, x_j&#39;</span><span class="p">)</span>
+<span class="go">(x_i, x_j)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">factor</span><span class="p">(</span><span class="n">x_i</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x_j</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">            ⎛   2                2⎞</span>
+<span class="go">(x_i - x_j)⋅⎝x_i  + x_i⋅x_j + x_j ⎠</span>
+</pre></div>
+</div>
+<p>we derive the set of equations <span class="math">F_{\mathcal{G}}</span> describing an admissible <span class="math">3</span>&#8211;coloring of a graph:</p>
+<div class="math">
+F_{\mathcal{G}} = \{ x_i^2 + x y + x_j^2 : (i, j) \in E \}</div>
+<p>At this point it is sufficient to compute the Gröbner basis <span class="math">G</span> of <span class="math">F = F_3 \cup F_{\mathcal{G}}</span>
+to find out if a graph <span class="math">\mathcal{G}</span> is <span class="math">3</span>&#8211;colorable, or not. After this theoretical introduction
+lets consider a graph <span class="math">\mathcal{G}(V, E)</span> of figure <a class="reference internal" href="#fig-graph-nocolor"><em>The graph .</em></a> with 12 vertices and
+23 edges, to see that the described scheme works in practice. We ask if the graph is <span class="math">3</span>&#8211;colorable.
+In this example we will first show how to answer this question SymPy and then we will compare this
+with three other symbolic manipulation systems on the market: Maxima, Axiom and Mathematica.</p>
+<div align="center" class="figure" id="fig-graph-nocolor">
+<img alt="../images/graph-nocolor.png" src="../images/graph-nocolor.png" />
+<p class="caption">The graph <span class="math">\mathcal{G}(V, E)</span>.</p>
+</div>
+<p>The question, if <span class="math">\mathcal{G}</span> is <span class="math">3</span>&#8211;colorable or not, is easy to answer by trial and error. We
+are, however, an interested in algorithmic solution to the problem, so lets first encode <span class="math">V</span> and
+<span class="math">E</span> of the graph <span class="math">\mathcal{G}</span> using Python&#8217;s built&#8211;in data structures:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">V</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">E</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">12</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">),(</span><span class="mi">4</span><span class="p">,</span><span class="mi">11</span><span class="p">),(</span><span class="mi">4</span><span class="p">,</span><span class="mi">9</span><span class="p">),(</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">),(</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">),(</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">),(</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">),(</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">),(</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">),(</span><span class="mi">5</span><span class="p">,</span><span class="mi">12</span><span class="p">),(</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span><span class="p">),(</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">),(</span><span class="mi">7</span><span class="p">,</span><span class="mi">11</span><span class="p">),(</span><span class="mi">8</span><span class="p">,</span><span class="mi">12</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>We encoded the set of vertices as a list of consecutive integers and the set of edges as a list
+of tuples of adjacent vertex indices. Next we will transform the graph into an algebraic form by
+mapping vertices to variables and tuples of indices into tuples of variables:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Vx</span> <span class="o">=</span> <span class="p">[</span> <span class="n">Symbol</span><span class="p">(</span><span class="s">&#39;x&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">V</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ex</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="n">Vx</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">Vx</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">E</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>As the last step of this construction we write equations for <span class="math">F_3</span> and <span class="math">F_{\mathcal{G}}</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">F3</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Vx</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Fg</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">Ex</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>Everything is set following the theoretical introduction, so now we can compute the Gröbner
+basis of <span class="math">F_3 \cup F_{\mathcal{G}}</span> with respect to <em>lexicographic</em> ordering of terms:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">(</span><span class="n">F3</span> <span class="o">+</span> <span class="n">Fg</span><span class="p">,</span> <span class="n">Vx</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We know that if the constructed system of polynomial equations has a solution then <span class="math">G</span> should be
+non&#8211;trivial, i.e. <span class="math">G \not= \emptyset</span>, which can be easily verified in SymPy:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">!=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The answer is that the graph <span class="math">\mathcal{G}</span> is colorable with <span class="math">3</span> colors. A sample coloring is shown
+in figure <a class="reference internal" href="#fig-graph-color"><em>A sample &#8211;coloring of the graph .</em></a>. Suppose we add an edge between vertices <span class="math">i = 3</span> and <span class="math">j = 4</span>. Is
+the new graph <span class="math">3</span>&#8211;colorable? To check this it is sufficient to construct <span class="math">F_{\mathcal{G'}}</span> by
+extending <span class="math">F_{\mathcal{G}}</span> with <span class="math">x_3^2 + x_3 x_4 + x_4^2</span> equation and recompute the Gröbner
+basis:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x3</span><span class="p">,</span> <span class="n">x4</span> <span class="o">=</span> <span class="n">Vx</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">Vx</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">(</span><span class="n">F3</span> <span class="o">+</span> <span class="n">Fg</span> <span class="o">+</span> <span class="p">[</span><span class="n">x3</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x3</span><span class="o">*</span><span class="n">x4</span> <span class="o">+</span> <span class="n">x4</span><span class="o">**</span><span class="mi">2</span><span class="p">],</span> <span class="n">Vx</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">!=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>We got a trivial Gröbner basis as the result, so the graph <span class="math">\mathcal{G'}</span> isn&#8217;t <span class="math">3</span>&#8211;colorable. We
+could continue this discussion asking if <span class="math">\mathcal{G'}</span> is <span class="math">4</span>&#8211;colorable or if the number of colors
+required to color the original graph could be lowered to <span class="math">2</span> colors.</p>
+<div align="center" class="figure" id="fig-graph-color">
+<img alt="../images/graph-color.png" src="../images/graph-color.png" />
+<p class="caption">A sample <span class="math">3</span>&#8211;coloring of the graph <span class="math">\mathcal{G}(V, E)</span>.</p>
+</div>
+<p>Before we compare SymPy&#8217;s syntax for computing Gröbner bases with other systems, let us clarify an
+issue arising around list indexing (e.g. why we write <tt class="docutils literal"><span class="pre">x3</span> <span class="pre">=</span> <span class="pre">Vx[2]</span></tt>). SymPy is a library built on top
+of Python, so it utilizes Python&#8217;s built&#8211;in data structures and their indexing schemes. Python, as a
+general purpose programming language, uses well established zero&#8211;based indexing scheme, contrary to the
+natural way of <em>indexing</em> things, i.e. saying 1st, 2nd, 3rd etc. (to which we are accustomed in real life
+and mathematics). The zero&#8211;based indexing scheme dates back to the time of first programming languages,
+which were hardware oriented (e.g. assemblers) and an index was understood as an offset from a particular
+location in memory (the start of a container) to the requested item (for a more detailed discussion about
+this issue see <a class="reference external" href="literature.html#dijkstra1982zero">[Dijkstra1982zero]</a>). General purpose programming languages, even those interpreted like
+Python, coherently follow this scheme. For SymPy, this is a cost of building the system on top of a general
+purpose language. As we will see in the following examples, other symbolic manipulation systems, i.e. those
+which invent their own programming language, use <em>natural indexing</em> scheme. Currently a workaround to have
+one&#8211;based indexing in SymPy, is to append a dummy element in front of a list, e.g. to index <tt class="docutils literal"><span class="pre">Vx</span></tt> this
+way we could issue <tt class="docutils literal"><span class="pre">Vx</span> <span class="pre">=</span> <span class="pre">[None]</span> <span class="pre">+</span> <span class="pre">Vx</span></tt> and then <tt class="docutils literal"><span class="pre">x3</span> <span class="pre">=</span> <span class="pre">Vx[3]</span></tt>.</p>
+</div>
+<div class="section" id="vertex-coloring-using-other-systems">
+<h4>Vertex coloring using other systems<a class="headerlink" href="#vertex-coloring-using-other-systems" title="Permalink to this headline">¶</a></h4>
+<p>We showed so far how to solve classical vertex coloring problem with SymPy. Lets now compare SymPy&#8217;s
+syntax and semantics of Gröbner bases functionality with three other mathematical software: Maxima,
+Axiom and Mathematica.</p>
+<p>One feature that makes SymPy different from other mathematical systems is that SymPy utilizes a general
+purpose programming language for its core, modules and interaction with the user, whereas Maxima, Axiom
+and Mathematica invent their own special languages for implementing their mathematical libraries and for
+user interaction. This will require us to make some remarks also on the syntactic level.</p>
+<p><a class="reference external" href="http://maxima.sourceforge.net">Maxima</a> implements Gröbner bases in an extension library. Detailed
+documentation can be found in <a class="reference external" href="literature.html#maximagroebner">[MaximaGroebner]</a>. We will reuse the same example and, as much as possible,
+the same computational approach. Maxima first requires us to load the Gröbner bases library. Note that
+we write <tt class="docutils literal"><span class="pre">grobner</span></tt> in this case. User should also remember about putting a semicolon at the end of every
+line. Next we define edges of the graph using a list of two element lists (there are no tuples in Maxima).
+Maxima uses very unusual syntax for variable assignment, utilizing colon for this purpose. In the next
+step we define the list of variables <tt class="docutils literal"><span class="pre">Vx</span></tt> and systems of polynomial equations <tt class="docutils literal"><span class="pre">F3</span></tt> and <tt class="docutils literal"><span class="pre">Fg</span></tt>. Instead
+of list comprehensions we use <tt class="xref docutils literal"><span class="pre">makelist()</span></tt> function. One should note that Maxima uses <tt class="docutils literal"><span class="pre">^</span></tt> symbol for
+exponentiation, whereas Python uses this symbol for bitwise XOR operation. Finally we can compute the
+Gröbner basis using <tt class="xref docutils literal"><span class="pre">poly_reduced_grobner()</span></tt>. Maxima by default assumes <em>lexicographic</em> ordering
+of monomials. This information can be changed only by setting a global variable. As the last step we
+check if the computed basis is non&#8211;trivial, utilizing <tt class="xref docutils literal"><span class="pre">is()</span></tt> and <tt class="xref docutils literal"><span class="pre">notequal()</span></tt> functions. Lets
+see full source code for this example:</p>
+<div class="highlight-python"><pre>(i1) load(grobner);
+
+(i2) E: [[1,2],[2,3],[1,4],[1,6],[1,12],[2,5],[2,7],[3,8],
+[3,10],[4,11],[4,9],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],
+[11,12],[5,12],[5,9],[6,10],[7,11],[8,12]];
+
+(i3) Vx: makelist(concat("x", i), i, 1, 12);
+
+(i4) F3: makelist(Vx[i]^3 - 1, i, 1, 12);
+(i5) Fg: [];
+
+(i6) for e in E do
+        Fg: endcons(Vx[e[1]]^2 + Vx[e[1]]*Vx[e[2]] + Vx[e[2]]^2, Fg);
+
+(i7) G: poly_reduced_grobner(append(F3, Fg), Vx);
+
+(i8) is(notequal(G, [1]));
+(o8) true</pre>
+</div>
+<p><a class="reference external" href="http://axiom-developer.org">Axiom</a> implements Gröbner bases toolkit in its core algebra library.
+The documentation on this matter, thought not very extensive, can be found in <a class="reference external" href="literature.html#daly2003horizon">[Daly2003horizon]</a>. Axiom
+uses a sophisticated autoloader of its library components, so explicit package loading in not necessary.
+As previously we start with the definition of the set of edges using a list of list. On should notice
+that, this time, the assignment operator is <tt class="docutils literal"><span class="pre">:=</span></tt>. Semicolons at the end of lines aren not obligatory,
+however, useful for preventing printing of the results of computations. Next we define <tt class="docutils literal"><span class="pre">Vx</span></tt> and <tt class="docutils literal"><span class="pre">Ex</span></tt>
+in a way very similar to Python, as Axiom supports list comprehensions. The main difference is Axiom&#8217;s
+approach to indexing lists. Axiom does not use an object oriented language, as one might presume looking
+at the source code, and it doesn&#8217;t support properties. This give opportunity for reusing the dot operator
+for indexing purpose (notice also one&#8211;base indexes). Next definitions of <tt class="docutils literal"><span class="pre">F3</span></tt> and <tt class="docutils literal"><span class="pre">Fg</span></tt> are almost
+equivalent to what we wrote using SymPy. Finally we compute the Gröbner basis using <tt class="xref docutils literal"><span class="pre">groebner()</span></tt>
+function. Notice the <tt class="docutils literal"><span class="pre">::</span></tt> operator. It tells that the previously constructed polynomials should belong
+to the domain that is on its right hand side, i.e. distributed multivariate polynomial in symbols from
+<tt class="docutils literal"><span class="pre">Vx</span></tt> with coefficients over integers. At the end we check that the basis in non&#8211;trivial using <tt class="docutils literal"><span class="pre">~=</span></tt>
+operator. Note that <tt class="docutils literal"><span class="pre">~=</span></tt> is not a comparison operator by default, but returns an unequality, so we
+need to use coercion operator <tt class="docutils literal"><span class="pre">&#64;</span></tt> to tell <tt class="docutils literal"><span class="pre">~=</span></tt> to end up with a <tt class="docutils literal"><span class="pre">Boolean</span></tt> result immediately.
+Here is the full source code for this example:</p>
+<div class="highlight-python"><pre>(1) -&gt; E := [[1,2],[2,3],[1,4],[1,6],[1,12],[2,5],[2,7],
+[3,8],[3,10],[4,11],[4,9],[5,6],[6,7],[7,8],[8,9],[9,10],
+[10,11],[11,12],[5,12],[5,9],[6,10],[7,11],[8,12]];
+
+(2) -&gt; Vx := [ concat("x", i::String)::Symbol for i in 1..12 ];
+(3) -&gt; Ex := [ [Vx.(e.1), Vx.(e.2)] for e in E ];
+
+(4) -&gt; F3 := [ x**3 - 1 for x in Vx ];
+(5) -&gt; Fg := [ e.1**2 + e.1*e.2 + e.2**2 for e in Ex];
+
+(6) -&gt; G := groebner([ f::DMP(Vx, INT) for f in concat(F3, Fg) ]);
+
+(7) -&gt; (G ~= [1]) @ Boolean
+   (7) true</pre>
+</div>
+<p><a class="reference external" href="http://www.wolfram.com/mathematica/">Mathematica</a> has extensive built&#8211;in support for Gröbner
+bases. Detailed documentation on this matter can be found in <a class="reference external" href="literature.html#mathematicagroebner">[MathematicaGroebner]</a>. Mathematica
+has a very peculiar language for interaction with the user and its syntax, which was influence by
+the infix dialect of lisp (or m&#8211;lisp), is very different from other languages used in symbolic
+mathematics, so will skip detailed syntactic comparison and refer the reader to <a class="reference external" href="literature.html#wolfram2003book">[Wolfram2003book]</a>.</p>
+<div class="highlight-python"><pre>In[1]:= Unprotect[E];
+In[2]:= E := {{1,2},{2,3},{1,4},{1,6},{1,12},{2,5},{2,7},
+{3,8},{3,10},{4,11},{4,9},{5,6},{6,7},{7,8},{8,9},{9,10},
+{10,11},{11,12},{5,12},{5,9},{6,10},{7,11},{8,12}}
+
+In[3]:= Vx := Table[Symbol["x" &lt;&gt; ToString[i]], {i,1,12}]
+In[4]:= h[{i_, j_}] := Vx[[i]]^2 + Vx[[i]] Vx[[j]] + Vx[[j]]^2
+
+In[5]:= F3 := Map[(#^3-1)&amp;, Vx]
+In[6]:= Fg := Map[h, E]
+
+In[7]:= G := GroebnerBasis[Join[F3, Fg], Vx]
+
+In[8]:= G != {1}
+Out[8]= True</pre>
+</div>
+<p>We showed how to perform classical vertex coloring of a graph based on the Gröbner bases method
+using SymPy and three other mathematical systems. It is interesting to compare the times that were
+needed to compute the Gröbner basis <span class="math">G</span> by each of those systems. Timings (average of multiple
+runs) were stored in the following table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="16%" />
+<col width="18%" />
+<col width="16%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">&nbsp;</th>
+<th class="head">SymPy</th>
+<th class="head">Maxima</th>
+<th class="head">Axiom</th>
+<th class="head">Mathematica</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Time [s]</td>
+<td>15.4</td>
+<td>17.6</td>
+<td>3.6</td>
+<td>0.34</td>
+</tr>
+</tbody>
+</table>
+<p>This shows that both SymPy and Maxima are significantly slower than Axiom and Mathematica. This is
+happens, because the implementation of Gröbner bases in both systems is done in an interpreted
+language (Python and Maxima language, respectively). Possibly they also implement less(&#8211;powerful)
+criteria for eliminating useless critical pairs.</p>
+</div>
+<div class="section" id="the-structure-of-vertex-coloring">
+<h4>The structure of vertex coloring<a class="headerlink" href="#the-structure-of-vertex-coloring" title="Permalink to this headline">¶</a></h4>
+<p>Till this point we showed how to check with SymPy that a graph is <span class="math">k</span>&#8211;colorable or not. However, using
+the Gröbner bases method, we can obtain much more exiting result. Suppose that <span class="math">G</span> is a lexicographic
+Gröbner basis of a system of polynomials <span class="math">F</span> describing a vertex <span class="math">k</span>&#8211;coloring problem. To prove
+that a graph is <span class="math">k</span>&#8211;colorable we used the fact that <span class="math">G \not= \{1\}</span>. We know that <span class="math">G</span> and <span class="math">F</span> have
+the same set of solutions, however, <span class="math">G</span> has more structure than <span class="math">F</span>. We can take advantage of this
+and find all possible <span class="math">k</span>&#8211;colorings of a graph by solving <span class="math">G</span> over the complex field.</p>
+<p>Lets first revise our approach to vertex coloring. To transform a graph problem in a polynomial problem,
+we mapped colors to primitive roots of unity. In our example of <span class="math">3</span>&#8211;coloring, the three colors were, say
+red, green and blue, were mapped to <span class="math">1</span>, <span class="math">\zeta</span>, <span class="math">\zeta^2</span>, where <span class="math">\zeta = \exp(\frac{2\pi\I}{k})</span>. In
+other words we worked in a field generated by <span class="math">\zeta</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">zeta</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">I</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="nb">complex</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zeta</span>
+<span class="go">    ___</span>
+<span class="go">I⋅╲╱ 3</span>
+<span class="go">─────── - 1/2</span>
+<span class="go">   2</span>
+</pre></div>
+</div>
+<p>Thus to tell that every vertex should be assigned a color we wrote a system of equations of the form
+<span class="math">x_i^3 - 1</span>, where <span class="math">i \in \{1, \ldots, |V|\}</span>. Lets factor this polynomial over <span class="math">\Q[\zeta]</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">factor</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">zeta</span><span class="p">)</span>
+<span class="go">        ⎛        ___      ⎞ ⎛        ___      ⎞</span>
+<span class="go">        ⎜    I⋅╲╱ 3       ⎟ ⎜    I⋅╲╱ 3       ⎟</span>
+<span class="go">(x - 1)⋅⎜x + ─────── + 1/2⎟⋅⎜x - ─────── + 1/2⎟</span>
+<span class="go">        ⎝       2         ⎠ ⎝       2         ⎠</span>
+</pre></div>
+</div>
+<p>We obtained the splitting factorization of <span class="math">x_i^3 - 1</span> and we can clearly see how our mapping works.
+Lets now solve each of the above linear obtaining a list of primitive roots of unity of order three:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">solve</span><span class="p">(</span><span class="n">arg</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">_</span><span class="o">.</span><span class="n">args</span> <span class="p">]</span>
+<span class="go">⎡         ___            ___      ⎤</span>
+<span class="go">⎢     I⋅╲╱ 3         I⋅╲╱ 3       ⎥</span>
+<span class="go">⎢1, - ─────── - 1/2, ─────── - 1/2⎥</span>
+<span class="go">⎣        2              2         ⎦</span>
+</pre></div>
+</div>
+<p>Going one step ahead, lets declare three variables which will literally represent colors in the studied
+<span class="math">3</span>&#8211;coloring problem and lets put together, in an arbitrary but fixed order, those variables and the
+previously computed roots of unity:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s">&#39;red,green,blue&#39;</span><span class="p">)</span>
+<span class="go">(red, green, blue)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">colors</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">__</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">colors</span>
+<span class="go">⎡          ⎛      ___             ⎞  ⎛    ___            ⎞⎤</span>
+<span class="go">⎢          ⎜  I⋅╲╱ 3              ⎟  ⎜I⋅╲╱ 3             ⎟⎥</span>
+<span class="go">⎢(1, red), ⎜- ─────── - 1/2, green⎟, ⎜─────── - 1/2, blue⎟⎥</span>
+<span class="go">⎣          ⎝     2                ⎠  ⎝   2               ⎠⎦</span>
+</pre></div>
+</div>
+<p>Now we are prepared to study the structure of the Gröbner basis <span class="math">G</span>. To make the analysis easier, we
+we will split <span class="math">G</span> into groups, discriminating polynomials by their degree and their number of terms:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="p">(</span><span class="n">degree</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<p>We obtained four groups of polynomials, so lets analyzed them one&#8211;by&#8211;one:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">⎡   3    ⎤</span>
+<span class="go">⎣x₁₂  - 1⎦</span>
+</pre></div>
+</div>
+<p>In the first group we have just a single polynomial of the well known form. This tells us that <span class="math">x_{12}</span>
+can be assigned any of the three possible colors. This wasn&#8217;t very interesting, so lets move the next
+group:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">⎡   2                2⎤</span>
+<span class="go">⎣x₁₁  + x₁₁⋅x₁₂ + x₁₂ ⎦</span>
+</pre></div>
+</div>
+<p>From the construction of the system of polynomials <span class="math">F_{\mathcal{G}}</span>, which describes an admissible
+vertex coloring for the graph <span class="math">\mathcal{G}</span>, we know that the above equation is zero when <span class="math">x_{11}</span>
+is different from <span class="math">x_{12}</span>. Still we didn&#8217;t learn anything new, so lets move to the third group:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">[x₁ + x₁₁ + x₁₂, x₁₁ + x₁₂ + x₅, x₁₁ + x₁₂ + x₈, x₁₀ + x₁₁ + x₁₂]</span>
+</pre></div>
+</div>
+<p>This time we got a lot more polynomials, which are of a new form. We should recall that we use
+primitive roots of unity for color assignment. Roots of this kind have the property that their
+sum is zero. So, from the above equations we can read that triples of vertices <span class="math">x_i</span>, <span class="math">x_{11}</span>
+and <span class="math">x_{12}</span>, where <span class="math">i \in \{1, 5, 8, 10\}</span>, should be assigned different colors. This is a
+piece of knowledge that we didn&#8217;t see in <span class="math">F</span> but we were able to learn from <span class="math">G</span>. Lets move
+to the last group:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="go">[-x₁₁ + x₂, -x₁₂ + x₃, -x₁₂ + x₄, -x₁₁ + x₆, -x₁₂ + x₇, -x₁₁ + x₉]</span>
+</pre></div>
+</div>
+<p>In the last group we got a set of trivial equations of the form <span class="math">x_i = x_j</span>, which tell us that
+particular pairs of vertices should have the same color assigned. What we described here is a
+complete knowledge necessary to invent a <span class="math">3</span>&#8211;coloring for <span class="math">\mathcal{G}</span>.</p>
+<p>Following this analysis of the structure of the Gröbner basis <span class="math">G</span>, to find a <span class="math">3</span>&#8211;coloring of
+the graph <span class="math">\mathcal{G}</span>, first we need to choose a color for <span class="math">x_{12}</span>. Suppose we let <span class="math">x_{12}</span> to
+have red color assigned. Then we have to assign a color other than red to <span class="math">x_{11}</span>. Let it be green.
+From the fourth group of equations from <span class="math">G</span> we know that <span class="math">x_3</span>, <span class="math">x_4</span> and <span class="math">x_7</span> will be assigned the
+same color as <span class="math">x_{12}</span>, i.e. red, and <span class="math">x_2</span>, <span class="math">x_6</span> and <span class="math">x_9</span> will have the same color as <span class="math">x_{11}</span>,
+i.e. blue. Then it is sufficient to assign other vertices, mainly <span class="math">x_1</span>, <span class="math">x_5</span>, <span class="math">x_8</span> and <span class="math">x_{10}</span>,
+with green color. This way we obtained a single admissible <span class="math">3</span>&#8211;coloring of the graph <span class="math">\mathcal{G}</span>
+(the same as the coloring of figure <a class="reference internal" href="#fig-graph-color"><em>A sample &#8211;coloring of the graph .</em></a>).</p>
+<p>What about other admissible <span class="math">3</span>&#8211;colorings? We can continue with the above procedure and generate
+more colorings. It would be, however, more interesting if we could get all solutions to our graph
+problem at once. To do this with SymPy, we will simply solve <span class="math">G</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">colorings</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">Vx</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">colorings</span><span class="p">)</span>
+<span class="go">6</span>
+</pre></div>
+</div>
+<p>We got six admissible <span class="math">3</span>&#8211;colorings for <span class="math">\mathcal{G}</span>. This is correct because there are three ways
+to assign <span class="math">x_{12}</span> a color, then there are only two ways to assign <span class="math">x_{11}</span> a color for each possible
+coloring of <span class="math">x_{12}</span>, and, with colors assigned to <span class="math">x_{11}</span> and <span class="math">x_{12}</span>, there is only one way to
+assign colors to other vertices.</p>
+<p>At this point we could simply print the computed solutions to see what are the admissible <span class="math">3</span>&#8211;colorings.
+This is, however, not a good idea, because we use algebraic numbers (roots of unity) for representing colors
+and <tt class="xref docutils literal"><span class="pre">solve()</span></tt> returned solutions in terms of those algebraic number, possibly even in a non&#8211;simplified
+form. To overcome this difficulty we will use previously defined mapping between roots of unity and literal
+colors:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">coloring</span> <span class="ow">in</span> <span class="n">colorings</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="p">[</span> <span class="n">elt</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="nb">complex</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">coloring</span> <span class="p">]</span>
+<span class="gp">...</span>
+<span class="gp">...</span>
+<span class="go">[blue, green, red, red, blue, green, red, blue, green, blue, green, red]</span>
+<span class="go">[green, blue, red, red, green, blue, red, green, blue, green, blue, red]</span>
+<span class="go">[green, red, blue, blue, green, red, blue, green, red, green, red, blue]</span>
+<span class="go">[red, green, blue, blue, red, green, blue, red, green, red, green, blue]</span>
+<span class="go">[blue, red, green, green, blue, red, green, blue, red, blue, red, green]</span>
+<span class="go">[red, blue, green, green, red, blue, green, red, blue, red, blue, green]</span>
+</pre></div>
+</div>
+<p>This is the result we were looking for, but a few words of explanation are needed. As <tt class="xref docutils literal"><span class="pre">solve()</span></tt> may
+return unsimplified results, we need to simplify any algebraic numbers that don&#8217;t match structurally with
+the precomputed roots of unity. Taking advantage of the domain of computation, we use complex expansion
+algorithm for this purpose. Having the solutions in a normal form, to get this nice form with literal
+colors it is sufficient to substitute <em>color</em> variables for roots of unity.</p>
+<p>There is one more important thing, which we must emphasise. When solving the Gröbner basis <span class="math">G</span>, we
+specified the list of symbols explicitly using <tt class="docutils literal"><span class="pre">Vx</span></tt>. In general this is unnecessary and <tt class="xref docutils literal"><span class="pre">solve()</span></tt>
+can work perfectly without this knowledge. However, in our case this additional piece of information
+was significant, because it guaranteed proper order of color assignments in the solution. Most functions
+in SymPy can derive variables of the problem being solved on their own, but in complex situations this
+may lead to wrong results or at least can complicate analysis of solutions. If unsure what a particular
+function will do, always specify variables explicitly.</p>
+</div>
+</div>
+<div class="section" id="algebraic-geometry">
+<h3>Algebraic geometry<a class="headerlink" href="#algebraic-geometry" title="Permalink to this headline">¶</a></h3>
+<p>Geometry is one of the primary subjects taught during elementary mathematics classes and using SymPy for
+studying theorems of euclidean geometry seems a very promising idea. For example, lets consider a rhombus
+in a fixed coordinate system. We would like to prove a theorem, that diagonals of this rhombus are mutually
+perpendicular. We are of course interested in a purely algorithmic approach to solve this problem. To prove
+this theorem we will use the machinery of Gröbner bases.</p>
+<p>Following <a class="reference external" href="literature.html#winkler1990geometry">[Winkler1990geometry]</a>, lets consider a geometric entity which properties can be translated into a
+system of <span class="math">m</span> polynomials, say <span class="math">\mathcal{H} = \{f_1, \ldots, f_m\}</span>. We will call <span class="math">\mathcal{H}</span> a hypothesis.
+Given a theorem concerning this geometric entity, the algebraic formulation is as follows:</p>
+<div class="math">
+\forall_{x_1, \ldots, x_n, y_1, \ldots, y_n} (f_1 = 0 \vee \ldots \vee f_m = 0) \Rightarrow g = 0</div>
+<p>where <span class="math">g</span> is the conclusion of the theorem and <span class="math">f_1, \ldots f_m</span> and <span class="math">g</span> are polynomials in <span class="math">\K[x_1, \ldots,
+x_n, y_1, \ldots, y_n]</span>. It follows from the Gröbner bases theory that the above statement is true when <span class="math">g</span>
+belongs to the ideal generated by <span class="math">\mathcal{H}</span>. To check this, i.e. to prove the theorem, it is sufficient
+to compute Gröbner basis of <span class="math">\mathcal{H}</span> and reduce <span class="math">g</span> with respect to this basis. If the theorem is
+true then the remainder from the reduction will vanish. In this example, for the sake of simplicity, we
+assume that the geometric entity is non&#8211;degenerate, i.e. it does not collapse into a line or a point.
+Anyway, the Gröbner basis approach allows to prove theorems in algebraic geometry in full generality
+and derive automatically non&#8211;degeneracy conditions.</p>
+<div align="center" class="figure" id="fig-geometry-rhombus">
+<img alt="../images/geometry-rhombus.png" src="../images/geometry-rhombus.png" />
+<p class="caption">A rhombus in a fixed coordinate system.</p>
+</div>
+<p>Lets consider the rhombus of figure <a class="reference internal" href="#fig-geometry-rhombus"><em>A rhombus in a fixed coordinate system.</em></a>. This geometric entity consists of four
+points <span class="math">A</span>, <span class="math">B</span>, <span class="math">C</span> and <span class="math">D</span>. To setup a fixed coordinate system, without loss of generality, we can
+assume that <span class="math">A = (0, 0)</span>, <span class="math">B = (x_B, 0)</span>, <span class="math">C = (x_C, y_C)</span> and <span class="math">D = (x_D, y_D)</span>. This is possible by
+taking rotational invariance of the geometric entity. We will prove that the diagonals of this rhombus,
+i.e. <span class="math">AD</span> and <span class="math">BC</span> are mutually perpendicular. We have the following conditions describing <span class="math">ABCD</span>:</p>
+<ol class="arabic simple">
+<li>Line <span class="math">AD</span> is parallel to <span class="math">BC</span>, i.e. <span class="math">AD \parallel BC</span>.</li>
+<li>Sides of <span class="math">ABCD</span> are of the equal length, i.e. <span class="math">AB = BC</span>.</li>
+<li>The rhombus is non&#8211;degenerate, i.e. is not a line or a point.</li>
+</ol>
+<p>Our conclusion is that <span class="math">AC \bot BD</span>. To prove this theorem, first we need to transform the above conditions
+and the conclusion into a set of polynomials. How we can achieve this? Lets focus on the first condition. In
+general, we are given two lines <span class="math">A_1A_2</span> and <span class="math">B_1B_2</span>. To express the relation between those two lines, i.e.
+that <span class="math">A_1A_2</span> is parallel <span class="math">B_1B_2</span>, we can relate slopes of those lines:</p>
+<div class="math">
+\frac{y_{A_2} - y_{A_1}}{x_{A_2} - x_{A_1}} = \frac{y_{B_2} - y_{B_1}}{x_{B_2} - x_{B_1}}</div>
+<p>Clearing denominators in the above expression and putting all terms on the left hand side of the equation, we
+derive a general polynomial describing the first condition. This can be literally translated into Python:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">parallel</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">B1</span><span class="p">,</span> <span class="n">B2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Line [A1, A2] is parallel to line [B1, B2]. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">A2</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">A1</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">B2</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">B1</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">B2</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">B1</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">A2</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">A1</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>assuming that <tt class="docutils literal"><span class="pre">A1</span></tt>, <tt class="docutils literal"><span class="pre">A2</span></tt>, <tt class="docutils literal"><span class="pre">B1</span></tt> and <tt class="docutils literal"><span class="pre">B2</span></tt> are instances of <tt class="xref docutils literal"><span class="pre">Point</span></tt> class. In the case of our
+rhombus, we will take advantage of the fixed coordinate system and simplify the resulting polynomials as
+much as possible. The same approach can be used to derive polynomial representation for other conditions
+and the conclusion. To construct <span class="math">\mathcal{H}</span> and <span class="math">g</span> we will use the following functions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The squared distance between points A1 and A2. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">A2</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">A1</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">A2</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">A1</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">equal</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">B1</span><span class="p">,</span> <span class="n">B2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lines [A1, A2] and [B1, B2] are of the same width. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">distance</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">)</span> <span class="o">-</span> <span class="n">distance</span><span class="p">(</span><span class="n">B1</span><span class="p">,</span> <span class="n">B2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">perpendicular</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">B1</span><span class="p">,</span> <span class="n">B2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Line [A1, A2] is perpendicular to line [B1, B2]. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">A2</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">A1</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">B2</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">B1</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">A2</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">A1</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">B2</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">B1</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The non&#8211;degeneracy statement requires a few words of comment. Many theorems in geometry are true only
+in the non&#8211;degenerative case and false or undefined otherwise. In our approach to theorem proving in
+algebraic geometry, we must supply sufficient non&#8211;degeneracy conditions manually. In the case of our
+rhombus this is <span class="math">x_B &gt; 0</span> and <span class="math">y_C &gt; 0</span> (we don&#8217;t need to take <span class="math">x_C</span> into account because <span class="math">AB = BC</span>).
+At first, this seems to be a show stopper, as Gröbner bases don&#8217;t support inequalities. However,
+we can use Rabinovich trick and transform those inequalities into a single polynomial condition by
+introducing an additional variable, say <span class="math">a</span>, about which we will assume that is positive. This gives
+us a non&#8211;degeneracy condition <span class="math">x_B y_C - a</span>.</p>
+<p>With all this knowledge we are ready to prove the main theorem. First, lets declare variables:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s">&#39;x_B, x_C, y_C, x_D, a&#39;</span><span class="p">)</span>
+<span class="go">(x_B, x_C, y_C, x_D, a)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">vars</span> <span class="o">=</span> <span class="n">_</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We had to declare the additional variable <span class="math">a</span>, but we don&#8217;t consider it a variable of our problem. This
+will lead to a new case in SymPy&#8217;s implementation of Gröbner bases, because we will be computing not
+over rationals, as we did in all previous examples, but the computations will be done over the field of
+univariate rational functions. Lets now define the four points <span class="math">A</span>, <span class="math">B</span>, <span class="math">C</span> and <span class="math">D</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x_B</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x_C</span><span class="p">,</span> <span class="n">y_C</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x_D</span><span class="p">,</span> <span class="n">y_C</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using the previously defined functions we can define the hypothesis:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">h1</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h2</span> <span class="o">=</span> <span class="n">equal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h3</span> <span class="o">=</span> <span class="n">x_B</span><span class="o">*</span><span class="n">y_C</span> <span class="o">-</span> <span class="n">a</span>
+</pre></div>
+</div>
+<p>and compute its Gröbner basis:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">groebner</span><span class="p">([</span><span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">,</span> <span class="n">h3</span><span class="p">],</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;grlex&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Two things need a comment here. Previously we specified variables in <tt class="xref docutils literal"><span class="pre">groebner()</span></tt>, when we were
+concerned about the order of variables. This was necessary when the task was to eliminate particular
+variables, before proceeding to the other steps of an algorithm. However, in this case we are rather
+concerned about not letting the variable <span class="math">a</span> to be considered as a significant variable in the problem,
+because we treat <span class="math">a</span> as a parameter. The other thing is that we can compute the Gröbner basis with
+respect to any admissible ordering of monomials. We chose the standard total degree scheme, over the
+default lexicographic ordering, because leads to shorter computation times.</p>
+<p>Lets now verify the theorem:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">reduced</span><span class="p">(</span><span class="n">perpendicular</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">),</span> <span class="n">G</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;grlex&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p>This proves that <span class="math">AC \bot BD</span>. Although, the theorem we described and proved was a simple one, one can
+handle much more complicated problems as well. One should refer to Winkler&#8217;s paper for more interesting
+examples, especially concerning issues with degenerate cases.</p>
+</div>
+<div class="section" id="other-applications">
+<h3>Other applications<a class="headerlink" href="#other-applications" title="Permalink to this headline">¶</a></h3>
+<p>So far several detailed examples of practical applications of the Gröbner bases method were
+presented, which explained most interesting features of Gröbner bases and their use patterns
+in SymPy. Following the list from the beginning of this section, there are, however, many more
+applications. We will give reference to several of them in this part.</p>
+<p>Besides the obvious application of solving systems of polynomial equations and the less obvious
+for computing LCMs and GCDs of multivariate polynomials, the Gröbner basis method is also used
+in SymPy for computing minimal polynomials of algebraic numbers, primitive elements of algebraic
+fields and isomorphisms between algebraic fields (for a detailed theoretical discussion see
+<a class="reference external" href="literature.html#adams1994intro">[Adams1994intro]</a> and algorithms refer to <a class="reference external" href="literature.html#cohen1993course">[Cohen1993course]</a>). For all those tasks there
+are much more efficient algorithms implemented in SymPy. However, Gröbner bases remain the
+fallback tool if any of the fast algorithms isn&#8217;t suitable for a particular job. For example,
+minimal polynomials can be relatively easily computed using PSLQ algorithm (see <tt class="xref docutils literal"><span class="pre">pslq()</span></tt>
+function in mpmath library) but only in the case of real algebraic numbers. In the more general
+case of complex algebraic numbers the Gröbner bases method is the only choice.</p>
+<p>Gröbner bases can be also directly applicable in symbolic manipulation systems for computing
+factorizations of multivariate polynomials (see <a class="reference external" href="literature.html#gianni1985groebner">[Gianni1985groebner]</a>) or evaluating symbolic
+summations and integrals (see <a class="reference external" href="literature.html#chyzak1998groebner">[Chyzak1998groebner]</a>).</p>
+</div>
+</div>
+<div class="section" id="complexity-of-computing-groebner-bases">
+<h2>Complexity of computing Gröbner bases<a class="headerlink" href="#complexity-of-computing-groebner-bases" title="Permalink to this headline">¶</a></h2>
+<p>Depending on our point of view, the complexity of the Gröbner bases method may vary. Gröbner
+bases can be considered easy when we are discussing the general idea that stands behind them, or
+the structure of Buchberger algorithm. As we saw in section <a class="reference internal" href="#gb-construct"><em>Construction of Gröbner bases</em></a>, the operations
+needed to compute a Gröbner basis are elementary and taught in high&#8211;school, and it shouldn&#8217;t be
+very difficult, for a high&#8211;school student, to experiment with Gröbner bases, especially in Python.</p>
+<p>However, the algorithmic complexity of the Gröbner basis method is very high. This is not a
+surprise, as in the examples we were able to solve several problems which intrinsic complexity
+is exponential. Thus, in the general setup, the Buchberger has exponential complexity as well,
+whereas in <em>pathological</em> cases its complexity may increase to doubly exponential. It should be
+emphasised that the Buchberger algorithm is very fragile to the choice of the ordering of
+monomials, so it often happens that a Gröbner basis, for a set of polynomials, with respect
+to one ordering is computable in relatively short time, whereas to compute it with respect to
+another ordering one would have to wait ages. Lexicographic Gröbner bases are considered to
+be the most expensive ones. In <a class="reference external" href="literature.html#buchberger2001systems">[Buchberger2001systems]</a> we can find a simple&#8211;looking system
+of three polynomials in three variables:</p>
+<div class="math">
+\begin{split}\left\{
+\begin{array}{l}
+    x y^3 - 2 y z - z^2 + 13          \\
+    y^2 - x^2 z + x z^2 + 3           \\
+    z^2 x - y^2 x^2 + x y + y^3 + 12
+\end{array}
+\right.\end{split}</div>
+<p>for which a Gröbner basis with respect to lexicographic ordering can&#8217;t be computed in a <em>reasonable</em>
+time in SymPy. However, if we switch to graded lexicographic ordering of monomials, SymPy requires less
+than a second to construct the basis. For comparison, Mathematica can compute both bases at glance (see
+<a class="reference external" href="literature.html#mathematica2009internal">[Mathematica2009internal]</a> for a description of its implementation of Buchberger algorithm).</p>
+<p>However, as the examples showed us, there is often a lot of <em>structure</em> in the Gröbner bases found
+in practical applications, so many non&#8211;trivial and interesting Gröbner bases are relatively simple
+to compute.</p>
+<p>There many improvements possible to the SymPy&#8217;s implementation of Buchberger algorithm. Techniques like
+Gröbner Walk, which allows to compute a basis with respect to a <em>cheaper</em> ordering of monomials first
+and then convert it to a more expensive one, or linear algebra approach (see <a class="reference external" href="literature.html#faugere1999f4">[Faugere1999f4]</a>), in which
+a polynomial algebra problem is transformed in into a linear algebra problem and solved using efficient
+algorithms available in this field, are all applicable in SymPy. Ideas for improving the Gröbner bases
+module are listed, among other, as <em>Google Summer of Code</em> proposals at <a class="reference external" href="literature.html#sympygsoc2010">[SymPyGSoC2010]</a>.</p>
+<p>Currently the most promising approach for improving the Buchberger algorithm is SymPy, which is scheduled
+for implementation in near future, is algorithm F5 due to Jean Charles Faugère (see <a class="reference external" href="literature.html#faugere2002f5">[Faugere2002f5]</a> and
+<a class="reference external" href="literature.html#stegers2006f5">[Stegers2006f5]</a>). The algorithm has the same structure as Buchberger algorithm, however it utilizes a very
+powerful criteria for elimination of useless critical pairs, significantly reducing the number of required
+polynomial divisions.  In practical cases there are <em>no</em> reductions to zero in F5 algorithm. Reductions to
+zero may happen in certain situations, however, their number is still less than in any other algorithm for
+computing Gröbner bases. Thus F5 is considered to be at least one order of magnitude faster than the
+fastest algorithm previously available.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../static/sympy-logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Gröbner bases and their applications</a><ul>
+<li><a class="reference external" href="#short-introduction-to-groebner-bases">Short introduction to Gröbner bases</a></li>
+<li><a class="reference external" href="#construction-of-groebner-bases">Construction of Gröbner bases</a><ul>
+<li><a class="reference external" href="#the-notion-of-s-polynomials">The notion of s&#8211;polynomials</a></li>
+<li><a class="reference external" href="#what-is-a-groebner-basis">What is a Gröbner basis?</a></li>
+<li><a class="reference external" href="#reduced-groebner-bases">Reduced Gröbner bases</a></li>
+<li><a class="reference external" href="#toy-buchberger-algorithm">Toy Buchberger algorithm</a></li>
+<li><a class="reference external" href="#termination-of-the-algorithm">Termination of the algorithm</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#computing-groebner-bases-with-sympy">Computing Gröbner bases with SymPy</a></li>
+<li><a class="reference external" href="#admissible-orderings-of-monomials">Admissible orderings of monomials</a></li>
+<li><a class="reference external" href="#specialization-of-groebner-bases">Specialization of Gröbner bases</a><ul>
+<li><a class="reference external" href="#special-case-1-gauss-algorithm">Special case 1: Gauss&#8217; algorithm</a></li>
+<li><a class="reference external" href="#special-case-2-euclid-s-algorithm">Special case 2: Euclid&#8217;s algorithm</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#applications-of-groebner-bases">Applications of Gröbner bases</a><ul>
+<li><a class="reference external" href="#solving-systems-of-polynomial-equations">Solving systems of polynomial equations</a></li>
+<li><a class="reference external" href="#algebraic-relations-in-invariant-theory">Algebraic relations in invariant theory</a></li>
+<li><a class="reference external" href="#integer-optimization">Integer optimization</a></li>
+<li><a class="reference external" href="#coloring-of-graphs">Coloring of graphs</a><ul>
+<li><a class="reference external" href="#classical-vertex-coloring">Classical vertex coloring</a></li>
+<li><a class="reference external" href="#vertex-coloring-using-other-systems">Vertex coloring using other systems</a></li>
+<li><a class="reference external" href="#the-structure-of-vertex-coloring">The structure of vertex coloring</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#algebraic-geometry">Algebraic geometry</a></li>
+<li><a class="reference external" href="#other-applications">Other applications</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#complexity-of-computing-groebner-bases">Complexity of computing Gröbner bases</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="algorithms.html"
+                                  title="previous chapter">Introduction to polynomial related algorithms in SymPy</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="gcd.html"
+                                  title="next chapter">Algorithmics of GCD and LCM computations</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../sources/src/groebner.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="gcd.html" title="Algorithmics of GCD and LCM computations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="algorithms.html" title="Introduction to polynomial related algorithms in SymPy"
+             >previous</a> |</li>
+        <li><a href="../index.html">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Mateusz Paprocki.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>
