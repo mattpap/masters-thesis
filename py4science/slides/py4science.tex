@@ -1,0 +1,366 @@
+\documentclass{beamer}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[OT4]{fontenc}
+
+\usetheme[bullet=circle,
+          titleline=true,
+          pageofpages=of,
+          alternativetitlepage=true]{Torino}
+
+\usepackage{color}
+
+\usepackage{ragged2e}
+\usepackage{hyphenat}
+\usepackage{booktabs}
+
+\usepackage{tikz}
+
+\usetikzlibrary{arrows}
+\usetikzlibrary{automata}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{decorations}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+
+\usepackage{../../slides/highlight/axiomhighlight}
+\usepackage{../../slides/highlight/maximahighlight}
+\usepackage{../../slides/highlight/pythonhighlight}
+\usepackage{../../slides/highlight/mathematicahighlight}
+
+\definecolor{MyGreen}{rgb}{0.40,0.80,0.20}
+
+\title{Symbolic manipulation in pure Python. Is it feasible?}
+\author{Mateusz Paprocki \texttt{<mattpap@gmail.com>}}
+\institute[PWR]{Wrocław University of Technology \linebreak SymPy Development Team}
+\date{\today}
+
+\newenvironment{jblock}[1]{
+    \begin{block}{#1}\justifying\nohyphens
+}{
+    \end{block}
+}
+
+\begin{document}
+
+\setbeamercovered{transparent}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]
+    \frametitle{Presentation plan}
+
+    \begin{itemize}
+        \item A few words about the author
+        \pause
+        \item Short introduction to SymPy
+            \begin{itemize}
+                \item the main goals of the project
+                \item listing of SymPy's capabilities
+            \end{itemize}
+        \pause
+        \item The main topic
+            \begin{itemize}
+                \item polynomials in SymPy
+                \item compare with other systems
+                \item examples, more examples \ldots
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{A few words about the author}
+
+    \begin{center}
+        \includegraphics[scale=0.6]{images/wr1.jpg}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Wrocław University of Technology (1)}
+
+    \begin{center}
+        \includegraphics[scale=0.25]{images/pwr1.jpg}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Wrocław University of Technology (2)}
+
+    \begin{center}
+        \includegraphics[scale=0.25]{images/pwr2.jpg}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{What is SymPy?}
+
+    \begin{itemize}
+        \item A pure Python library for symbolic mathematics
+    \end{itemize}
+
+    \pause
+    \begin{python}
+  >>> from sympy import *
+  >>> x = Symbol('x')
+
+  >>> limit(sin(pi*x)/x, x, 0)
+  pi
+
+  >>> integrate(x + sinh(x), x)
+  (1/2)*x**2 + cosh(x)
+
+  >>> diff(_, x)
+  x + sinh(x)
+    \end{python}
+\end{frame}
+
+\begin{frame}
+    \frametitle{My role in the project}
+    \framesubtitle{A short historical background}
+
+    \begin{itemize}
+        \item cooperation started in March 2007
+            \begin{itemize}
+                \item a few simple bugfixes and improvements
+            \end{itemize}
+            \pause
+        \item next came Google Summer of Code 2007
+            \begin{itemize}
+                \item algorithms for solving recurrence relations
+                \item algorithms for definite and indefinite summations
+            \end{itemize}
+            \pause
+        \item and this is how it works:
+            \begin{itemize}
+                \item algorithms for symbolic integration
+                \item algebraic structures, polynomials
+                \item expression simplification, \ldots
+            \end{itemize}
+            \pause
+        \item else:
+            \begin{itemize}
+                \item GSoC 2009, 2010 mentor (PSU, PSF)
+                \item tutorial at EuroSciPy '09
+                \item master's thesis
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Why reinvent the wheel for the 37th time?}
+
+    There are numerous symbolic manipulation systems:
+    \begin{itemize}
+        \item \structure{Proprietary} software:
+            \begin{itemize}
+                \item Mathematica, Maple, Magma, \ldots
+            \end{itemize}
+        \item \structure{Open Source} software:
+            \begin{itemize}
+                \item AXIOM, GiNaC, Maxima, PARI, Sage, Singular, Yacas, \ldots
+            \end{itemize}
+    \end{itemize}
+    \pause
+    {\color{red} Problems:}
+    \begin{itemize}
+        \item all \structure{invent} their own \structure{language}
+            \begin{itemize}
+                \item need to learn yet another language
+                \item separation into core and library
+                \item hard to extend core functionality
+                \item \structure{except}: GiNaC and Sage
+            \end{itemize}
+        \item all need quite some time to compile
+            \begin{itemize}
+                \item slow development cycle
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List of SymPy's modules (1)}
+
+    \begin{description}
+        \item[concrete] symbolic products and summations
+        \item[core] Basic, Add, Mul, Pow, Function, \structure{\ldots}
+        \item[functions] elementary and special functions
+        \item[galgebra] geometric algebra
+        \item[geometry] geometric entities
+        \item[integrals] symbolic integrator
+        \item[interactive] for setting up pretty--printing
+        \item[logic] new assumptions engine, boolean functions
+        \item[matrices] Matrix class, orthogonalization etc.
+        \item[mpmath] fast arbitrary precision numerical math
+    \end{description}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List of SymPy's modules (2)}
+
+    \begin{description}
+        \item[ntheory] number theoretical functions
+        \item[parsing] Mathematica and Maxima parsers
+        \item[physics] physical units, Pauli matrices
+        \item[plotting] 2D and 3D plots using pyglet
+        \item[polys] polynomial algebra, factorization
+        \item[printing] pretty-printing, code generation
+        \item[series] compute limits and tructated series
+        \item[simplify] rewrite expresions in other forms
+        \item[solvers] algebraic, recurrence, differential
+        \item[statistics] standard probability distributions
+        \item[utilities] test framework, compatibility stuff
+    \end{description}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{How to get involved?}
+
+    \begin{itemize}
+        \item Visit our main web site:
+            \begin{itemize}
+                \item \texttt{www.sympy.org}
+            \end{itemize}
+        \item and additional web sites:
+            \begin{itemize}
+                \item \texttt{docs.sympy.org}
+                \item \texttt{wiki.sympy.org}
+                \item \texttt{live.sympy.org}
+            \end{itemize}
+        \item Contact us on our mailing list:
+            \begin{itemize}
+                \item \texttt{sympy@googlegroups.com}
+            \end{itemize}
+        \item or/and IRC channel:
+            \begin{itemize}
+                \item \texttt{\#sympy} on FreeNode
+            \end{itemize}
+        \item Clone source repository:
+        \begin{verbatim}
+        git clone git://git.sympy.org/sympy.git
+        \end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{The first example}
+    \framesubtitle{Vertex $k$--coloring of graphs}
+
+    \begin{columns}
+        \begin{column}[l]{0.4\textwidth}
+            \begin{center}
+                \input{../../slides/content/graph-nocolor.tex}
+            \end{center}
+        \end{column}
+        \begin{column}[r]{0.4\textwidth}
+            \pause
+            \begin{center}
+                \input{../../slides/content/graph-color.tex}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{The first example}
+    \framesubtitle{Graph coloring with Gr\"{o}bner bases (1)}
+
+    Given a graph $\mathcal{G}(V, E)$. We write two sets of equations:
+    \begin{itemize}
+        \item $I_k$ --- allow one of $k$ colors per vertex
+            \begin{equation*}
+                I_k = \{ x_i^k - 1 : i \in V \}
+            \end{equation*}\pause
+        \item $I_{\mathcal{G}}$ --- adjacent vertices have different colors assigned
+            \begin{equation*}
+                I_{\mathcal{G}} = \{ x_{i}^{k-1} + x_{i}^{k-2} x_{j} + \ldots + x_{i} x_{j}^{k-2} + x_{j}^{k-1} : (i, j) \in E \}
+            \end{equation*}
+    \end{itemize}
+    \pause
+    Next we solve $I_k \cup I_{\mathcal{G}}$ using the Gr\"{o}ebner bases method.
+\end{frame}
+
+\begin{frame}
+    \frametitle{The first example}
+    \framesubtitle{Graph coloring with Gr\"{o}bner bases (2)}
+
+    \begin{columns}
+        \begin{column}[l]{0.4\textwidth}
+            \scriptsize
+            \begin{align*}
+                \{& \structure{x_{1}} + x_{11} + x_{12},              \\
+                  & \structure{x_{2}} - x_{11},                       \\
+                  & \structure{x_{3}} - x_{12},                       \\
+                  & \structure{x_{4}} - x_{12},                       \\
+                  & \structure{x_{5}} + x_{11} + x_{12},              \\
+                  & \structure{x_{6}} - x_{11},                       \\
+                  & \structure{x_{7}} - x_{12},                       \\
+                  & \structure{x_{8}} + x_{11} + x_{12},              \\
+                  & \structure{x_{9}} - x_{11},                       \\
+                  & \structure{x_{10}} + x_{11} + x_{12},             \\
+                  & \structure{x_{11}}^2 + x_{11} x_{12} + x_{12}^2,  \\
+                  & \structure{x_{12}}^3 - 1 \}
+            \end{align*}
+        \end{column}
+        \begin{column}[r]{0.4\textwidth}
+            \begin{center}
+                \input{../../slides/content/graph-color.tex}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{The first example}
+    \framesubtitle{Graph coloring with Gr\"{o}bner bases in SymPy}
+
+    \input{../../slides/content/example-sympy.tex}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{A comparison with other systems}
+    \framesubtitle{Graph coloring with Gr\"{o}bner bases in Maxima}
+
+    \input{../../slides/content/example-maxima.tex}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{A comparison with other systems}
+    \framesubtitle{Graph coloring with Gr\"{o}bner bases in Axiom}
+
+    \input{../../slides/content/example-axiom.tex}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{A comparison with other systems}
+    \framesubtitle{Graph coloring with Gr\"{o}bner bases in Mathematica}
+
+    \input{../../slides/content/example-mathematica.tex}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{And what about the speed of computations?}
+    \framesubtitle{In the case of our example \ldots}
+
+    \begin{center}
+        \begin{tabular}{l|llll} \toprule
+                 & SymPy & Maxima & Axiom & Mathematica \\ \midrule
+        Time [s] & 15.4  & 17.6   & 3.6   & 0.34        \\ \bottomrule
+        \end{tabular}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \begin{center}
+        \vskip+0.5cm
+        \textbf{\LARGE Thank you for your attention!}
+        \linebreak
+        \vskip+0.5cm
+        \includegraphics[scale=0.2]{images/sympy-logo.pdf}
+    \end{center}
+\end{frame}
+
+\end{document}
+

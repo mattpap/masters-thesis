@@ -1,0 +1,9 @@
+\frametitle {And what about the speed of computations?}
+    \framesubtitle{In the case of our example \ldots}
+
+    \begin{center}
+        \begin{tabular}{l|llll} \toprule
+                 & SymPy & Maxima & Axiom & Mathematica \\ \midrule
+        Time [s] & 15.4  & 17.6   & 3.6   & 0.34        \\ \bottomrule
+        \end{tabular}
+    \end{center}
