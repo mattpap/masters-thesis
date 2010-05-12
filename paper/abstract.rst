@@ -1,6 +1,6 @@
 
-Polynomial Manipulation in SymPy (or making pure Python fast and beyond ...)
-============================================================================
+                Computing with Polynomials in SymPy
+                ===================================
 
           Mateusz Paprocki, Wrocław University of Technology
 
