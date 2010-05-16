@@ -175,13 +175,13 @@ htmlhelp_basename = 'PolynomialsManipulationModuledoc'
 # The paper size ('letter' or 'a4').
 
 latex_paper_size = 'a4'
-latex_font_size = '11pt'
+latex_font_size = '12pt'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index',
-   'PolynomialsManipulationModule.tex',
+   'sympy.tex',
    u'Polynomials Manipulation Module Documentation',
    u'Mateusz Paprocki',
    'book',
@@ -197,7 +197,57 @@ latex_documents = [
 #latex_use_parts = False
 
 # Additional stuff for the LaTeX preamble.
-#latex_preamble = ''
+latex_preamble = """
+\\usepackage{amsmath}
+\\usepackage{amsfonts}
+\\usepackage{amsthm}
+\\newcommand{\\N}[0]{\\mathbf{N}}
+\\newcommand{\\Z}[0]{\\mathbf{Z}}
+\\newcommand{\\Q}[0]{\\mathbf{Q}}
+\\newcommand{\\R}[0]{\\mathbf{R}}
+\\newcommand{\\C}[0]{\\mathbf{C}}
+\\newcommand{\\K}[0]{\\mathbf{K}}
+\\newcommand{\\I}[0]{\\mathrm{i}}
+\\newcommand{\\Xn}[0]{[x_1, \\ldots, x_n]}
+\\newcommand{\\LM}[0]{\\operatorname{LM}}
+\\newcommand{\\LT}[0]{\\operatorname{LT}}
+\\newcommand{\\lcm}[0]{\\operatorname{lcm}}
+\\newcommand{\\remainder}[0]{\\operatorname{remainder}}
+\\newcommand{\\spoly}[0]{\\operatorname{s-polynomial}}
+\\DeclareUnicodeCharacter{22C5}{\ensuremath{\cdot}}
+\\DeclareUnicodeCharacter{23A0}{x}
+\\DeclareUnicodeCharacter{23A1}{x}
+\\DeclareUnicodeCharacter{23A2}{x}
+\\DeclareUnicodeCharacter{23A3}{x}
+\\DeclareUnicodeCharacter{23A4}{x}
+\\DeclareUnicodeCharacter{23A5}{x}
+\\DeclareUnicodeCharacter{23A6}{x}
+\\DeclareUnicodeCharacter{23A7}{x}
+\\DeclareUnicodeCharacter{23A8}{x}
+\\DeclareUnicodeCharacter{23A9}{x}
+\\DeclareUnicodeCharacter{23AB}{x}
+\\DeclareUnicodeCharacter{23AC}{x}
+\\DeclareUnicodeCharacter{23AD}{x}
+\\DeclareUnicodeCharacter{239A}{x}
+\\DeclareUnicodeCharacter{239B}{x}
+\\DeclareUnicodeCharacter{239C}{x}
+\\DeclareUnicodeCharacter{239D}{x}
+\\DeclareUnicodeCharacter{239E}{x}
+\\DeclareUnicodeCharacter{239F}{x}
+\\DeclareUnicodeCharacter{2500}{x}
+\\DeclareUnicodeCharacter{2571}{x}
+\\DeclareUnicodeCharacter{2572}{x}
+\\DeclareUnicodeCharacter{2080}{x}
+\\DeclareUnicodeCharacter{2081}{x}
+\\DeclareUnicodeCharacter{2082}{x}
+\\DeclareUnicodeCharacter{2083}{x}
+\\DeclareUnicodeCharacter{2084}{x}
+\\DeclareUnicodeCharacter{2085}{x}
+\\DeclareUnicodeCharacter{2086}{x}
+\\DeclareUnicodeCharacter{2087}{x}
+\\DeclareUnicodeCharacter{2088}{x}
+\\DeclareUnicodeCharacter{2089}{x}
+"""
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []
