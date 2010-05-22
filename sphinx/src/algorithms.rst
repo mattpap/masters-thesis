@@ -2,28 +2,52 @@
 
 .. _thesis-algorithms:
 
-======================================================
-Introduction to polynomial related algorithms in SymPy
-======================================================
+==================================
+Polynomial manipulation algorithms
+==================================
 
-* Polynomials arithmetics
-* Euclidean algorithms
-* GCDs and LCMs
-* Square--free decomposition
-* Functional decomposition
-* Factorization into irreducibles
+SymPy implements wide variety of algorithms for polynomials manipulation, which ranges from
+polynomial arithmetics to advanced methods for factoring polynomials over algebraic number
+fields or computing |groebner| bases. In this chapter we will give a short description to all
+polynomial manipulation algorithms in SymPy. The descriptions will include a short note on the
+purpose and applications of a particular algorithm, as well as discussion on its computational
+complexity and possibility of parallelization. We will also give reference to most influential
+papers, which were used for implementing polynomial related algorithms in SymPy.
 
-  * Univariate polynomials
+Polynomials arithmetics
+=======================
 
-    * Over integers and rationals
-    * Algebraic number fields
-    * Other domains
+Euclidean algorithms
+====================
 
-  * Multivariate polynomials
+GCDs and LCMs
+=============
 
-    * Over integers and rationals
-    * Algebraic number fields
-    * Other domains
+Functional decomposition
+========================
 
-* |groebner| bases
+Square--free decomposition
+==========================
+
+Factorization into irreducibles
+===============================
+
+Univariate polynomials
+----------------------
+
+* Integers and rationals
+* Algebraic number fields
+* Composite domains
+* Other domains
+
+Multivariate polynomials
+------------------------
+
+* Integers and rationals
+* Algebraic number fields
+* Composite domains
+* Other domains
+
+|groebner| bases
+================
 
