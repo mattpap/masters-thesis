@@ -140,6 +140,7 @@ jsMath.Easy = {
       R: '\\mathbf{R}',
       C: '\\mathbf{C}',
       K: '\\mathbf{K}',
+      F: '\\mathbf{F}',
       I: '\\mathrm{i}',
       Xn: '[x_1, \\ldots, x_n]',
       LM: '\\operatorname{LM}',
@@ -147,6 +148,8 @@ jsMath.Easy = {
       lcm: '\\operatorname{lcm}',
       remainder: '\\operatorname{remainder}',
       spoly: '\\operatorname{s-polynomial}',
+      floor: ['\\left\\lfloor {#1} \\right\\rfloor', 1],
+      ceil: ['\\left\\lceil {#1} \\right\\rceil', 1],
   },
 
   //
