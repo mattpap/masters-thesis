@@ -180,6 +180,11 @@ Literature
 .. [PlanetMathSymmetric] http://planetmath.org/encyclopedia/ReductionAlgorithmForSymmetricPolynomials.html
 .. [MaximaGroebner] http://maxima.sourceforge.net/docs/manual/en/maxima_54.html
 .. [MathematicaGroebner] http://reference.wolfram.com/mathematica/tutorial/ComplexPolynomialSystems.html
+.. [PythonModules] http://docs.python.org/tutorial/modules.html
+.. [KNS2009]
+.. [EuroSciPy2009]
+.. [py4science2010]
+.. [EuroSciPy2010]
 .. [Buchberder1965thesis]
 .. [Abramson2006translation]
 .. [Abramson2009history]
@@ -187,4 +192,6 @@ Literature
 .. [Winkler1990geometry]
 .. [Buchberger1998applications]
 .. [Sturmfels1996lectures]
+.. [Grabmeier2003algebra]
+.. [Graham1994concrete]
 

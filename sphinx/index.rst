@@ -13,6 +13,7 @@ Contents:
     src/stateofart.rst
     src/internals.rst
     src/algorithms.rst
+    src/polynomials.rst
     src/groebner.rst
     src/glossary.rst
     src/literature.rst

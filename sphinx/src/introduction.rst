@@ -6,8 +6,24 @@
 Introduction
 ============
 
+
+
 What is symbolic manipulation?
 ==============================
+
+There is another term often used when speaking about symbolic manipulation
+
+
+What is a polynomial?
+=====================
+
+Polynomials at the core of this thesis and it would be very unwise to proceed with any discussion about
+the internals of polynomials manipulation module without giving a definition of this fundamental concept.
+Suppose we are given an expression $7*x**3 + x*y + 11$. Is it a polynomial? A high school student can
+answer this question affirmatively: yes, this is a polynomial.
+
+But it this all? Hopfully not, because
+if we recognize the expression as a polynomial we can take advantage of this fact.
 
 The current version
 ===================
@@ -101,4 +117,174 @@ California at Berkeley, CA, USA (see [py4science2010]_). In the presentation the
 results of his work on polynomials manipulation module and of this thesis. For July 2010, the author has
 a talk scheduled at EuroSciPy conference, which will be held at Ecole Normale Supérieure in Paris, France
 (see [EuroSciPy2010]_).
+
+_
+
+SymPy: a Python library for symbolic mathematics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another approach to symbolic mathematics is SymPy, which is available
+from http://sympy.org.  SymPy is a library written in pure Python,
+which aims to become a full-featured symbolic mathematics package
+while keeping the code as simple as possible in order to be
+comprehensible and easily extensible. Moreover, SymPy does not depend,
+by default, on any external software besides a Python interpreter,
+although additional dependencies like GMPY, Cython or Pyglet (for
+plotting) are optional. This way it is straightforward to use SymPy's
+mathematical functionality in environments like Google App Engine or
+Jython (Python in Java). It is also fairly easy for people to include
+SymPy in their projects.
+
+SymPy can be used either as a standalone library, or inside `Sage
+<http://sagemath.org/>`_ (or other similar distributions like `FEMhub
+<http://femhub.org/>`_). It is also part of most of the Linux
+distributions and the OS X Fink package system. There is also an
+installer for Windows available.
+
+The fundamental difference between SymPy and many other mathematical
+packages is that SymPy is written from scratch in a simple,
+interpreted, general purpose programming language: Python.  There is
+no separation between the core and user libraries, which are usually
+implemented in different programming languages, the core in a compiled
+(machine oriented) one and libraries in an interpreted one. This gives
+great flexibility and allows the user to experiment with every detail
+of SymPy, without any need for compiling code, which leads to a much
+faster development cycle.
+
+Below we use IPython, which is a feature rich version of the standard
+Python shell, equipped with syntax highlighting, auto-completion, many
+*magic* functions and a rich API (for details refer to
+http://ipython.scipy.org). Lets consider a simple SymPy session using
+IPython::
+
+    In [1]: from sympy import var, sin, integrate, pi
+
+    In [2]: var('x')
+    Out[2]: x
+
+    In [3]: sin(x)
+    Out[3]: sin(x)
+
+    In [4]: sin(x).diff(x)
+    Out[4]: cos(x)
+
+    In [5]: integrate(sin(x), x)
+    Out[5]: -cos(x)
+
+    In [6]: integrate(sin(x), (x, 0, pi))
+    Out[6]: 2
+
+First we need to import all classes and functions that we will take
+advantage of in this session. We could alternatively import everything
+that SymPy exports by default, by issuing ``from sympy import *``;
+however, this approach is not recommended if the user plans to use
+SymPy in parallel with other libraries, like NumPy, in a single
+session. We are using a general purpose programming language, so we
+need to declare all symbols that we will use. In this case we declare
+one symbol ``x``, using :func:`var` function, which is clever enough
+to inject ``x`` into the current namespace, saving us a little
+typing. From this point we can start computing with symbolics, either
+by using procedural (see :func:`integrate`) or object oriented (see
+:func:`diff`) styles. For users convenience, both ways are usually
+available, as users may have different backgrounds and may be
+accustomed to different styles.
+
+For a detailed explanation of SymPy's functionality and its semantics,
+refer to SymPy's documentation, which is available at
+http://docs.sympy.org. If help is needed, then one may ask questions
+at SymPy's mailing list sympy@googlegroups.com or IRC channel
+``#sympy`` at irc.freenode.net.
+
+The same behavior can be obtained from inside Sage. There is full
+interoperability between Sage's and SymPy's functionality. For
+example, the user can create Sage's expressions and use them with
+SymPy's classes and functions, and then use the computed results back
+in Sage. All conversions, in both directions, are done automatically.
+
+There exists a similar link between SymPy and mpmath, a library for
+arbitrary precision numerical computing in Python (see the following
+section for more details). SymPy is a symbolic mathematics library,
+but it also allows for numerical evaluation thanks to the mpmath
+library, which is included by default in SymPy. For example, SymPy
+implements a symbolic integrator and the user can compute various
+classes of integrals in a purely symbolic way. It is easy to also
+compute similar integrals numerically using mpmath.  The bindings are
+sufficiently strong so that the user doesn't have to do any manual
+conversions or even use mpmath's functionality directly, although if
+needed, anything specific can be imported explicitly from mpmath.
+
+SymPy ships with a simple script called ``isympy``, which can be used
+to run SymPy as a standalone application. The script chooses the best
+Python shell installed on the system (e.g., IPython, if available, and
+falls back to a standard Python shell otherwise), imports SymPy,
+setups pretty printing and injects some predefined symbols and
+functions declarations into the current namespace, for user
+convenience.
+
+Although the project started in 2006, SymPy already implements a wide
+variety of algorithms and data structures for symbolic
+manipulation. SymPy can do basic arithmetic, calculus
+(differentiation, integration, limits), simplification of expressions,
+polynomials (factoring, expansion, Gröbner bases), pattern matching,
+solving (algebraic, difference and differential equations, and systems
+of equations), symbolic matrices (determinants, LU decomposition,
+eigenvalues/eigenvectors), 2D and 3D plotting, unicode pretty printing
+of expressions and more. Lets consider a few nontrivial examples of
+SymPy's capabilities::
+
+    In [1]: from sympy import *
+
+    In [2]: var('x')
+    Out[2]: x
+
+    In [3]: sqrt3 = lambda x: x**(S(1)/3)
+
+    In [4]: limit((sqrt3(x**2) - 2*sqrt3(x) + 1)/(x - 1)**2, x, 1)
+    Out[4]: 1/9
+
+    In [5]: f = (x - tan(x)) / tan(x)**2  +  tan(x)
+
+    In [6]: integrate(f, x)
+    Out[6]: log(1 + tan(x)**2)/2 - x/tan(x) - x**2/2
+
+    In [7]: ratsimp(diff(_, x)) == f
+    Out[7]: True
+
+This example shows one important point about SymPy and the pure Python
+approach. In the third input we wrote ``S(1)/3`` to get the rational
+one over three. Why couldn't we simply write ``1/3``? This is because
+``1`` and ``3`` are Python objects and division of those objects will
+either give an integer (floor division) or a floating--point value
+(this depends on the version of Python interpreter and its
+configuration). In this particular case we have to tell Python that
+``1`` should be a SymPy's object, so we need to write ``S(1)``.  ``S``
+is a shorthand for :func:`sympify` function, which converts objects
+and strings into SymPy's objects. We could write alternatively
+``S('1/3')`` or ``Rational(1, 3)``, but never ``1/3`` directly. This
+is a cost associated with the approach we took when designing SymPy.
+In contrast, in Sage this problem is automatically dealt with via a
+preparser.
+
+    sage: 1/3
+    1/3
+
+There is another frequently asked question concerning any library
+written entirely in an interpreted programming language for the very
+demanding task of symbolic manipulation: is SymPy at all efficient?
+Compared to Pynac, which uses an optimized core written in C++ (a
+fast, machine-oriented programming language), SymPy can be considered
+slow, because of the significant overhead of interpretation of the
+Python language.  In some areas SymPy can already compete with other
+mathematical software, for example with Maxima when computing certain
+classes of Gröbner bases. There are efforts ongoing to make SymPy
+faster, e.g., by using pure mode Cython (this approach allows us to
+compile Python source code, while keeping a single source base). We
+are also considering writing tiny auxiliary modules in Cython for time
+critical parts of SymPy.
+
+Besides those issues, the pure Python approach seems very promising,
+for example in teaching, because it allows for analysis and
+modification of the implemented algorithms and data structures, on any
+level, even by people with only moderate programming experience and
+knowledge of Python.
 

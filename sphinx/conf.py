@@ -207,6 +207,7 @@ latex_preamble = """
 \\newcommand{\\R}[0]{\\mathbf{R}}
 \\newcommand{\\C}[0]{\\mathbf{C}}
 \\newcommand{\\K}[0]{\\mathbf{K}}
+\\newcommand{\\F}[0]{\\mathbf{F}}
 \\newcommand{\\I}[0]{\\mathrm{i}}
 \\newcommand{\\Xn}[0]{[x_1, \\ldots, x_n]}
 \\newcommand{\\LM}[0]{\\operatorname{LM}}
@@ -214,6 +215,8 @@ latex_preamble = """
 \\newcommand{\\lcm}[0]{\\operatorname{lcm}}
 \\newcommand{\\remainder}[0]{\\operatorname{remainder}}
 \\newcommand{\\spoly}[0]{\\operatorname{s-polynomial}}
+\\newcommand{\\floor}[1]{\\left\\lfloor {#1} \\right\\rfloor}
+\\newcommand{\\ceil}[1]{\\left\\lceil {#1} \\right\\rceil}
 \\DeclareUnicodeCharacter{22C5}{\ensuremath{\cdot}}
 \\DeclareUnicodeCharacter{23A0}{x}
 \\DeclareUnicodeCharacter{23A1}{x}

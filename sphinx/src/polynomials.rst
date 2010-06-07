@@ -6,10 +6,28 @@
 Polynomials over Various Ground Domains
 =======================================
 
-In the previous chapter we described the internals of polynomials manipulation module in |sympy|
-and introduced the reader to the concept of ground domains. The discussion was on a very detailed
-technical level. In this chapter we will show the differences between different ground domains on
-the user level.
+In the two previous chapters we introduced the reader to the internals of polynomials manipulation
+module in |sympy| and described algorithms that were implemented. The discussion was grounded on a
+very detailed and technical level. In this chapter we will move to a much more practical level and
+show how to use polynomials in |sympy| for something useful. We will be mostly concerned about the
+public API and behaviour of polynomial manipulation tools over different ground domains.
+
+We will start our discussion from the two simplest but also the most common cases, polynomials over
+the ring of integers and the rational field, and later proceed to more complex domains. Although
+integers and rationals form the simplest domains, they are ubiquitous in polynomial manipulation
+and polynomial over many other domains can (or have to) be transformed into one of those domains.
+For example, if |sympy| encounters a polynomial with coefficients from a polynomial ring, then
+when computing a factorization of such a polynomial, |sympy| will transform it to form a polynomial
+over the ring of integers, factor the resulting polynomial and transform the factors back to the
+original domain.
+
+The simple domains
+==================
+
+To cons
+
+
+
 
 Finite Fields
 =============
@@ -61,4 +79,16 @@ to expand the factorization. In the later case, where we used non--symmetric rep
 only positive (large) coefficients, which after expansion result in a different polynomial than the
 one we obtained in the former case. To get the same result, we need to truncate coefficients of the
 expanded polynomial modulo $65537$.
+
+
+Conclusion
+==========
+
+In this chapter we showed how to actually use polynomial manipulation module in practise. This
+tutorial like introduction might have been useful to grasp some of the ideas described in detail
+in the previous, more technical, chapters. It might seem like a little abuse to add a chapter of
+this kind to this thesis, however, design of an API that is comfortable to the users is one of
+the main objectives of this work. In the following chapter we will say more practical use--cases
+of this module on the  ...
+
 
