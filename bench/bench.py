@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+
+import sys, os
+
+if len(sys.argv) == 2:
+    BASE = sys.argv[1]
+else:
+    BASE = '.'
+
+import matplotlib
+matplotlib.use('Agg')
 
 """
 f = Poly(27*x + y**2 - 15*z)
@@ -19,6 +30,8 @@ f = Poly(27*x + y**2 - 15*z)
 """
 
 from matplotlib import pyplot as plt
+gcf = plt.gcf()
+gcf.set_size_inches(6, 4)
 X = [10, 20, 30, 40, 50]
 Y_python = [0.02, 0.26, 2.25, 4.93, 21.67]
 Y_cython = [0.01, 0.18, 1.53, 3.33, 14.92]
@@ -26,10 +39,12 @@ plt.plot(X, Y_python, 'bo-', X, Y_cython, 'ro-')
 plt.legend(('Python', 'Cython'), loc='upper left')
 plt.xlabel('Exponent ($n$)')
 plt.ylabel('Time [s]')
-plt.title('$(27 x + y^2 - 15 z)^n$')
+#plt.title('$(27 x + y^2 - 15 z)^n$')
 plt.grid()
-plt.savefig('cython-power.pdf')
-plt.show()
+plt.savefig(os.path.join(BASE, 'cython-power.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(BASE, 'cython-power.png'), bbox_inches='tight')
+#plt.show()
+plt.clf()
 
 """
 %time u = factor(x**200-1)
@@ -56,6 +71,8 @@ plt.show()
 """
 
 from matplotlib import pyplot as plt
+gcf = plt.gcf()
+gcf.set_size_inches(6, 4)
 X = [200, 400, 600, 800, 1000, 1200, 1400]
 Y_python = [0.28, 0.85, 3.18, 3.76, 5.06, 11.64, 15.13]
 Y_cython = [0.19, 0.67, 2.37, 2.87, 3.82, 8.76, 11.50]
@@ -63,10 +80,12 @@ plt.plot(X, Y_python, 'bo-', X, Y_cython, 'ro-')
 plt.legend(('Python', 'Cython'), loc='upper left')
 plt.xlabel('Exponent ($n$)')
 plt.ylabel('Time [s]')
-plt.title('$factor\\left(x^n - 1\\right)$')
+#plt.title('$factor\\left(x^n - 1\\right)$')
 plt.grid()
-plt.savefig('cython-factor.pdf')
-plt.show()
+plt.savefig(os.path.join(BASE, 'cython-factor.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(BASE, 'cython-factor.png'), bbox_inches='tight')
+#plt.show()
+plt.clf()
 
 """
 %time dmp_pow(F2, 5, 2, ZZ);
@@ -170,6 +189,8 @@ G3 = sdp_from_dict(dmp_to_dict(F3, 2), lex)
 """
 
 from matplotlib import pyplot as plt
+gcf = plt.gcf()
+gcf.set_size_inches(6, 4)
 X1 = [5, 10, 15, 20, 25]
 Y1_dense = [0.02, 0.24, 2.10, 4.81, 22.16]
 Y1_sparse = [0.02, 0.61, 6.23, 18.80, 89.93]
@@ -177,12 +198,16 @@ plt.plot(X1, Y1_dense, 'bo-', X1, Y1_sparse, 'ro-')
 plt.legend(('dense', 'sparse'), loc='upper left')
 plt.xlabel('Exponent ($n$)')
 plt.ylabel('Time [s]')
-plt.title('100% dense polynomial exponentiation')
+#plt.title('100% dense polynomial exponentiation')
 plt.grid()
-plt.savefig('100-dense-power.pdf')
-plt.show()
+plt.savefig(os.path.join(BASE, '100-dense-power.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(BASE, '100-dense-power.png'), bbox_inches='tight')
+#plt.show()
+plt.clf()
 
 from matplotlib import pyplot as plt
+gcf = plt.gcf()
+gcf.set_size_inches(6, 4)
 X2 = [5, 10, 15, 20, 25, 30]
 Y2_dense = [0.01, 0.09, 0.97, 2.02, 9.16, 26.71]
 Y2_sparse = [0.00, 0.06, 0.54, 1.55, 6.69, 19.99]
@@ -190,12 +215,16 @@ plt.plot(X2, Y2_dense, 'bo-', X2, Y2_sparse, 'ro-')
 plt.legend(('dense', 'sparse'), loc='upper left')
 plt.xlabel('Exponent ($n$)')
 plt.ylabel('Time [s]')
-plt.title('50% dense polynomial exponentiation')
+#plt.title('50% dense polynomial exponentiation')
 plt.grid()
-plt.savefig('50-dense-power.pdf')
-plt.show()
+plt.savefig(os.path.join(BASE, '50-dense-power.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(BASE, '50-dense-power.png'), bbox_inches='tight')
+#plt.show()
+plt.clf()
 
 from matplotlib import pyplot as plt
+gcf = plt.gcf()
+gcf.set_size_inches(6, 4)
 X3 = [5, 10, 15, 20, 25, 30]
 Y3_dense = [0.00, 0.01, 0.10, 0.23, 0.75, 1.94]
 Y3_sparse = [0.00, 0.00, 0.01, 0.03, 0.10, 0.19]
@@ -203,12 +232,16 @@ plt.plot(X3, Y3_dense, 'bo-', X3, Y3_sparse, 'ro-')
 plt.legend(('dense', 'sparse'), loc='upper left')
 plt.xlabel('Exponent ($n$)')
 plt.ylabel('Time [s]')
-plt.title('sparse polynomial exponentiation: $(x + y + z)^n$')
+#plt.title('sparse polynomial exponentiation: $(x + y + z)^n$')
 plt.grid()
-plt.savefig('sparse-power.pdf')
-plt.show()
+plt.savefig(os.path.join(BASE, 'sparse-power.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(BASE, 'sparse-power.png'), bbox_inches='tight')
+#plt.show()
+plt.clf()
 
 from matplotlib import pyplot as plt
+gcf = plt.gcf()
+gcf.set_size_inches(6, 4)
 X = [100, 200, 300, 400, 500, 600, 700, 800]
 Y_sympy = [0.33, 1.19, 4.15, 4.23, 5.79, 15.88, 17.07, 19.24]
 Y_python = [0.06, 0.19, 0.59, 0.58, 0.75, 2.07, 2.09, 2.38]
@@ -217,10 +250,12 @@ plt.plot(X, Y_sympy, 'bo-', X, Y_python, 'ro-', X, Y_gmpy, 'go-')
 plt.legend(('sympy', 'python', 'gmpy'), loc='upper left')
 plt.xlabel('Exponent ($n$)')
 plt.ylabel('Time [s]')
-plt.title('$factor(x^n - 1)$')
+#plt.title('$factor(x^n - 1)$')
 plt.grid()
-plt.savefig('ground-factor-small.pdf')
-plt.show()
+plt.savefig(os.path.join(BASE, 'ground-factor-small.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(BASE, 'ground-factor-small.png'), bbox_inches='tight')
+#plt.show()
+plt.clf()
 
 """
 for i in xrange(0, 9):
@@ -316,6 +351,8 @@ Out[121]: (1, [(Poly(1234*x + 123*y + 12*z + 1, x, y, z, domain='ZZ'), 18)])
 """
 
 from matplotlib import pyplot as plt
+gcf = plt.gcf()
+gcf.set_size_inches(6, 4)
 X = [10, 11, 12, 13, 14, 15, 16, 17, 18]
 Y_sympy = [0.61, 0.99, 1.47, 2.26, 3.52, 5.34, 8.10, 12.38, 18.37]
 Y_python = [0.32, 0.53, 0.92, 1.52, 2.56, 4.16, 6.59, 10.43, 15.99]
@@ -324,8 +361,29 @@ plt.plot(X, Y_sympy, 'bo-', X, Y_python, 'ro-', X, Y_gmpy, 'go-')
 plt.legend(('sympy', 'python', 'gmpy'), loc='upper left')
 plt.xlabel('Exponent ($n$)')
 plt.ylabel('Time [s]')
-plt.title('$factor((1234 x + 123 y + 12 z + 1)^n)$')
+#plt.title('$factor((1234 x + 123 y + 12 z + 1)^n)$')
 plt.grid()
-plt.savefig('ground-factor-large.pdf')
-plt.show()
+plt.savefig(os.path.join(BASE, 'ground-factor-large.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(BASE, 'ground-factor-large.png'), bbox_inches='tight')
+#plt.show()
+plt.clf()
+
+from matplotlib import pyplot as plt
+gcf = plt.gcf()
+gcf.set_size_inches(6, 4)
+from numpy import arange
+X = ['SymPy', 'Maxima', 'Axiom', 'Mathematica']
+Y = [15.4, 17.6, 3.6, 0.34]
+loc = arange(len(X)) + 0.5
+plt.bar(loc, Y, width=0.5)
+plt.xticks(loc + 0.25, X)
+plt.yticks(range(0, 19))
+plt.ylabel('Time [s]')
+plt.gca().get_xaxis().tick_bottom()
+plt.gca().get_yaxis().tick_left()
+plt.grid()
+plt.savefig(os.path.join(BASE, 'groebner-time-compare.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(BASE, 'groebner-time-compare.png'), bbox_inches='tight')
+#plt.show()
+plt.clf()
 
