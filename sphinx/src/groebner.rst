@@ -1204,18 +1204,24 @@ mathematics, so will skip detailed syntactic comparison and refer the reader to 
 We showed how to perform classical vertex coloring of a graph based on the |groebner| bases method
 using SymPy and three other mathematical systems. It is interesting to compare the times that were
 needed to compute the |groebner| basis $G$ by each of those systems. Timings (average of multiple
-runs) were stored in the following table:
+runs) were collected in figure :ref:`fig-groebner-time-compare`. This simple study shows that both
+SymPy and Maxima are significantly slower than Axiom and Mathematica. This happens, because the
+implementation of |groebner| bases in both systems is done in an interpreted language (Python and
+Maxima language, respectively). Possibly they also implement less(--powerful) criteria for eliminating
+useless critical pairs.
 
-+----------+-------+--------+-------+-------------+
-|          | SymPy | Maxima | Axiom | Mathematica |
-+==========+=======+========+=======+=============+
-| Time [s] | 15.4  | 17.6   | 3.6   | 0.34        |
-+----------+-------+--------+-------+-------------+
+.. _fig-groebner-time-compare:
+.. figure:: ../img/plot/groebner-time-compare.*
+    :align: center
 
-This shows that both SymPy and Maxima are significantly slower than Axiom and Mathematica. This is
-happens, because the implementation of |groebner| bases in both systems is done in an interpreted
-language (Python and Maxima language, respectively). Possibly they also implement less(--powerful)
-criteria for eliminating useless critical pairs.
+    Average timing for computing |groebner| basis of graph $\mathcal{G}(V, E)$.
+
+..
+    +----------+-------+--------+-------+-------------+
+    |          | SymPy | Maxima | Axiom | Mathematica |
+    +==========+=======+========+=======+=============+
+    | Time [s] | 15.4  | 17.6   | 3.6   | 0.34        |
+    +----------+-------+--------+-------+-------------+
 
 The structure of vertex coloring
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
