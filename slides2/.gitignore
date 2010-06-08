@@ -1,0 +1,10 @@
+output/*.aux
+output/*.log
+output/*.nav
+output/*.out
+output/*.snm
+output/*.toc
+output/*.vrb
+
+slides.bib
+
