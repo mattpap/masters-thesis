@@ -17,11 +17,12 @@ papers, which were used for implementing polynomial related algorithms in SymPy.
 Polynomials arithmetics
 =======================
 
-Euclidean algorithms
-====================
+SymPy
 
-GCDs and LCMs
-=============
+The Greatest Common Divisor
+===========================
+
+GCD (Greatest Common Divisor) is a fundamental component of most
 
 Functional decomposition
 ========================
@@ -91,40 +92,100 @@ Multivariate polynomials
 Root isolation
 ==============
 
+Polynomials are solvable by radicals only up to degree 4 (inclusive). This is an unfortunate
+but well known consequence of Abel--Ruffini theorem. SymPy implements heuristic algorithms
+for solving polynomials in terms of radicals in :func:`roots` function. In some cases it is
+possible to find roots of higher degree polynomials, by taking advantage of polynomial
+factorization and decomposition algorithms, and pattern matching.
+
+This is an obviously limited approach and there is a need, in various areas of symbolic
+mathematics, e.g. solving of systems of polynomial equations [Strzebonski1997computing]_, to
+compute values of roots of a polynomial to a desired precision. This could be done by using
+numerical root finding algorithms, like Durand--Kerner's, which is has its implementation
+in mpmath library and is exposed to the top--level via :func:`nroots` function. However, in
+pathological cases, numerical algorithms may fail to compute correct values of polynomials'
+roots.
+
+To tackle this problem, when the user needs guaranteed error bounds of the computed roots,
+symbolic root isolation algorithms can be used. SymPy can isolate roots of a polynomial with
+rational coefficients in real and complex domains, taking advantage of most recent algorithmic
+solutions in the field. Symbolic root isolation is not that efficient as numerical root finding,
+but is always successful for arbitrary polynomials, giving, as the result, isolating intervals
+of the roots, in the real case, or rectangles, in the complex case.
+
 Real roots
 ----------
+
+For root isolation over reals SymPy implements continued fractions algorithm.
+[Akritas2008improving]_
+[Akritas2008study]_
+[Sharma2007complexity]_
+[Collins1976descarte]_
 
 Complex roots
 -------------
 
-    Implemented Collins-Krandick root isolation algorithm
+Isolation of complex roots is a much more demanding task. In SymPy we implemented the algorithm
+of Collins and Krandick [Collins1992infallible]_, the best currently known algorithm for symbolic
+complex root isolation (it is also implemented in Mathematica, see [Mathematica2009internal]_ for
+details).
 
-    Based on the infallible algorithm for counting roots in a
-    rectangle in the complex plane, an algorithm for isolation
-    of complex roots of polynomials with rational coefficients
-    was implemented.
+Collins--Krandick algorithm is an infallible (purely symbolic) algorithm for isolating complex
+roots of univariate polynomials with rational and Gaussian rational coefficients. In SymPy we
+currently allow only rational coefficients, but extension to the more general domain should be
+rather straightforward (Gaussian rational domain has to be implemented).
 
-    The algorithm computes the number of roots in a sufficiently
-    large initial rectangle (using Cauchy bound) and then performs
-    vertical and horizontal bisections and root counting until only
-    rectangles with exactly one root in each remain.
+The algorithm starts with a sufficiently large rectangle, which contains all roots the input
+polynomial, it bisects this rectangle, either vertically or horizontally, depending on the
+geometry of the isolation rectangle and computes the number of roots in each bisected part.
+If there are no roots in a rectangle then such a rectangle is skipped. If there is exactly
+one root, then the algorithm returns the rectangle a solution. Otherwise, the new rectangle
+is added to a queue and scheduled for further bisection. The initial rectangle is computed
+using Cauchy bound, which may give large overestimation on the magnitude of roots. If the
+there are no more rectangles left, i.e. each resulting rectangle contains only a single
+root (is an isolation rectangle), then the algorithm terminates. After the isolation phase,
+resulting rectangles can be further refined to the desired precision.
 
-    The algorithm isolates roots only in the upper half plane, but
-    excluding the real line, so real roots of the input polynomial
-    are discarded immediately and can be isolated using much more
-    efficient continued fraction approach. Conjugates are trivially
-    added to the resulting rectangles list by symmetry.
+As only rational coefficients are allowed, this gives the possibility of improving the speed
+of computations by isolating strictly complex roots only in the upper half--plane, excluding
+the real line (positive imaginary component). Conjugates are located by symmetry and real
+roots are located using much more efficient real root isolation algorithm.
 
-    The problem of roots located on boundary of isolating rectangles
-    is resolved by counting only roots that are located on northern
-    and western edges, and on north-western corner. This implies
-    the fact that the real line is not considered for root counting
-    at all.
+An important issue is location of roots on the boundary of an isolation rectangle. The
+algorithm can easily count roots in such setup (as opposed to other complex root isolation
+algorithm). However, to disambiguate the bisection scheme, where the same could be counted
+as a part of two (or more) adjacent rectangles, we only count roots located on the northern
+and western edges, and on the north--western corner of an isolation rectangle.
 
-    Isolating rectangles are sorted by their real component and
-    then by negated imaginary component, so that root and its
-    conjugate are located together forming a pair.
+The current implementation of Collins--Krandick algorithm in SymPy is suboptimal and there
+are several possible enhancements, some of listed in [Collins1992infallible]_, which ought
+to make complex root isolation in SymPy much faster.
 
-    This is not the optimal implementation of Collins-Krandick
-    algorithms and several significant improvements are possible.
+Collins--Krandick algorithm seems to be a good candidate for parallelization on multiple
+processors, although the author is not aware of any work tackling this problem. An approach
+would be to schedule refinement of particular isolation rectangles or clusters of rectangles
+on different processors. Currently we simply maintain a queue of rectangles in order from
+the smallest to the largest and refine each one--by--one on a single CPU.
+
+Previously also we experimented with, so called, global bisection algorithm due to Wilf (see
+[Wilf1978bisection]_). As its name suggests, Wilf's algorithm takes advantage of bisection
+scheme and operates on rectangles, similarly to Collins--Krandick algorithm, however it uses
+Sturm sequences to compute the number of roots in a rectangle and thus is very slow, because
+computing polynomial remainder sequences (in particular Sturm sequences) is slow a computationally
+demanding process. The other issue is that when a root is located on or even near (there is no
+definition of the word *near* in this context) rectangle boundary then the algorithm has to be
+restarted with an updated initial configuration. This makes global bisection algorithm fragile
+and unpredictable. There are other approaches to symbolic root isolation, see for example
+[Pinkert1976complex]_.
+
+Collins--Krandick algorithm takes advantage of purely symbolic approach, thus is significantly
+slower than rapidly converging numerical algorithms. However, it is possible to turn it into a
+mixed symbolic--numerical algorithm, where, in certain conditions, it is possible to replace
+symbolic computations with validated numerical computations, without compromising properties
+of the original algorithm.
+
+It should be obvious that real root isolation is less computationally intensive than complex
+root isolation, so whenever it is known that only real (or even negative or positive) roots
+are required, then the domain of computation should be appropriately limited to speed up the
+computations (for a detailed discussion see [Collins1996complex]_).
 
