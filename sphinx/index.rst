@@ -10,11 +10,11 @@ Contents:
     :maxdepth: 3
 
     src/introduction.rst
-    src/stateofart.rst
     src/internals.rst
     src/algorithms.rst
     src/polynomials.rst
     src/groebner.rst
+    src/conclusions.rst
     src/glossary.rst
     src/literature.rst
 
