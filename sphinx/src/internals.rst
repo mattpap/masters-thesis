@@ -3,7 +3,7 @@
 .. _thesis-internals:
 
 ====================================
-Notes on the Internal Implementation
+Notes on the internal implementation
 ====================================
 
 Knowing the goals of the project, lets now focus on the internal implementation of polynomials
@@ -819,6 +819,8 @@ In [6]: %time u = factor(x**100 - 1)
 CPU times: user 2.66 s, sys: 0.01 s, total: 2.66 s
 Wall time: 2.75 s
 
+To reset configuration to the default
+
 In [8]: setup("USE_CYCLOTOMIC_FACTOR")
 
 In [9]: %time u = factor(x**100 - 1)
@@ -833,27 +835,55 @@ made a lot easier.
 Using Cython internally
 =======================
 
-Cython [] is a general purpose programming language that is based on Python, but has extra
-language extensions to allow static typing and allows for direct translation into optimized
-C/C++ code. It makes easy to write Python wrappers for foreign libraries, but also it allows
-to optimize pure Python code.
+Cython (www.cython.org) is a general purpose programming language that is based on Python
+(shares very similar syntax), but has extra language extensions to allow static typing and
+allows for direct translation into optimized C code. Cython makes it easy to write Python
+wrappers to foreign libraries for exposing exposing their functionality to interpreted code.
+It also allows to optimize pure Python codes, which we take advantage of.
 
-There are two approaches. The first is to rewrite selected parts in Cython and compile them.
-Depending on the quality of Cython code, speed gain might vary, but, in any case, will be
-substantial. This approach has the benefit that we can control the optimization and make it
-better where ever possible. However, one has to provide to source bases for optimized parts
-of the system, which makes maintenance and future extensions hard.
+There are two approaches to enhance software speed that is written in pure Python. The first
+is to rewrite carefully selected parts of Python code in Cython and compile them. Depending
+on the quality of Cython code, speed gain might vary, but, in any case, will be substantial
+over the pure Python version. This approach has the benefit that developers have complete
+control over the optimizations that are used. However, one has to provide two source bases
+for optimized parts of the system, which makes maintenance and future extensions complicated.
+This makes direct Cython usage a measure of last resort when optimizing Python codes.
 
-The other approach is to use, so called, pure mode Cython. This allows the developers to keep
-a single source base, while still benefiting from translation to the machine code level, gaining
-speed improvement. Pure mode can be very easily utilized in SymPy, because there is a simplified
-interface provided
+The other approach is to use, so called, *pure mode* Cython. This a very recent development
+in Cython, which allows the developers to keep a single source base of pure Python code, while
+still benefiting from translation to machine code level, gaining speed improvement. Single source
+base is achieved by simply decorating functions or methods with a special decorator, which marks
+a function or method as compilable. The decorator also allows to specify which variables will be
+considered as native and which will remain pure Python variables. It is also possible to declare
+the type of each native variable. Then the decorated code can be run as normally in a standard
+Python interpreter, of course without any speed gain, but, what is more important, without any
+speed degeneracy (Cython decorators are empty decorators in interpreted mode). To take advantage
+of Cython, the user has to compile selected modules with Cython compiler, which results in a
+dynamically linked library (e.g. ``*.so`` on Unix platforms and ``*.dll`` on Windows) for each
+compiled module. During the next execution of the system, Python interpreters will select compiled
+modules in favour to the pure Python ones.
 
-Employing Cython
-----------------
+It should be clearly understood that if a variable is marked as native, then it conforms to the
+rules of the platform for which the code was compiled. If we declared, for example, a variable
+to be of integer type (C's ``int`` type), then there will be restriction of on the size of values
+accepted by such variable. There is no overflow checking or automatic conversion to arbitrary
+length integers, so one has to be very careful about which variables are marked as native to
+avoid faulty code on certain platforms.
 
-Suppose we implement function for rising a value to the $n$--th power. We do this for the
-general setup in pure Python to meet SymPy's goals. A sample implementation follows::
+Pure mode Cython in SymPy
+-------------------------
+
+To reduce the overhead of using pure mode Cython in SymPy to minimum, ``@cythonized`` decorator
+was introduced, which wraps original Cython's decorators and adjusts them to SymPy's needs. This
+is useful because we don not take advantage of many advanced Cython's features. The only feature
+we need is to mark variables as native, because all native variables in SymPy, at least at this
+point, are integers, so there is not need to make things unnecessarily complicated. The decorator
+also allows to run SymPy in interpreted mode without Cython installation on the system. To achieve
+this, which is one of fundamental SymPy's goals, we simply try import Cython and when this is not
+possible, we simply define an empty decorator.
+
+Suppose we implement a function for rising a value to the $n$--th power, :func:`power` in this case.
+For this task we employ classical repeated squaring algorithm. A sample implementation goes as follows::
 
     @cythonized('value,result,n,m')
     def power(value, n):
@@ -880,64 +910,110 @@ general setup in pure Python to meet SymPy's goals. A sample implementation foll
 
         return result
 
-The function :func:`power` is
+The function can be run in both interpreted and compiled modes. To tell Cython that :func:`power`
+is ready for compilation, we use ``@cythonized`` decorator, in which we declare four variables as
+native: ``value``, ``result``, ``n`` and ``m``. All four will have ``int`` type assigned during
+translation to C code. Two of those variables are input to the function. Cython is enough clever
+to automatically convert Python integers to native integers if necessary. The same can happen the
+other way in ``return`` statement. It is important to note that in interpreted mode Python uses
+arbitrary length integers, so we can compute arbitrary powers using :func:`power` function. This
+situation changes in compiled mode because we are restricted by machine types --- we can store
+at most 32--bit or 64--bit values in native variables, depending on the actual architecture for
+which this piece of code was compiled. Such difference can have serious consequences, like wrong
+results of computation, if pure mode Cython was used without understanding of the behavior of this
+code on different platforms. This shows that developers have to be very careful about which variables
+should and which should not be marked as native. The general advice is to use native variables for
+loop indexes and auxiliary storage which we can guarantee to remain in right bounds. There are,
+however, cases where native variables can be used for doing actual computations, because it
+might be unrealistic to use larger values that 32--bit long. A good example is :func:`divisors`,
+which computes all divisors of an integer.
 
-This means that `some_function` will be compiled by
-Cython if available, treating variables n and k as
-integers (cython.int). This is convenient because
-currently we don't use any other types.
+In polynomials manipulation mode we marked all loop index variables and some auxiliary variables on
+the lowest level as native. At this moment no coefficient arithmetics is done natively. It would be,
+however, very convenient in future to take advantage of native coefficient arithmetics when computing
+with polynomials over finite fields. In most practical cases in SymPy, coefficients which arise over
+finite fields are half--words, so arithmetics (especially including multiplication) can be done in a
+single machine word (32 bits). We could also consider allowing 64--bit words, if architecture supports
+this, to widen the range of application of optimized routines.
 
-If Cython is not available then @cythonized is an
-empty decorator (there is no performance penalty).
+To take advantage of Cython in SymPy, the user has to compile it. By default SymPy ships only with
+bytecode modules and scripts for compiling them, if Cython is installed on the system. Assuming
+that GNU make is installed, then compiling SymPy is as simple as typing ``make`` at a shell prompt
+in the main directory of SymPy source distribution. If GNU make is not available, then the user
+has to issue the following command::
 
-To take advantage of pure mode Cython, you have to
-compile modules which support cythonization. To do
-this, issue:
+    python build.py build_ext --inplace
 
-python build.py build_ext --inplace
+from the same directory. This command tells Cython to compile all modules in SymPy, which have
+functions or methods marked with ``@cythonized`` decorator. The compilation is done in--place,
+meaning that there will two additional files for each Python source file: ``*.pyc`` file with
+bytecode and a compiled dynamically linked library. If ``--inplace`` was omitted, then Cython
+would store compiled modules in a separate directory, which would make running SymPy with
+compiled modules complicated.
 
-in SymPy's root directory (or use make). Then run
-isympy or import sympy as usually (compiled modules
-will have priority over pure Python).
+Benchmarking pure mode Cython
+-----------------------------
 
-Cythonized zero-level algorithms in new polynomials module
+It is very cheap to employ pure mode Cython in Python code. Does it, however, bring any improvement
+over pure Python? First experiments with pure mode Cython, which we conducted in SymPy, showed that
+the befit can be substantial or even impressive, giving over 20 times speedup for particular small
+functions, in which we could use native variables for coefficient arithmetics. The main subject of
+those experiments was :func:`divisors`` function. Those experiments were, however, artificial and
+for real--life cases speedup is not that big, but still worthy consideration, especially we take
+the tiny cost of pure mode Cython (one additional line per function or method).
 
-Pure Python:
+Suppose we expand a non--trivial expression $((x + y + z)^15 + 1) \cdot ((x + y + z)^15 + 2)$ and
+then we want to factor the result back. We are interested only in factorization time. We perform
+the same computation in pure Python and pure mode Cython:
 
-In [1]: f = expand(((x+y+z)**15+1)*((x+y+z)**15+2))
+* pure Python
+    ::
 
-In [2]: %time a = factor(f)
-CPU times: user 109.45 s, sys: 0.01 s, total: 109.47 s
-Wall time: 110.83 s
+        >>> f = expand(((x+y+z)**15+1)*((x+y+z)**15+2))
 
-In [4]: %time a = factor(f)
-CPU times: user 109.31 s, sys: 0.03 s, total: 109.34 s
-Wall time: 110.68 s
+        >>> %time a = factor(f)
+        CPU times: user 109.45 s, sys: 0.01 s, total: 109.47 s
+        Wall time: 110.83 s
 
-Pure mode Cython:
+        >>> %time a = factor(f)
+        CPU times: user 109.31 s, sys: 0.03 s, total: 109.34 s
+        Wall time: 110.68 s
 
-In [1]: f = expand(((x+y+z)**15+1)*((x+y+z)**15+2))
+* pure mode Cython
+    ::
 
-In [2]: %time a = factor(f)
-CPU times: user 72.09 s, sys: 1.02 s, total: 73.11 s
-Wall time: 74.18 s
+        >>> f = expand(((x+y+z)**15+1)*((x+y+z)**15+2))
 
-In [4]: %time a = factor(f)
-CPU times: user 72.81 s, sys: 0.04 s, total: 72.85 s
-Wall time: 73.74 s
+        >>> %time a = factor(f)
+        CPU times: user 72.09 s, sys: 1.02 s, total: 73.11 s
+        Wall time: 74.18 s
 
-On average Cython version is two times faster than pure
-Python. This is an improvement and hopefully it should
-get even better in future.
+        >>> %time a = factor(f)
+        CPU times: user 72.81 s, sys: 0.04 s, total: 72.85 s
+        Wall time: 73.74 s
 
-To make cooperation with Cython more comfortable a new
-decorator was added to sympy/utilities/cythonutils.py.
+We can see that for this very particular benchmark we obtained 1.5 times speedup. This is
+not 20 times, but still can be considered important, especially when such long computation
+times are involved. More throughout timings can be found in figures :ref:`fig-cython-power`
+and :ref:`fig-cython-factor`, where we exponentiated and factored polynomials for various
+exponents and degrees, respectively.
 
-Example:
+.. _fig-cython-power:
+.. figure:: ../img/plot/cython-power.*
+    :align: center
 
+    Benchmark: exponentiation of $(27 x + y^2 - 15 z)^n$.
 
-Using the module without SymPy
-==============================
+.. _fig-cython-factor:
+.. figure:: ../img/plot/cython-factor.*
+    :align: center
 
+    Benchmark: factorization of $x^n - 1$ over integers.
 
+In future we expect even better improvements when native variables will be used for coefficient
+arithmetics. Every algorithm which uses modular approach, which include algorithms for factoring
+polynomials, computing GCD or resultants, will benefit from this, because coefficients arising
+on the intermediate steps in those algorithms are usually half--words (computations are done in
+small finite fields). How to achieve this, without compromising functionality and correctness,
+is a subject for future discussion.
 
