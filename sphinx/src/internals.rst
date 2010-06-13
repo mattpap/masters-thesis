@@ -7,14 +7,15 @@ Notes on the internal implementation
 ====================================
 
 Knowing the goals of the project, lets now focus on the internal implementation of polynomials
-manipulation module and methods that were used to reach the goals. In this chapter we will
-describe step--by--step all details concerning the design and implementation of them module,
-from the technical point of view. In the next chapter we will jump in the implemented algorithms.
+manipulation module and methods that were used to reach the goals. In this chapter we will describe
+step--by--step all details concerning the design and implementation of the module, from the technical
+point of view. In the next chapter we will jump in the details of implemented algorithms.
 
 Physical structure of the module
 ================================
 
-Polynomials manipulation module consists of a
+Polynomials manipulation module consists of a single, ``sympy/polys``,  directory with Python source
+files:
 
 ``sympy/polys/__init__.py``
     Contains imports of the public API.
@@ -56,7 +57,7 @@ Polynomials manipulation module consists of a
     Tools for configuring functionality of the module.
 
 ``sympy/polys/polycontext.py``
-    Tools for managing context of evaluation.
+    Tools for managing contexts of evaluation.
 
 ``sympy/polys/polyerrors.py``
     Definitions of polynomial specific exceptions.
@@ -65,10 +66,10 @@ Polynomials manipulation module consists of a
     Managers of options that can used with the public API.
 
 ``sympy/polys/polyroots.py``
-    Algorithms for root finding via radicals.
+    Algorithms for root finding, specifically via radicals.
 
 ``sympy/polys/polytools.py``
-    The public API of polynomials manipulation module.
+    The main part of the public API of polynomials manipulation module.
 
 ``sympy/polys/polyutils.py``
     Internal utilities for expression parsing, handling generators etc.
@@ -82,8 +83,10 @@ Polynomials manipulation module consists of a
 ``sympy/polys/specialpolys.py``
     A collection of functions for generating special sorts of polynomials.
 
-In future, ``algebratools.py`` will be split into smaller source files and put into a separate
-directory ``ground`` in ``sympy/polys``.
+There are also two subdirectories with tests and benchmarks. Altogether there are about 1900
+functions and methods, and about 90 classes in about 30 thousandth lines of code. We don not
+give exact measures because those statistics are not that important and are changing all the
+time.
 
 Logical structure of the module
 ===============================
@@ -91,155 +94,256 @@ Logical structure of the module
 One of the main concerns when designing a symbolic manipulation library, especially one which is
 written in an interpreted general purpose programming language, is speed. Even the best equipped
 library, with most recent, cutting edge algorithms and data structures, user friendly API and
-easily configurable internals, has little value if the user needs to wait ages for any, even a
-trivial, result. This was recently the main problem with |sympy| in general and its fundamental
-weakness . It should be clearly understood that code written in an interpreted language will be
+easily configurable internals, has little value if the user needs to wait ages for any, even
+trivial, results. This was recently the main problem with |sympy| in general and its fundamental
+weakness. It should be clearly understood that code written in an interpreted language will be
 always slower than compiled code, unless we had a very clever JIT (Just--In--Time) compiler which
-could optimize and compile the code on--the--fly. However, this shouldn't be discouraging and we
-are supposed to put our best efforts to make |sympy| as fast as possible, especially when
-implementing the infrastructure which is used everywhere else in the library.
+could optimize and compile the code on--the--fly. There is some progress in this area, especially
+within projects Unladen Swallow [UnladenSwallow]_ and PyPy [PyPy]_, but we are still waiting for
+truly working solutions. This, however, should not be discouraging and we are supposed to put our
+best efforts to make |sympy| as fast as possible on pure Python level, especially when implementing
+the infrastructure which is used everywhere else in the library.
 
 There is a trivial observation about interpreted programming languages: there is a very high cost
 associated with every function call and with every use of *magic* functionality of the language of
 choice. This statement is true in the general case of interpreted languages and the first part is
-especially true in the case of Python programming language. There is another observation concerning,
-this time, algorithms of symbolic mathematics: often they require very large number of function calls.
-The number varies between different algorithms, but for the most complex ones, the number can be as
-high as millions (or more) function calls per algorithm execution.
+especially true in the case of Python programming language. There is another observation concerning
+algorithms of symbolic mathematics: often they require very large number of function calls. The number
+varies between different algorithms, but for the most complex ones, the number can be as high as millions
+(or more) function calls per algorithm execution.
 
 One obvious (in theory) solution to this problem is to use *better* algorithms. Unfortunately, it
 is not clear what we mean by better in this context. If we take only pure algorithmic complexity
 of methods we implement in |sympy|, then one could argue that we should always implement polynomial
-time algorithms, of course if they exist in particular areas. This would be a perfect solution,
-however, there an interesting phenomenon occurs. Often polynomial time algorithms are slower than
-their counter parts which exhibit exponential time. This is true, for example, in the case of polynomial
-factorization algorithms where the LLL algorithm [Lenstra1982factor]_, the only known polynomial time
-approach to polynomial factorization, is almost always slower than *efficient* exponential time algorithms.
-Besides this phenomenon, whatever approach we take for choosing a good algorithm for implementation in
-|sympy| for improving speed, there is a high cost associated with such event, because first one has to
-assure correctness of the new development and only then think about improving speed. Of course, this is
-what we do in |sympy| and a detailed discussion about algorithms will follow in the next chapter.
+time algorithms, of course if they exist in the particular area of interest. This would be a perfect
+solution, however, an interesting phenomenon occurs. Often polynomial time algorithms are slower for
+common input than their counter parts which exhibit exponential time complexity. This is true, for
+example, in the case of polynomial factorization algorithms, where LLL algorithm [Lenstra1982factor]_,
+the only known polynomial time approach to polynomial factorization, is almost always slower than
+*efficient* exponential time algorithms. Besides this phenomenon, whatever approach we take for choosing
+a good algorithm for implementation in |sympy| for improving speed, there is always a high cost associated
+with such development, because first one has to assure correctness of the newly implemented algorithm and
+only then think about improving speed. Of course, this is what we do in |sympy| and a discussion about
+algorithms will follow in the next chapter.
 
 There is, however, another method for significantly improving computations speed. In parallel with
 implementation of *better* algorithms, one can eliminate as much overhead as possible. The overhead
 is associated with the cost of interpretation of program code. As we stated before, the cost of
-function calls in Python is high, but the more *advanced* constructs of the language we use the
+function calls in Python is high and the more *advanced* constructs of the language we use the
 higher the cost is. However, the less *magic* we use the harder is to use the code, so our task
-is to find the cross--over point, where we have both speed and usability in balance. This is
+is to find the cross--over point, where we have balance between speed and usability. This is
 because speed without usability is as much pointless as usability without speed.
 
 The answer to those observations is a design of polynomials manipulation module in a form of a
 multiple--level environment, where on the lowest level are fundamental functions which are run
 most often and form a computational basis for other levels which tend to be much more oriented
-towards the user adding the cost associated with more user friendly API. Multiple--levels is
+towards the user, adding the cost associated with more user friendly API. Multiple--levels is
 nothing new to symbolic mathematics and this is how things were done from the very beginning.
-However, usually those levels were associated with usage of different programming languages,
-where the core, which is usually not accessible directly by the user, is implemented in a
-compiled language and the library (API) is written in a much more user friendly programming
-language. |sympy| is written entirely in a single, interpreted programming language so we
-introduce multiple levels in this one language, by selecting appropriate feature of the
-language on each level.
+However, previously those levels were associated with usage of different programming languages,
+where the core was one level, written in a compiled programming language like C or C++, and
+usually not accessible by the end user. The other was a library of mathematical algorithms,
+written in a domain specific language (DSL), designed specially for a particular symbolic
+mathematics system. Contrary, |sympy| is written entirely in a single, interpreted programming
+language, so we introduce multiple levels in this language by selecting appropriate sets of
+feasible features of the language for each level.
 
-In polynomials manipulation module, three levels were introduced: L0, L1 and L2. Each level
+In polynomials manipulation module four levels were introduced: L0, L1, L2 and L3. Each level
 has its own syntax and API, and is used for different tasks in |sympy|. Redundancy between
 levels is reduced to minimum, so that not a single algorithm is duplicated on any level. Also
-tests are designed the way that they only test correctness of incrementally added functionality.
+tests were designed the way that they only test correctness of incrementally added functionality.
+On the lowest level we test correctness of the implementations of algorithms of mathematics, and
+on other levels we test (mostly) APIs and correctness of argument passing. The first two levels,
+L0 and L1, are used internally in the module. The other two levels form the public API of the
+module and are used extensively in other parts of |sympy| and in interactive sessions.
+
+Motivation
+----------
+
+Why we need exactly four levels in polynomials manipulation module? Suppose we need to compute
+a factorization of polynomial $x^{10} - 1$. There are four levels, so we can perform the same
+computation in four different ways::
+
+    >>> f3 = x**10 - 1
+    >>> %timeit factor_list(f3)
+    100 loops, best of 3: 5.57 ms per loop
+
+    >>> f2 = Poly(x**10 - 1, x, domain='ZZ')
+    >>> %timeit f2.factor_list()
+    100 loops, best of 3: 2.15 ms per loop
+
+    >>> f1 = DMP([mpz(1), mpz(0), mpz(0), mpz(0), mpz(0),
+    ... mpz(0), mpz(0), mpz(0), mpz(0), mpz(0), mpz(-1)], ZZ)
+    >>> %timeit f1.factor_list()
+    100 loops, best of 3: 1.90 ms per loop
+
+    >>> f0 = [mpz(1), mpz(0), mpz(0), mpz(0), mpz(0),
+    ... mpz(0), mpz(0), mpz(0), mpz(0), mpz(0), mpz(-1)]
+    >>> %timeit dup_factor_list(f0, ZZ)
+    100 loops, best of 3: 1.88 ms per loop
+
+We factored polynomial $x^{10} - 1$ starting with the highest level and ending on the lowest
+level. On L3 we used an expression to construct the polynomial and we did not have to pay any
+attention to the details, which were figured out automatically by :func:`factor_list` function.
+On L2 we created a polynomial explicitly by providing a generator and coefficient domain. This
+time we used :func:`factor_list` method of :class:`Poly`. This computation took less than half
+of time that was needed to compute the same thing on L3. Next we performed the same computation
+on L1 level, the first internal level of the module, constructing the polynomial by providing
+an explicit polynomial representation (dense in this case) and we gained a 10% speedup. Finally
+we computed the factorization on the lowest level, gaining tiny speed improvement.
+
+We can see that, depending on the level on which we performed the computation, we had to pay
+increasingly more attention to the technical details, but we gained speed improvement thanks
+to this. The improvement might not seem very encouraging, especially when we compare levels
+L2, L1 and L0. However, we have to keep in mind that those milli-- or microseconds that we
+save with each computation, have to be multiplied by the number of all computations we do,
+and from this perspective we do not save only fractions of seconds but we save seconds or
+even minutes or hours of computation time.
 
 The zeroth level: L0
 --------------------
 
-This is the most inner level of polynomials manipulation functionality, which is used only for
-internal purpose in the module. All code on this level is written in purely structural style and
-no magic Python's functionality is used. We tried to choose only a minimal subset of functionality
-of the module for implementation on this level. L0 is spread over several files in ``sympy/polys``
-and implements two polynomial representations and most important algorithms:
+This is the lowest level of polynomials manipulation functionality, which is used only for internal
+purpose of the module. Most algorithms that the module implements, especially those which are most
+commonly used as parts of other algorithms or are most computationally demanding, are implemented
+on this level. This includes algorithms for polynomial arithmetics, GCD and LCM computation,
+square--free decomposition, polynomial factorization, root isolation, |groebner| bases and others.
 
-* polynomial arithmetics
-* gcd, lcm, square--free decomposition
-* factorization into irreducibles
-* real and complex root isolation
-* |groebner| bases
+To reduce the overhead of Python to minimum, the zeroth level is implemented in purely procedural
+style: it consists only of functions and all data is passed explicitly via arguments to functions.
+On this level we do not take advantage of any runtime magic like context managers, everything is
+done explicitly. Besides being fast, this has also the benefit that the code is very verbose and
+thus easily understandable, which is not often the case in object--oriented programming. It might
+seem a bit awkward, after so many years of declining of procedural programming, to use this old
+fashioned style, but currently it seems the right choice. Although, in the opinion of the author,
+procedural code is easy to understand, it is not that easy to write, especially for newcomers,
+because of very high level of verboseness of such code. However, this is the trade--off we have
+to make, to make |sympy| both usable and reasonably fast.
 
-Functions on this level are split into several groups, depending on which polynomial representation
-they belong to and what kind of ground domain can be used with them. Currently there are four major
-groups, which can be distinguished by their special prefixes:
+Functions on this level are spread over several source files in ``sympy/polys`` and are split into
+groups, depending on which polynomial representation they belong to and what kind of ground domain
+can be used with them. Currently there are four major groups, which can be distinguished by their
+special prefixes:
 
-``gf_`` --- univariate polynomials over Galois fields (finite fields)
+* ``gf_`` --- dense univariate polynomials over finite (Galois) fields
 
-``dup_`` --- dense univariate polynomials over arbitrary domains
+* ``dup_`` --- dense univariate polynomials over arbitrary domains
 
-``dmp_`` --- dense multivariate polynomials over arbitrary domains
+* ``dmp_`` --- dense multivariate polynomials over arbitrary domains
 
-``sdup_`` --- sparse distributed univariate polynomials over arbitrary domains
+* ``sdp_`` --- sparse distributed polynomials over arbitrary domains
 
-``sdmp_`` --- sparse distributed multivariate polynomials over arbitrary domains
-
-There are additional minor suffixes which can be added to the major prefixes. They are used to tell
+There are additional minor suffixes, which can be added to the major prefixes. They are used to tell
 the difference between the same function, e.g. for computing the greatest common divisor, for various
 ground domains. The typically used suffixes are ``zz_``, ``qq_``, ``rr_`` and ``ff_``, which stand
-for the ring of integers, the rational field, any ring and any field, respectively. Note that those
-suffixes are not combined with the ``gf_`` prefix. Usually function if a function comes with a suffix,
-then it will be defined for both, either ``zz_`` and ``qq_``, or ``rr_`` and ``ff_``. There will be
-also a function without any suffix, which will dispatch flow to an appropriate specialized function,
-depending on the analysis of the ground domain. This separation is necessary, because it often happens
-that functions for computing a particular quantity over different ground domains, have very different
-semantics and internal structure. A good examples are functions for computing GCDs and factorizations
-of polynomials. One should also note that even if there is a separation between different ground domains,
-it is still possible (and it often happens) that a function for a more general domain will transform the
-problem and run an algorithm for a smaller domain, to take advantage of more efficient algorithms.
+for the ring of integers, the rational field, a ring and a field, respectively. Note that those
+suffixes are not combined with the ``gf_`` prefix, which already limits the possible ground domains
+to a single one. Usually, if a function comes with a suffix, then it will be defined for both, either
+``zz_`` and ``qq_``, or ``rr_`` and ``ff_`` suffixes. There will be also a function without any suffix,
+which will dispatch the flow to an appropriate function for a specialized ground domain, depending on
+the analysis of the ground domain argument to this function. This separation is necessary, because it
+often happens that functions for computing a particular thing over different ground domains, have very
+different semantics and internal structure. A good examples are functions for computing GCDs and
+factorizations of polynomials. One should also note that even if there is a separation between different
+ground domains, it is still possible (and it often happens) that a function for a more general domain
+will transform the problem and run an algorithm for a smaller domain, to take advantage of more efficient
+algorithms.
 
+Although we listed four groups of types of functions, there are really only three true groups, because
+``dup_`` and ``dmp_`` depend on each other, forming a larger group. This is because ``dmp_`` functions
+use ``dup_`` function to terminate recurrence, as ``dmp_`` implement dense recursive representation.
 
-Each type of polynomial: GFP, DUP, DMP, SDP, has a raw
-representation and function call specification associated:
+Suppose we want to implement a function for computing Taylor shifts. Given a univariate polynomial
+$f$ in $\K[x]$, where $\K$ is an arbitrary domain, and a value $a \in \K$, we call a Taylor shift an
+evaluation of $f(x + a)$. For details of the algorithm refer to [Nijenhuis1978combinatorial]_. To focus
+our attention, we will show a sample implementation Taylor shift algorithm only for dense polynomial
+representation. The implementation may be as follows::
+
+    @cythonized('n,i,j')
+    def dup_taylor(f, a, K):
+        """Evaluate efficiently Taylor shift ``f(x + a)`` in ``K[x]``. """
+        f, n = list(f), dup_degree(f)
+
+        for i in xrange(n, 0, -1):
+            for j in xrange(0, i):
+                f[j+1] += a*f[j]
+
+        return f
+
+We defined a function called ``dup_taylor`` which takes three arguments: ``f``, ``a`` and ``K``. We
+followed here the standard convention of L0 level, where ``dup_`` prefix tells us that the function
+uses dense polynomial representation and allows only univariate polynomials. In the arguments list,
+the first argument is an input polynomial, the second is evaluation point $a$ and the last one is
+the coefficient domain. If a function requires two polynomials as input, e.g. multiplication function,
+then the first two arguments are polynomials and other arguments come next. However, the domain is
+always the last one (not counting optional or keyword--only arguments, which are rarely used on
+this level).
+
+This was for dense univariate polynomials. The convention for other groups of functions varies a
+little bit. In the case of dense multivariate polynomials we add an additional argument ``u``, which
+always goes before the ground domain, and stands for the number of variables of the input polynomial
+minus one. Thus we get zero for univariate polynomials, which is convenient, because in the univariate
+case, we can efficiently check that the polynomial is really univariate and fallback to the equivalent
+univariate function to terminate recurrence. In the case of sparse distributed polynomials we add
+another argument ``O``, besides ``u``, which goes between ``u`` and ``K``, and stands for a function
+that defines an ordering relation between monomials (more about monomial orderings can be found in
+section :ref:`thesis-orderings`).
+
+A very special case is the group of ``gf_`` functions, which are used for computations with polynomials
+over finite fields. The convention in this case is that the domain ``K`` is some domain representing
+the ring of integers, not finite fields. We add an additional argument ``p``, which goes before ``K``
+and stands for the size of the finite field (modulus). This, somehow awkward convention, has purely
+historical background, because when L0 level was invented there were no ground domains in |sympy|, so
+the argument ``p`` was the way to pass knowledge about the finite field, in which computations are
+done, to ``gf_`` function. When ground domains were added to |sympy|, then it was too costly at that
+time to remove argument ``p`` and use finite field domains instead of integer ring domains. It was
+also uncertain if such move would not add too much overhead and slowdown ``gf_`` functions. A study
+is needed to show if there is any advantage at all of having separate group of functions for the
+special case of finite fields. Possibly in near future ``gf_`` functions will be merged with ``dup_``
+functions, and ``gf_`` will be transformed to a suffix, because still finite fields are special
+because specialized algorithms are needed for performing computations over this domain.
 
 The first level: L1
 -------------------
 
-Is implemented using OO paradigm and wraps up functionality
-provided by L0. For each type of polynomial there is a class
-implemented: GFP, DUP, DMP, SDP. There are additional classes
-for multivariate rational functions DMF and algebraic number
-polynomials ANP (a representation of algebraic numbers).
+This is the second level in polynomials manipulation module and the last level used for internal
+purpose. It is implemented in object--oriented style and wraps up functionality of the lowest
+level into four classes: ``GFP``, ``DUP``, ``DMP`` and ``SDP``. Each class has methods which
+reflect functions of L0 level, but with prefixes stripped. Also method call convention changes,
+because ground domain and other properties are included in instances of L1 classes and provided
+only on class initialization. This makes usage of functionality exposed by this level more
+efficient, because the code is not that verbose as on the lowest level. L1 also implements
+several other classes which provide more general computational tools, e.g. ``DMF`` for dense
+multivariate fractions and ``ANP`` for a representation of algebraic numbers.
 
-Each class is constructed using an explicit representation and
-algebra specification. Method calls will unify arguments by
-coercing their ground domains (e.g. ZZ + QQ -> QQ), so there
-is no need to specify any extra arguments.
+Classes of L1 level add tiny overhead over L0 functions, because L1 allows for unification
+polynomials if they have different ground domains and there is additional constant time
+needed to construct instances of L1 classes. In general in |sympy| we allow only immutable
+classes, so instantiation overhead is added with every computation.
 
-Note that unification rules on this level are very simple so
-e.g. operations on a univariate polynomial as one argument and
-a multivariate polynomial as the other aren't allowed, unless
-you make any coercions explicitly.
-
-For efficiency, every class in L1 doesn't derive from Basic, which
-allows to use those classes as representations of composite ground
-domains e.g. ZZ[x,y,z], QQ(x,y).
+The main task for L1 level, besides wrapping up functionality of the lowest level, is to
+provide types (classes) which can be used in composite ground domains, i.e. polynomial,
+rational function and algebraic domains. We could use for this purpose tools of levels L2
+and L3, but overhead associated with them would be too significant and thus computations
+with composite ground domains would be very inefficient. This way levels L0 and L1 define
+a self contained computational model for polynomials, which is later wrapped in much more
+user friendly levels L2 and L3, which we will describe next.
 
 The second level: L2
 --------------------
 
-User-level interface to polynomial manipulation algorithms. If
-you are a user, then you choose this level, which provides you
-convenient Poly class which wraps L1 classes as internal poly
-representations but provides user-friendly interface. There
-is also a set of public functions exported: gcd, lcm, factor
-and many others.
+This is the first level in polynomials manipulation module that is oriented towards the end
+user. We implement only one class in L2, :class:`Poly`, which wraps up by composition ``GFP``,
+``DUP``, ``DMP`` and ``SDP`` classes of L1. We call L2 classes, in this setup, polynomial
+representations. :class:`Poly` implements the union of all functions that are available in L2
+classes. If a certain operation is not supported by the underlying polynomial representation
+then :exc:`OperationNotSupported` exception is raised.
 
-Poly class allows you to convert a SymPy expression into a
-polynomial. There is no need to specify symbols, Poly class
-will parse the expression and figure out what are symbols
-and what are members of the coefficient domain. Note also
-that you can create polynomials using not only symbols but
-any expressions, this way Poly.symbols was renamed to
-Poly.gens, to emphasize this fact, so
 
-             Poly(sin(x)**2 + 1, sin(x))
+The third level: L3
+-------------------
 
-are valid arguments to Poly.__init__ and computing e.g.
-
-           gcd(sin(x)**2 - 1, sin(x) - 1)
-
-is also allowed.
+The :class:`Poly` and all functions of L3 are called the public API of polynomials manipulation
+module.
 
 Motivation for multiple--level design
 -------------------------------------
@@ -765,7 +869,14 @@ Python is a dynamically typed programming language and its users expect for it a
 Transforming expressions into polynomials
 =========================================
 
-
+Before the user can take advantage of efficient algorithms and data structures for polynomials
+manipulation, expressions that are involved in computations have to be transformed to a form
+that is understood in polynomials manipulation module. This transformation is called expression
+parsing. The reason why such step is necessary, when constructing polynomials, is that the
+internal representation of an expression is different from a representation of a polynomial
+representing this expression and does not take into account many polynomial related properties,
+like generators or coefficient domain. With expression parser we can understand the structure
+of an expression and construct a polynomial representation for it.
 
 Expression parsing
 ------------------
@@ -773,11 +884,18 @@ Expression parsing
 _dict_from_basic_if_gens
 _dict_from_basic_no_gens
 
-By default, everything that is not an explicit number (an instance of ``Number`` class) is
-treated as a potential generator of a polynomial.
 
 Greedy vs. non--greedy parsers
 ------------------------------
+
+By default, everything that is not an explicit number (an instance of ``Number`` class) is
+treated as a potential generator of a polynomial.
+
+Speed related issues
+--------------------
+
+Depending on the size of an input polynomial and the coefficient domain, expression parsing
+make take considerable amount of time.
 
 Polynomial unification
 ======================
@@ -793,6 +911,7 @@ Managing contexts of evaluation
 
 Adjusting the internal configuration
 ====================================
+
 
 Previously there were two methods used for configuring what
 algorithms should be used and how they will perform:
@@ -831,6 +950,7 @@ This way several low-level algorithms can be configured and, for
 example, benchmarking or algorithm parameters optimization was
 made a lot easier.
 
+.. _thesis-cython:
 
 Using Cython internally
 =======================

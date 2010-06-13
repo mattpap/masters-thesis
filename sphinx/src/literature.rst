@@ -181,6 +181,8 @@ Literature
 .. [MaximaGroebner] http://maxima.sourceforge.net/docs/manual/en/maxima_54.html
 .. [MathematicaGroebner] http://reference.wolfram.com/mathematica/tutorial/ComplexPolynomialSystems.html
 .. [PythonModules] http://docs.python.org/tutorial/modules.html
+.. [UnladenSwallow] http://code.google.com/p/unladen-swallow
+.. [PyPy] http://codespeak.net/pypy
 .. [KNS2009]
 .. [EuroSciPy2009]
 .. [py4science2010]
