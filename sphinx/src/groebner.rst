@@ -1237,7 +1237,7 @@ The structure of vertex coloring
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Till this point we showed how to check with |sympy| that a graph is $k$--colorable or not. However, using
-the |groebner| bases method, we can obtain much more exiting result. Suppose that $G$ is a lexicographic
+the |groebner| bases method, we can obtain a much more exciting result. Suppose that $G$ is a lexicographic
 |groebner| basis of a system of polynomials $F$ describing a vertex $k$--coloring problem. To prove
 that a graph is $k$--colorable we used the fact that $G \not= \{1\}$. We know that $G$ and $F$ have
 the same set of solutions, however, $G$ has more structure than $F$. We can take advantage of this
