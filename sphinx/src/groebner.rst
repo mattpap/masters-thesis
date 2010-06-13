@@ -268,7 +268,7 @@ algorithm was introduced. Later on, other more powerful elimination criteria wer
 example, heuristic criteria for lexicographic ordering of monomials (see [Czapor1991heuristic]_)
 or, so called, *sugar flavour* (see [Giovini1991sugar]_ for details).
 
-.. _gb-order:
+.. _thesis-orderings:
 
 Admissible orderings of monomials
 =================================
@@ -1381,8 +1381,8 @@ Algebraic geometry
 ------------------
 
 Geometry is one of the primary subjects taught during elementary mathematics classes and using SymPy for
-studying theorems of euclidean geometry seems a very promising idea. For example, lets consider a rhombus
-in a fixed coordinate system. We would like to prove a theorem, that diagonals of this rhombus are mutually
+studying theorems of Euclidean geometry seems a very promising idea. For example, lets consider a rhombus
+(in a fixed coordinate system). We would like to prove a theorem that diagonals of a rhombus are mutually
 perpendicular. We are of course interested in a purely algorithmic approach to solve this problem. To prove
 this theorem we will use the machinery of |groebner| bases.
 
