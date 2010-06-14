@@ -2,36 +2,163 @@
 
 .. _thesis-algorithms:
 
-=================================================
-Algorithms of the Polynomials Manipulation Module
-=================================================
+=====================================
+Algorithms for algebraic computations
+=====================================
 
-SymPy implements wide variety of algorithms for polynomials manipulation, which ranges from
-polynomial arithmetics to advanced methods for factoring polynomials over algebraic number
-fields or computing |groebner| bases. In this chapter we will give a short description to all
-polynomial manipulation algorithms in SymPy. The descriptions will include a short note on the
-purpose and applications of a particular algorithm, as well as discussion on its computational
-complexity and possibility of parallelization. We will also give reference to most influential
-papers, which were used for implementing polynomial related algorithms in SymPy.
+SymPy implements a wide variety of algorithms for polynomials manipulation, which ranges from
+relatively simple algorithms for doing arithmetics of polynomials, to advanced methods for
+factoring polynomials into irreducibles over algebraic number fields or computing |groebner|
+bases. In this chapter we will shortly describe most important algorithms of polynomials
+manipulation module in SymPy. The descriptions will include a brief note on the purpose and
+applications of a particular algorithm. Where possible, we will also discuss computational
+complexity of an algorithm and possibility for parallelization.
 
-Polynomials arithmetics
-=======================
+In this chapter we will give references to the most influential literature (papers, books,
+proceedings, etc.) about every algorithm we will describe. Besides those very specific sources,
+we also took advantage of classical books of symbolic and algebraic computing [Davenport1988systems]_
+[Geddes1992algorithms]_, [Gathen1999modern]_, [Grabmeier2003algebra]_, which are considered the
+ultimate source on algorithmic knowledge in this field. We also took advantage of Knuth's books,
+especially [Knuth1985seminumerical]_, and general books on algorithms and data structures, like
+[Cormen2001algorithms]_, and mathematical tables [Abramowitz1964handbook]_ (useful when implementing
+special polynomials, e.g. orthogonal polynomials).
 
-SymPy
+Arithmetics of polynomials
+==========================
+
+Arithmetics, i.e. addition, subtraction, multiplication, exponentiation and division, for a basis
+for all other polynomials manipulation algorithms. In |sympy| we currently implement only *classical
+algorithms* for doing arithmetics of polynomials, i.e. repeated squaring algorithm for exponentiation,
+and $O(n^2)$ algorithms for multiplication and division, where $n$ is the maximal number of terms in
+the set of input polynomials. Over finite fields we use algorithms of [Monagan1993inplace]_, which
+slightly improve speed of computations over this very specific domain.
+
+An alternative to classical algorithms are, so called, *fast algorithms*, which are sub--quadratic
+time algorithms for doing arithmetics polynomials [Moenck1976practical]_. Fast algorithms are usually
+limited to specific domains of computation, like integers or rationals. The family includes Karatsuba
+and FFT (Fast Fourier Transform) algorithms. The decision was made to use classical algorithms at this
+point, because it is not a trivial task to make fast algorithms really advantageous, especially for
+small or ill conditioned polynomials. In future, when the module will stabilize, we will consider
+implementing fast algorithms, as a companion to classical algorithms, and use them where it is
+advantageous.
+
+There are other ideas to improve arithmetics of polynomials, especially over integers and rationals.
+An interesting example of such optimisation is algorithm of [Fateman2005encoding]_, where polynomials
+with integer coefficients are encoded as sufficiently large integers and arithmetics are done using
+long integer arithmetics, and later results are converted back to polynomials. This is possible by
+using an isomorphism (a reversible transformation) between polynomials and integers. To make this
+algorithm efficient, we need a very fast integer arithmetics library, like gmpy, which is not always
+available on the system. One has to also be aware of the fact that transformations back and forth
+may be very costly, especially for large polynomials.
+
+Evaluation of polynomials
+=========================
+
+In SymPy we employ Horner scheme [Geddes1992algorithms]_ for evaluation of univariate polynomials
+over arbitrary domains. Horner scheme was proved to be the optimal algorithm for evaluation, which
+takes minimum number of additions and multiplications. In the multivariate case, Horner scheme is
+non--unique, thus there are many different schemes possible, which lead to different evaluation
+times. Currently we use a *natural* scheme, which is a consequence of using by default recursive
+polynomial representation. In the past we experimented with greedy algorithms for optimizing
+multivariate Horner scheme [Ceberio2004greedy]_, however, without much success. This was because,
+although evaluation was considerably faster comparing to the default scheme, however optimisation
+times were often comparable to computation times. In future we may reconsider using some sort of
+optimisation of polynomial evaluation algorithm in the multivariate case.
+
+Horner scheme is a very general algorithm, which is also used in SymPy for computing compositions
+and rational transformations polynomials, and many other, which require some sort of efficient
+evaluation of polynomials.
 
 The Greatest Common Divisor
 ===========================
 
-GCD (Greatest Common Divisor) is a fundamental component of most
+Another fundamental algorithm of polynomials manipulation is the GCD (Greatest Common Divisor)
+algorithm, which allows us to compute common factors of two or more polynomials. This is very
+useful on its own and as a component of other algorithms, e.g. square--free decomposition or
+simplification of rational expressions.
 
-Functional decomposition
-========================
+We implement three algorithms for computing GCDs. The most general algorithm is based on
+subresultants (special case of polynomial remainder sequences) and can be used regardless
+of the ground domain and polynomial representation. This is also the slowest algorithm, but
+very useful if other algorithms fail or are not applicable. Where possible we use heuristic
+GCD algorithm [Liao1995heuristic]_, which transforms a problem of computing GCD of polynomials
+to integer GCD problem. Although the algorithm is heuristic, with current parametrization it
+never failed in SymPy. Daily practice shows that this approach is superior to the algorithm
+based on subresultants, however heuristic GCD is only limited to integers and rationals (by
+clearing denominators). It also requires very efficient integer GCD algorithm, so it is
+beneficial to use gmpy library for this purpose. We also implement an algorithm that uses
+|groebner| bases for computing GCD of multivariate polynomials [Cox1997ideals]_. This was
+historically the first implementation of multivariate polynomial GCD algorithm in |sympy|
+(see section :ref:`thesis-euclid` for details).
+
+In future we plan to implement EEZ--GCD algorithm of Wang [Wang1980eezgcd]_, [Moses1973ezgcd]_,
+which we hope will improve computation of GCDs of very sparse multivariate polynomials over
+integers and rationals. Implementation of EEZ--GCD algorithm should be rather straightforward,
+because we already have EEZ polynomial factorization algorithm implemented, and both algorithms
+share a common core (parallel variable--by--variable Hensel lifting algorithm), and they differ
+main in the initialization phase.
+
+An alternative would be to implement sparse modular algorithm (SPMOD) of Zippel, which is also
+optimized for sparse multivariate case. This algorithm is even more interesting in the light of
+recent developments [Monagan2004algebraic]_, [Javadi2007spmod]_, where the algorithm was
+successfully employed over algebraic number and function fields. Although there is a simple
+idea standing behind SPMOD, this algorithm is considered in the literature to be very hard
+to implement, because there are many special cases, which have to properly worked out. Thus,
+at least for optimizing GCD computations over integers and rationals, we see EEZ algorithm
+more beneficial at the moment.
+
+Some parts of modular algorithms can be relatively easily parallelized on multiple processors,
+because it often happens that several computations over a smaller domain have to be performed
+to compute the GCD in the original domain. For example this is the case in EEZ--GCD algorithm
+where, as one of initialization steps, we need to compute several univariate GCDs to compute
+the original multivariate GCD. Those univariate GCDs can be very costly, but we have to do
+several such computations (at least three) to guarantee correctness of EEZ algorithm (otherwise
+it the algorithm may fail and will have to be restarted and another sequence of univariate
+polynomial factorizations would have to be performed). Those univariate factorization can
+be computed in parallel, greatly improving speed of multivariate GCD algorithm.
 
 Square--free decomposition
 ==========================
 
-Factorization into irreducibles
-===============================
+Given a polynomial $f$, square--free decomposition (factorization) of $f$ gives a list of
+polynomials (factors) $f_1$, $f_2$, $\ldots$, $f_n$, such that all pairs of polynomials
+$(f_i, f_j)$, for $i \not= j$, are co--prime, and $f = f_1 f_2^2 \ldots f_n^n$. Thus each
+$f_i$ has no repeated roots. Note that square--free decomposition does not give a true
+factorization into irreducibles, although is a very important step in any factorization
+algorithm (which we will describe in the following section).
+
+In SymPy we implement a fast algorithm of Yun [Yun1976squarefree]_ for computing square--free
+decompositions. The cost of computing square--free decomposition is equivalent to computation
+of the greatest common divisor of $f$ and its derivative. Over finite fields we currently use
+less efficient algorithm, due to odd but well known behaviour of derivatives over finite fields,
+where $f'$ might vanish even if $f$ is non--constant polynomial (e.g. $f = x^k$ over $\F_k$),
+which leads to complications in the algorithm. In future we should implement Yun's algorithm
+also in this case.
+
+Factorization of polynomials
+============================
+
+[Musser1975factor]_
+[Wang1975integers]_
+[Moses1973ezgcd]_
+[Wang1978improved]_
+
+[Lenstra1982factor]_ LLL
+
+[Zhi1997optimal]_ algebraic
+[Gao2003partial]_
+[Abbott2000searching]_
+
+[Shoup1993reality]_
+[Kaltofen1995subquadratic]_
+[Shoup1995factor]_
+[Gathen1992frobenious]_
+
+[Wang1976algebraic]_
+
+[Encarnacion1997norms]_
+[vanHoeij2002knapsack]_
+[Trager1976algebraic]_
 
 Univariate polynomials
 ----------------------
@@ -89,6 +216,8 @@ Multivariate polynomials
 ================
 
 
+:ref:`thesis-groebner`
+
 Root isolation
 ==============
 
@@ -99,8 +228,8 @@ possible to find roots of higher degree polynomials, by taking advantage of poly
 factorization and decomposition algorithms, and pattern matching.
 
 This is an obviously limited approach and there is a need, in various areas of symbolic
-mathematics, e.g. solving of systems of polynomial equations [Strzebonski1997computing]_, to
-compute values of roots of a polynomial to a desired precision. This could be done by using
+mathematics, e.g. when solving of systems of polynomial equations [Strzebonski1997computing]_,
+to compute values of roots of a polynomial to a desired precision. This could be done by using
 numerical root finding algorithms, like Durand--Kerner's, which is has its implementation
 in mpmath library and is exposed to the top--level via :func:`nroots` function. However, in
 pathological cases, numerical algorithms may fail to compute correct values of polynomials'
@@ -108,10 +237,10 @@ roots.
 
 To tackle this problem, when the user needs guaranteed error bounds of the computed roots,
 symbolic root isolation algorithms can be used. SymPy can isolate roots of a polynomial with
-rational coefficients in real and complex domains, taking advantage of most recent algorithmic
+rational coefficients over real and complex domains, taking advantage of most recent algorithmic
 solutions in the field. Symbolic root isolation is not that efficient as numerical root finding,
-but is always successful for arbitrary polynomials, giving, as the result, isolating intervals
-of the roots, in the real case, or rectangles, in the complex case.
+but is always successful for arbitrary polynomials, giving, as the result, isolation intervals
+of the roots of a polynomial, in the real case, or isolation rectangles, in the complex case.
 
 Real roots
 ----------
@@ -121,6 +250,8 @@ For root isolation over reals SymPy implements continued fractions algorithm.
 [Akritas2008study]_
 [Sharma2007complexity]_
 [Collins1976descarte]_
+
+giving exact results (points instead of intervals) whenever possible.
 
 Complex roots
 -------------
@@ -167,8 +298,8 @@ would be to schedule refinement of particular isolation rectangles or clusters o
 on different processors. Currently we simply maintain a queue of rectangles in order from
 the smallest to the largest and refine each one--by--one on a single CPU.
 
-Previously also we experimented with, so called, global bisection algorithm due to Wilf (see
-[Wilf1978bisection]_). As its name suggests, Wilf's algorithm takes advantage of bisection
+Previously also we experimented with, so called, global bisection algorithm due to Wilf
+[Wilf1978bisection]_. As its name suggests, Wilf's algorithm takes advantage of bisection
 scheme and operates on rectangles, similarly to Collins--Krandick algorithm, however it uses
 Sturm sequences to compute the number of roots in a rectangle and thus is very slow, because
 computing polynomial remainder sequences (in particular Sturm sequences) is slow a computationally
@@ -188,4 +319,16 @@ It should be obvious that real root isolation is less computationally intensive 
 root isolation, so whenever it is known that only real (or even negative or positive) roots
 are required, then the domain of computation should be appropriately limited to speed up the
 computations (for a detailed discussion see [Collins1996complex]_).
+
+Conclusions
+===========
+
+In this chapter we gave a brief description to the most important algorithms of polynomials
+manipulation module. There are other algorithms that were implemented in the module, which
+also deserve attention and a few words of explanation. Hopefully in some foreseeable future
+we will be able to write a more capacious volume, in which we will describe all of them. We
+also gave references to the most influential literature that was used to implement those
+algorithms or seems promising for further developments in near future. We consider this a
+good starting point for people who would be interested in picking up some development tasks
+to improve the module.
 
