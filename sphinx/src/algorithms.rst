@@ -36,7 +36,7 @@ slightly improve speed of computations over this very specific domain.
 
 An alternative to classical algorithms are, so called, *fast algorithms*, which are sub--quadratic
 time algorithms for doing arithmetics polynomials [Moenck1976practical]_. Fast algorithms are usually
-limited to specific domains of computation, like integers or rationals. The family includes Karatsuba
+limited to specific domains of computation, like integers or rationals. The family includes Karatsuba's
 and FFT (Fast Fourier Transform) algorithms. The decision was made to use classical algorithms at this
 point, because it is not a trivial task to make fast algorithms really advantageous, especially for
 small or ill conditioned polynomials. In future, when the module will stabilize, we will consider
@@ -167,7 +167,7 @@ Finite fields
 
 |sympy| supports polynomial factorization over finite fields only in the univariate case, mostly because
 originally factorization over finite fields was needed only as a sub--algorithm of polynomial factoring
-algorithms over integers. In future we may extend support to multivariate as well, implementing (for
+algorithms over integers. In future we may extend support to multivariate case as well, implementing (for
 example) algorithm of [Gathen1983polytime]_. Over finite fields we have a wide variety of algorithms
 implemented. There is Berlekamp's algorithm implemented, which uses linear algebra and is suitable for
 small finite fields. We have also Cantor--Zassenhaus' algorithm, which uses polynomial algebra and is
@@ -180,16 +180,49 @@ finite field is comparable to the degree of an input polynomial).
 Integers and rationals
 ----------------------
 
-[Musser1975factor]_
-[Wang1975integers]_
-[Wang1978improved]_
+Factorization algorithms of univariate and multivariate polynomials over integers and rationals are
+currently the most important tools among all factorization algorithms that were implemented in |sympy|.
 
-[Lenstra1982factor]_ LLL
-[Abbott2000searching]_
+Factorization of polynomials over rationals is done by clearing denominators of coefficients of an input
+polynomial and performing factorization over integers. As opposed other algorithms, here the results are
+not populated back with the common denominator, but integer coefficients are left in the input, and a
+rational common coefficient of all factors is left in front of others.
 
-[vanHoeij2002knapsack]_
+In the univariate case |sympy| implements the algorithm of Zassenhaus, which is an exponential time
+algorithm, which works by transforming factorization problem over integers to factorization problem
+over a small finite field (optimally half--word coefficients, if possible). The resulting factors
+are later *lifted* using Hensel's algorithm and combined using combinatorial search algorithm to
+form *true* univariate factors over integers (searching phase). The
+last part of this algorithm makes it exponential time. However, as we previously said, the algorithm
+behaves as it had polynomial time complexity, and its true nature is visible only for specially
+constructed classes of polynomials (especially those which have very many factors over most finite
+fields). The unfortunate thing is that polynomials resulting from multivariate or algebraic factoring
+algorithms have often those properties. Many heuristics exist to improve the searching phase of
+Zassenhaus' algorithm and reduce overall execution time of the algorithm [Abbott2000searching]_.
 
-[Gao2003partial]_
+In 1982, a polynomial time algorithm for univariate factoring over integers of Lenstra, Lenstra and
+Lovash was invented [Lenstra1982factor]_. This was the first polynomial time algorithm for the task.
+However, it happens that exponential time algorithms are anyway superior for most inputs and the new
+algorithm is only beneficial for very large and very badly conditioned inputs. Thus we did not consider
+implementing this algorithm in SymPy. There is, however, an algorithm of van Hoeij [vanHoeij2002knapsack]_,
+which uses a sub--algorithm of LLL factoring algorithm (latice basis reduction) to optimize the searching
+phase of Zassenhaus algorithm. van Hoeij's algorithm is actually a family of algorithms and proper
+parametrisation is significant to make the algorithm very efficient. Such parametrisation and some
+additional optimisations can be found in [Belabas2004relative]_. The algorithm has still exponential
+time but is superior to any other known algorithm for the taks of univariate polynomials factorization
+over integers. We plan to implement this algorithm in near future in |sympy|.
+
+In the multivariate case we implement EEZ algorithm of Wang [Wang1978improved]_, which is an improved
+version of Musser's algorithm for multivariate polynomial factorization over integers [Musser1975factor]_,
+[Wang1975integers]_. The algorithm works by finding a set of valid substitution integers for all but
+one variables. This way a univariate polynomial is constructed which is factored and the resulting
+factors are used to compute true multivariate factors of the input polynomial. Multivariate factors
+are constructed using very efficient parallel (variable--by--variable) Hensel lifting algorithm. The
+algorithm tries to predict some of the coefficients during each lifting step, reducing significantly
+this way execution times. There are other algorithms that could be implemented in |sympy|, for example
+algorithm of Gao [Gao2003partial]_, which factors polynomials via partial differential equations.
+However, at this point we do not see a need for implementing another algorithm, because there is
+still a lot room for improvements in our implementation of Wang's algorithm.
 
 Algebraic number fields
 -----------------------
