@@ -12,7 +12,6 @@ Contents:
     src/introduction.rst
     src/internals.rst
     src/algorithms.rst
-    src/polynomials.rst
     src/groebner.rst
     src/conclusions.rst
     src/glossary.rst
