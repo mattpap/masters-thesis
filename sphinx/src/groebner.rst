@@ -418,6 +418,8 @@ of linear algebra in |sympy|. This situation will change and the observed phenom
 disappear in near future, when linear algebra module will be refactored (using similar
 approach to what was done with polynomials manipulation module).
 
+.. _thesis-euclid:
+
 Special case 2: Euclid's algorithm
 ----------------------------------
 
