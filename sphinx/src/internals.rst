@@ -568,6 +568,10 @@ Excluding transformation and compilation steps, the lower bounds are
 Polynomial representations
 ==========================
 
+In the previous section, when we were discussing the multiple--level architecture of polynomials
+manipulation module, we introduced the term *polynomial representations*, however, we did not
+define it properly. Now we will fix this issue ...
+
 SymPy implements two major polynomial representations: dense and sparse. A polynomial
 representation is a specialized data structure that is used for storing the structure
 of a polynomial and its coefficients. Metadata, e.g. ground domain information, is not
@@ -653,6 +657,11 @@ we need to somehow extract information about the common nature of all coefficien
 information in some data structures. This is crucial for optimizing speed of computations, because
 the more we know about the domain, the better algorithms we can pick up for doing the computations.
 
+[Bronstein2004algebra]_
+[Aldor2000guide]_
+
+[Richardson1997zero]_
+
 Motivation
 ----------
 
@@ -666,6 +675,8 @@ Suppose we perform computations with polynomials that have coefficients in the r
     interfaces, e.g. int does not implement gcd(), which is however
     implemented by Integer and mpz. On the other hand int and mpz
     are fast, but Integer is very slow.
+
+
 
 
 Basic definitions
@@ -866,6 +877,21 @@ Python is a dynamically typed programming language and its users expect for it a
     $ python2.4 bin/isympy -q
     Python console for SymPy 0.6.7-git (Python 2.4.4) (types: python/sympy)
 
+Benchmarking ground types
+-------------------------
+
+.. _fig-ground-factor-small:
+.. figure:: ../img/plot/ground-factor-small.*
+    :align: center
+
+    Benchmark: factorization of $x^n - 1$ (small coefficients)
+
+.. _fig-ground-factor-large:
+.. figure:: ../img/plot/ground-factor-large.*
+    :align: center
+
+    Benchmark: factorization of $(1234 x + 123 y + 12 z + 1)^n$ (large coefficients)
+
 Transforming expressions into polynomials
 =========================================
 
@@ -897,65 +923,12 @@ Speed related issues
 Depending on the size of an input polynomial and the coefficient domain, expression parsing
 make take considerable amount of time.
 
-Polynomial unification
-======================
-
-Public APIs of the module
-=========================
-
-Private APIs of the module
-==========================
-
-Managing contexts of evaluation
-===============================
-
-Adjusting the internal configuration
-====================================
-
-
-Previously there were two methods used for configuring what
-algorithms should be used and how they will perform:
-
-1. Passing keyword arguments around.
-2. Setting up global variables.
-
-Now there is only one configuration approach, via polyconfig.
-
-Consider the following example:
-
-In [1]: from sympy.polys.polyconfig import query, setup
-
-In [2]: query("USE_CYCLOTOMIC_FACTOR")
-Out[2]: True
-
-In [3]: %time u = factor(x**100 - 1)
-CPU times: user 0.04 s, sys: 0.00 s, total: 0.04 s
-Wall time: 0.05 s
-
-In [5]: setup("USE_CYCLOTOMIC_FACTOR", False)
-
-In [6]: %time u = factor(x**100 - 1)
-CPU times: user 2.66 s, sys: 0.01 s, total: 2.66 s
-Wall time: 2.75 s
-
-To reset configuration to the default
-
-In [8]: setup("USE_CYCLOTOMIC_FACTOR")
-
-In [9]: %time u = factor(x**100 - 1)
-CPU times: user 0.05 s, sys: 0.00 s, total: 0.05 s
-Wall time: 0.05 s
-
-This way several low-level algorithms can be configured and, for
-example, benchmarking or algorithm parameters optimization was
-made a lot easier.
-
 .. _thesis-cython:
 
 Using Cython internally
 =======================
 
-Cython (www.cython.org) is a general purpose programming language that is based on Python
+Cython (http://www.cython.org) is a general purpose programming language that is based on Python
 (shares very similar syntax), but has extra language extensions to allow static typing and
 allows for direct translation into optimized C code. Cython makes it easy to write Python
 wrappers to foreign libraries for exposing exposing their functionality to interpreted code.
@@ -1136,4 +1109,7 @@ polynomials, computing GCD or resultants, will benefit from this, because coeffi
 on the intermediate steps in those algorithms are usually half--words (computations are done in
 small finite fields). How to achieve this, without compromising functionality and correctness,
 is a subject for future discussion.
+
+Conclusions
+===========
 
