@@ -94,6 +94,7 @@ their projects.
 
 To give |sympy| a try, lets consider a simple session in a standard Python's interpreter.
 Suppose we would like to compute the following indefinite integral:
+
 .. math::
 
     \int \frac{x - \tan(x)}{\tan(x)^2 + \tan(x)} dx

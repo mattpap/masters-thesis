@@ -345,14 +345,14 @@ The third level: L3
 The :class:`Poly` and all functions of L3 are called the public API of polynomials manipulation
 module.
 
-Motivation for multiple--level design
--------------------------------------
+Multiple--levels in practice
+----------------------------
 
 Suppose we are given a univariate polynomial with integer coefficients:
 
 .. math::
 
-    f = 3 x^17 + 3 x^5 - 20 x^2 + x + 17
+    f = 3 x^{17} + 3 x^5 - 20 x^2 + x + 17
 
 We ask what is the value of $f$ at some specific point, say $15$. We can achieve this by
 substituting $15$ for $x$ using :func:`subs` method of ``Basic``. This might not seem to
@@ -515,9 +515,6 @@ Excluding transformation and compilation steps, the lower bounds are
 
 ::
 
-    def evaluate(f, point):
-
-
     In [3]: f3 = product(x-k, (k, 1, 10))
 
     In [4]: f2 = Poly(f3)
@@ -589,33 +586,25 @@ There is ultimate polynomial representation that would fit to all problems.
 Dense polynomial representation
 -------------------------------
 
-This is currently the main polynomial representation
-
 The univariate case
 ~~~~~~~~~~~~~~~~~~~
 
 The multivariate case
 ~~~~~~~~~~~~~~~~~~~~~
 
-1. GFP repr: [c_n, ..., c_0]
-
-     spec: gf_some_function(f, g, p, K)
-
-     where p is prime >= 2, type int
-           K is any ZZ algebra
-
-2. DUP repr: [c_n, ..., c_0]
-     spec: dup_some_function(f, g, K)
-
-     where K is any algebra
-
-3. DMP repr: [[...], [...], ..., [...]]
-     spec: dup_some_function(f, g, u, K)
-
-     where u is number of nested levels - 1
-           K is any algebra
-
-     DMP for u = 0 is DUP
+..
+    1. GFP repr: [c_n, ..., c_0]
+         spec: gf_some_function(f, g, p, K)
+         where p is prime >= 2, type int
+               K is any ZZ algebra
+    2. DUP repr: [c_n, ..., c_0]
+         spec: dup_some_function(f, g, K)
+         where K is any algebra
+    3. DMP repr: [[...], [...], ..., [...]]
+         spec: dup_some_function(f, g, u, K)
+         where u is number of nested levels - 1
+               K is any algebra
+         DMP for u = 0 is DUP
 
 Sparse polynomial representation
 --------------------------------
@@ -627,27 +616,43 @@ is an important part of Buchberger algorithm.
 The univariate case
 ~~~~~~~~~~~~~~~~~~~
 
-In the univariate case the sparse polynomial
-
 The multivariate case
 ~~~~~~~~~~~~~~~~~~~~~
 
+..
+    4. SDP repr: [(M_n, c_n), ..., (M_0, c_0)]
+         spec: dup_some_function(f, g, u, O, K)
+         where u is number of variables - 1
+               O is monomial order function
+               K is any algebra
 
-4. SDP repr: [(M_n, c_n), ..., (M_0, c_0)]
-     spec: dup_some_function(f, g, u, O, K)
-
-     where u is number of variables - 1
-           O is monomial order function
-           K is any algebra
-
-Comparing speed of both representations
+Benchmarking polynomial representations
 ---------------------------------------
 
+.. _fig-100-dense-power:
+.. figure:: ../img/plot/100-dense-power.*
+    :align: center
 
+    Benchmark:
+
+.. _fig-50-dense-power:
+.. figure:: ../img/plot/50-dense-power.*
+    :align: center
+
+    Benchmark:
+
+.. _fig-sparse-power:
+.. figure:: ../img/plot/sparse-power.*
+    :align: center
+
+    Benchmark:
 
 This clearly indicates that sparse representation should be used as the main polynomial
-representation in near future, because it works better in the average case, especially
-when the
+representation in near future, because it works better sparse and semi--dense inputs,
+thus covers most polynomials which can be encountered in real--life symbolic problems.
+However, one should not go int a conclusion that dense representation is completely
+useless, because, for example, truncated power series (Taylor series) tend to be dense,
+so in this case a dense polynomial representation is beneficial.
 
 Categories, domains and types
 =============================
@@ -656,226 +661,6 @@ To understand and use the properties of the coefficient domain (computation doma
 we need to somehow extract information about the common nature of all coefficients and store this
 information in some data structures. This is crucial for optimizing speed of computations, because
 the more we know about the domain, the better algorithms we can pick up for doing the computations.
-
-[Bronstein2004algebra]_
-[Aldor2000guide]_
-
-[Richardson1997zero]_
-
-Motivation
-----------
-
-Suppose we perform computations with polynomials that have coefficients in the ring of integers.
-    So, lets suppose we want to compute in integers ring. Then we have
-    a category ZZ, which is supposed to have binary operations +, -
-    , functions like gcd(), lcm() etc. and some properties. On the
-    other side we have several data types for integers: Python (int),
-    SymPy (Integer) or gmpy (mpz), or maybe even something else. Each
-    of these has different algorithms implemented and have different
-    interfaces, e.g. int does not implement gcd(), which is however
-    implemented by Integer and mpz. On the other hand int and mpz
-    are fast, but Integer is very slow.
-
-
-
-
-Basic definitions
------------------
-
-The type system
-
-category
-    Category is the most general bit in the type system of SymPy's polynomials manipulation
-    module. It defines the mathematical properties and the interface that concrete domains
-    will implement. Categories are abstract classes which are inherited by domains. Examples
-    for categories are.
-
-    Ring
-    Field
-    IntegerRing,
-    RationalField,
-    PolynomialRing
-    FractionField
-
-
-domain
-    Domain is a
-
-    Domain encapsulates functionality provided by a type. This way we can use different
-    types and have a single, unified interface to all of them.
-
-type
-    Type is a raw implementation of the of a particular domain. Types are system specific
-    and
-
-    Types are usually provided by third--parties and SymPy's developers
-
-    For example ``int`` is a built--in Python's type, which implements the standard interface
-    for numeric types, i.e. arithmetics operators: ``__add__``, ``__mul__``, ..., and some
-    functions e.g. ``__abs__``.
-
-    This is only a partial interface, as, for example, :func:`gcd` method is missing. Python
-    also does not provide :func:`gcd` function in the standard library.
-
-The API for constructing domains
---------------------------------
-
-All domains in SymPy are classes, so to construct a domain the user needs
-
-Automatic selection of an optimal domain
-----------------------------------------
-
-It would be tedious to always specify the ground domain manually via ``domain`` option. However,
-when constructing a polynomial, e.g. from an expression, SymPy can figure out the best domain
-that contains all coefficients of the input polynomial.
-
-
-Motivation
-----------
-
-
-Python is a dynamically typed programming language and its users expect for it a
-
-    Polynomial manipulation algorithms understand algebraic properties
-    of elements of a ground domain (polynomial coefficients). For this
-    purpose additional module was implemented to define all important
-    coefficient domains (the only missing is for algebraic numbers).
-
-    Basically the world is divided into to parts: types and categories
-    (here algebras or domains). Type is an object which caries data
-    and is equipped with algorithms for processing this data in some
-    way using some paradigm for this purpose. Different types have
-    different algorithms and use different paradigms. However from
-    mathematical point of view there are categories which have some
-    properties and don't care about internal behavior of a data type.
-
-    To have one source base of algorithms we specify a category for
-    a mathematical concept for each data type we want to have, e.g.
-    we have (in algebratools.py) ZZ_python, ZZ_sympy and ZZ_gmpy
-    which implement Ring interface which is based on Algebra
-    abstract class.
-
-    You can use any of ZZ_* classes as coefficient domains in new
-    polynomials module, by creating instances of those classes. Or
-    you can just
-
-              from sympy.polys.algebratools import ZZ
-
-    to get optimal solution for your system (ZZ is an instance).
-
-    Then if a function gets as parameter K algebra ZZ, then it knows
-    that all coefficients given in a polynomial representation to this
-    function have type ZZ.dtype (e.g. int) and know that int is supposed
-    to provide some methods, e.g. __add__ and that ZZ wraps some other
-    methods, e.g. ZZ.gcd is really igcd from sympy.core.numbers.
-
-    The same is for other domains: QQ, ZZ[x,y], ZZ(x,y,z), QQ('x') ...
-
-    There is also one category above all others: EX, which is a wrapper
-    for SymPy expressions. If Poly can't figure out an optimal domain
-    or such domain in not yet implemented (e.g. algebraic numbers),
-    then it uses EX. EX is slow, but tries to do its best to solve
-    zero equivalence problem in a symbolic way (by calling simplify).
-
-    On L2 level you don't have to care about domains at all. Poly will
-    figure out a domain or fallback to EX. However, when implementing
-    algorithms that require certain algebraic properties to be met, be
-    specific or you loose the battle. The most important thing is
-    to see a difference between computations over a ring and a field,
-    which can cause you a lot of trouble. So, don't hack and use
-    the interface, e.g. don't gcd(), div(), div() but cancel() and
-    it will take care of all weird cases.
-
-    To specify a domain simply add `domain` keyword argument. Note
-    you need also to specify generators when this kwarg is given
-    (this will change in future) e.g.
-
-                 Poly(x**2*y + z, x, y, domain='ZZ[z]')
-
-    Domain can be specified as a string or explicit algebra. Allowed
-    strings are 'GF(p)' where p is prime, 'ZZ' or 'Z', 'QQ' or 'Q',
-    'ZZ[x,y,z]', 'QQ[x,y,z]', 'ZZ(x,y,z'), 'QQ(x,y,z)' and 'EX'. Or
-
-               from sympy.polys.algebratools import ZZ
-
-    and ZZ[x,y,z] or even ZZ['x','y','z'] will work. Each algebra
-    implements __getitem__ for this, which fallbacks to poly_ring
-    method. Note that __call__ is used for very different purpose,
-    so don't get tricked, use ZZ.frac_field(x,y,z) or a convenient
-    string representation.
-
-    If you don't want to specify an exact domain but you know
-    computation has to be done in a field then pass `field=True`
-    to Poly or any polynomial function to force a Field to be
-    chosen rather than a Ring. By default if Poly sees that
-    coefficients fall into a Ring it will choose it, e.g.
-
-               Poly(x**2 + 1) will have the domain ZZ
-
-    but
-
-               Poly(x**2 + 1, field=True) will have QQ
-
-    Despite that if a function needs a field then it will silently
-    convert to field and continue computations. To disable this
-    set `auto=False`. Don't complain if you get DomainError or
-    ExactQuotientFailed exceptions. This automatic behaviour is
-    available only on L2 level. On other levels no auto-games are
-    played by polynomial manipulation algorithms and if there is
-    an inappropriate domain of computation specified, algorithm
-    will just fail, raising an exception.
-
-    If you want to compute in Galois fields then specify `modulus`
-    keyword argument. Note that only univariate polynomials are
-    supported and some methods might not be implemented (you will
-    get OperationNotSupported exception). Alternatively specify
-    `domain='GF(p)'` where `p` is a prime integer.
-
-    Note that when parsing expressions Poly will treat everything
-    which is not a number as a generator. This way
-
-                     gcd(x**2 - 2, x - sqrt(2))
-
-    is 1, not x - sqrt(2). Specify generators to override this behaviour.
-    In future `extension` keyword might be included to notify algorithms
-    about algebraic relations between coefficients.
-
-
-   Use gmpy by default in polys and show types at init
-
-    Previously the default ground types were Python's int and Fraction
-    types (or SymPy's Rational on 2.4 / 2.5). The new default is gmpy,
-    if gmpy is available. If not SymPy will fallback to slower types
-    as previously.
-
-    To cut down on confusion what ground types are being used in a
-    particular session, the information about ground types that were
-    setup is now displayed in the welcome message in isympy. The text
-    is in a form: "types: something" (as it is done with cache).
-
-    If SymPy was able to use the same types for both ZZ and QQ domains,
-    then 'something' will be set to 'gmpy', 'python' or 'sympy'. If this
-    is not the case, e.g. in 2.4 w/o gmpy, then SymPy uses mixed ground
-    types and 'something' will be in a form: "ZZ_type/QQ_type". In the
-    example given it would be "types: python/sympy", i.e. ZZ.dtype is
-    int and QQ.dtype is Rational.
-
-    Examples:
-
-    1. Python 2.6 with gmpy
-
-    $ python2.6 bin/isympy -q
-    IPython console for SymPy 0.6.7-git (Python 2.6.2) (types: gmpy)
-
-    2. Python 2.6 w/o gmpy
-
-    $ SYMPY_GROUND_TYPES=python python2.6 bin/isympy -q
-    IPython console for SymPy 0.6.7-git (Python 2.6.2) (types: python)
-
-    3. Python 2.4 w/o gmpy
-
-    $ python2.4 bin/isympy -q
-    Python console for SymPy 0.6.7-git (Python 2.4.4) (types: python/sympy)
 
 Benchmarking ground types
 -------------------------
@@ -903,25 +688,6 @@ internal representation of an expression is different from a representation of a
 representing this expression and does not take into account many polynomial related properties,
 like generators or coefficient domain. With expression parser we can understand the structure
 of an expression and construct a polynomial representation for it.
-
-Expression parsing
-------------------
-
-_dict_from_basic_if_gens
-_dict_from_basic_no_gens
-
-
-Greedy vs. non--greedy parsers
-------------------------------
-
-By default, everything that is not an explicit number (an instance of ``Number`` class) is
-treated as a potential generator of a polynomial.
-
-Speed related issues
---------------------
-
-Depending on the size of an input polynomial and the coefficient domain, expression parsing
-make take considerable amount of time.
 
 .. _thesis-cython:
 
