@@ -6,122 +6,19 @@
 Introduction
 ============
 
+Design and implementation issues of a computer algebra in an interpreted dynamically typed programming language.
+
+Where numerical methods fail or are incompetent, giving only local view of the problem
+domain, computer algebra systems, or CAS for short, arise. Hamming [9] said, concerning
+numerical computations, that *"The purpose of computing is insight, not numbers"*, meaning
+that besides obtaining some raw results, which we can call data, we ought to learn something,
+hopefully new, from the results we get.
 
 
-What is symbolic manipulation?
-==============================
+[Ulmer1996kovacic]_
+[Frink2001large]_
+[Wang1976teaching]_
 
-There is another term often used when speaking about symbolic manipulation
-
-
-What is a polynomial?
-=====================
-
-Polynomials at the core of this thesis and it would be very unwise to proceed with any discussion about
-the internals of polynomials manipulation module without giving a definition of this fundamental concept.
-Suppose we are given an expression $7*x**3 + x*y + 11$. Is it a polynomial? A high school student can
-answer this question affirmatively: yes, this is a polynomial.
-
-But it this all? Hopfully not, because
-if we recognize the expression as a polynomial we can take advantage of this fact.
-
-The current version
-===================
-
-Polynomials manipulation module is under continuous development, so the notion of, so called, current
-version of the module, which was used for writing this thesis, is a fluid concept and changed during
-as the thesis was being written. In general, as the current version we can understand the HEAD of the
-``polysn`` branch, where ``n`` is a positive integer, currently ``n = 9``, of git development repository
-of the author: ``http://github.com/mattpap/sympy-polys``.
-
-Origin of the name *polys*
-==========================
-
-For most people, it would be more straightforward to name the module simply *polynomials*, instead
-of the shorter name *polys*, which is currently in use. There are two reasons for having the latter
-in |sympy|. The first reason is that the name *polys* is just shorter and, this way, it is easier to
-use it in interactive sessions. Polynomials manipulation module has a very rich API, which makes it
-necessary, in some cases, to explicitly abbreviate function and class names with the module name.
-Alternatively, we could use module name aliases, but this would lead to inconsistent naming scheme
-and confusion for inexperienced |sympy|'s users. The other reason is less trivial and has historical
-background. The first module for polynomial manipulation was developed during Google Summer of Code
-2007 and later, when a new module was under implementation, for a year there were to modules for
-polynomials manipulation in parallel, so a different name was necessary. Afterwards, the new name,
-*polys*, was kept.
-
-Historical background
-=====================
-
-At the very beginning, in 2006, |sympy| was lacking a separate module for polynomial manipulation.
-This wasn't a pity, because a well established module of this kind was necessary for making |sympy|
-grow and implementation of algorithms that depend on polynomials was a big struggle. A task for
-implementing polynomials in |sympy| was proposed by a German student for Google Summer of Code 2007.
-The student was selected for the task and developed a basic module during GSoC time frame. The module
-was called *polynomials* and featured elementary polynomial arithmetics, real root counting and root
-finding via radicals, GCD and LCM algorithms, square--free decomposition, univariate and multivariate
-factorization into irreducibles over rationals (Kronecker algorithms) and |groebner| bases. Later the
-module was extended with fast modular factorization algorithm of univariate polynomials. This was,
-unfortunately, last development in SymPy of the original author. For several months polynomials
-manipulation module wasn't maintained.
-
-The same year, in 2007, the author of this thesis was selected within Google Summer of Code for
-implementing, so called, *concrete mathematics* module in |sympy|. The task was to extend |sympy|
-with algorithms for finding closed forms of symbolic summations and solving recurrence relations.
-Although the preliminary developments were possible without direct usage of polynomial manipulation
-algorithms, later on the barrier between the two modules was shrinking very rapidly as new algorithms
-were scheduled for implementation in concrete mathematics module. The author was required several
-times to implement polynomial manipulation related tools on his own. Altogether it was a great
-experience for the author, showing importance of polynomials and related algorithms, not only as
-a standalone tool, but also as a component of other, often very complex, algorithms.
-
-It was a natural thing to takeover polynomials manipulation module after departure of its original
-author. At first the plan was just to maintain the existing code and improve speed of the module in
-a few places (e.g. implement better polynomial arithmetics). However, as |sympy| grown the need for
-more general and faster polynomial manipulation tools was also growing. The author soon realised that
-the original module didn't provide a sufficiently strong basis for new developments in this area. The
-decision was to implement a new module for polynomials manipulation in parallel with the existing one
-and reusing as much code as possible from the *polynomials* module. By reusing we mean taking most
-algorithms to assure correctness. During later stages of development some of the original algorithms
-were replaced with more general or faster ones.  Many bugs in the original code were revealed and fixed.
-Work on the new module was carried through 2008. During that time, |sympy| had two modules for polynomials
-manipulation. To avoid confusion, the new module was named *polys* and other modules were gradually
-refactored to use the new implementation.  At the end of 2008 the old module was removed and *polys*
-remained the main and the only module for polynomials manipulation. The name *polys* was kept, because
-of its short length, which is beneficial when experimenting with polynomials in interactive sessions.
-
-At that time, although the new module was a big step forward, the author realised that its design is
-still very limited and requires deep changes to make it an even better basis for future developments
-in |sympy|, that require strong support for polynomials. The first few new developments were done on
-top of *polys* module and preliminary results were presented during EuroSciPy 2009 conference. After
-the conference, in two months, a completely new structure of polynomials manipulation module was
-implemented which superseded the old design. All developments were done this time gradually on the
-existing module, however, the scale of changes soon gave a rise to a completely new module, which
-is the main actor of this thesis. To keep continuity in the naming convention, the name *polys*
-remained and there are no plans, in foreseeable future, to return to the original name.
-
-Hopefully, as the author predicts, this was the last major rewrite of polynomials manipulation module.
-The new structure allows to rewrite parts of the module, introducing better quality, without touching
-other parts. Also the public API seems to be quite stable at this point, however, till major version
-1.0.0 of |sympy| significant changes to the API may still occur.
-
-Presentations of this work
-==========================
-
-Early results concerning polynomials manipulation module were presented at Students Conference in 2009,
-which was held at University of Technology in Wrocław, Poland (see [KNS2009]_). A more extensive talk
-(including a short tutorial) was given by the author at EuroSciPy conference in 2009, which was held in
-Leipzig, Germany (see [EuroSciPy2009]_). This was a general presentation about |sympy| with some remarks
-concerning polynomials manipulation. In 2010, at Python for Scientists (py4science) meeting, the author
-had a talk and a tutorial dedicated to polynomials manipulation. The event took place at University of
-California at Berkeley, CA, USA (see [py4science2010]_). In the presentation the author showed preliminary
-results of his work on polynomials manipulation module and of this thesis. For July 2010, the author has
-a talk scheduled at EuroSciPy conference, which will be held at Ecole Normale Supérieure in Paris, France
-(see [EuroSciPy2010]_).
-
-_
-
-SymPy: a Python library for symbolic mathematics
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Another approach to symbolic mathematics is SymPy, which is available
 from http://sympy.org.  SymPy is a library written in pure Python,
@@ -228,7 +125,7 @@ manipulation. SymPy can do basic arithmetic, calculus
 polynomials (factoring, expansion, Gröbner bases), pattern matching,
 solving (algebraic, difference and differential equations, and systems
 of equations), symbolic matrices (determinants, LU decomposition,
-eigenvalues/eigenvectors), 2D and 3D plotting, unicode pretty printing
+eigenvalues/eigenvectors), 2D and 3D plotting, Unicode pretty printing
 of expressions and more. Lets consider a few nontrivial examples of
 SymPy's capabilities::
 
@@ -287,4 +184,208 @@ for example in teaching, because it allows for analysis and
 modification of the implemented algorithms and data structures, on any
 level, even by people with only moderate programming experience and
 knowledge of Python.
+
+
+
+
+   SymPy is not the first approach to the problem of designing a computer algebra
+system, nor the last. First CAS emerged in early 1960s as the requirement of
+theoretical physics and research into artificial intelligence. For a detailed historical
+insight refer to an interview [8] with Gaston Gonnet, a key figure in computer algebra
+systems design, co–creator of Maple, a leading third–party CAS. The early systems,
+which provide basis for modern tools, include, amongst others, Reduce, Macsyma,
+AXIOM and Derive. The more recent are Maple, Singular, Mathematica, Magma,
+Maxima, Yacas, GiNaC, SAGE etc.
+
+    The standard approach [10] to computer algebra systems design was to separate the
+system into a core (engine) and a mathematical library. The core was written in
+a higher–level, compiled (to machine code) programming language, like Lisp, C or
+C + +, and implemented low–level primitives, resource demanding algorithms, but
+also, a compiler (to machine independent byte code) of a new extension (domain
+specific) language, or DSL for short, and its evaluator (virtual machine). The
+mathematical library implemented actual algorithms, transformation rules etc., using
+the newly invented language.
+    In our view this approach is unfortunate, because it implies additional burden of
+setting up whole grammar, parsing mechanisms, evaluation etc. of the new DSL and
+requires users to learn this new language to use the system. The situation gets even
+worse when there are several computer algebra systems that each specialize in
+different fields of science and each having its own scripting language, usually with
+many subtle differences from others (e.g. operator precedence). Most notable
+exceptions to this rule are GiNaC and SAGE.
+    GiNaC is a C + + library designed to allow the creation of integrated systems that
+embed symbolic manipulations together with more established areas of computer
+science, like computation–intense numeric applications, graphical interfaces, etc.,
+under one roof [2]. Although GiNaC does not introduce a new a new domain specific
+language, it is a very inefficient practice to script GiNaC directly in C + +, due to its
+non--dynamic characteristic and lack of interactiveness (compilation required).
+    To overcome this difficulty several Python based interfaces were developed. The
+most notable implementations are pyginac and swiginac. Although both allow its users
+to access GiNaC features from an interactive environment, still all modifications of
+the core of GiNaC are needed to be written in C + +.
+    SAGE [15] goes a step further and provides a coherent interface, written in Python
+and Cython (a static compiled to C version of Python), to several computer algebra
+systems and scientific libraries in the market, both open source and third--party. Note
+that SymPy is included in SAGE as a part of the distribution. SAGE also provides
+many additional features like interactive web notebooks, similar to Mathematica's
+notebook but much more powerful. However the preferred way to work with SAGE is
+using a preparser of a Python--like language.
+    Combining best features of many existing systems, which are being considered as
+leaders in their fields of expertise, in a single environment seems very appealing, as
+user is no more required to learn the language of choice of each single system that
+SAGE maps to, and each system incorporates its optimum of computing power in its
+field. This gives an impressive tool for doing both numeric and symbolic
+computations.
+    There are however deficiencies of this model. SAGE itself can not be called an
+algebra system but rather a software distribution, very large in size, as all subsystems
+are included in appropriate versions to build APIs. Being built as a glue to bind
+together heterogeneous subsystems, if there is a bug in one of those systems, one has
+to be an expert in that subsystem, or otherwise it's difficult to fix the bug. As opposed
+to a homogeneous system, written just in Python and possibly Cython.
+
+What is symbolic manipulation?
+==============================
+
+
+And what is computer algebra?
+=============================
+
+The state of art in symbolic and algebraic computing
+====================================================
+
+There is another term often used when speaking about symbolic manipulation
+
+
+What is a polynomial?
+=====================
+
+Polynomials at the core of this thesis and it would be very unwise to proceed with any discussion about
+the internals of polynomials manipulation module without giving a definition of this fundamental concept.
+Suppose we are given an expression $7*x**3 + x*y + 11$. Is it a polynomial? A high school student can
+answer this question affirmatively: yes, this is a polynomial.
+
+But it this all? Hopfully not, because
+if we recognize the expression as a polynomial we can take advantage of this fact.
+
+
+The current version
+===================
+
+Polynomials manipulation module is under continuous development, so the notion of, so called, current
+version of the module, which was used for writing this thesis, was a fluid concept and changed as this
+thesis was being written. As of the finalization of this thesis, the current version was the HEAD of
+branch *polys9* in development repository of the author, located at http://github.com/mattpap/sympy-polys.
+All stable results of this branch were already merged with *master* branch of official repository of
+|sympy| and are scheduled for release with the upcoming 0.7.0 release of |sympy|.
+
+Origin of module's name
+=======================
+
+For most people, it would be more straightforward to name the module simply *polynomials*, instead
+of the shorter name *polys*, which is currently in use. There are two reasons for having the latter
+in |sympy|. The first reason is that the name *polys* is just shorter and, this way, it is easier to
+use it in interactive sessions. Polynomials manipulation module has a very rich API, which makes it
+necessary, in some cases, to explicitly abbreviate function and class names with the module name.
+Alternatively, we could use module name aliases, but this would lead to inconsistent naming scheme
+and confusion for inexperienced |sympy|'s users. The other reason is less trivial and has historical
+background. The first module for polynomial manipulation was developed during Google Summer of Code
+2007, and later, when a new module was under implementation, for a year there were to modules for
+polynomials manipulation in parallel, so a different name was necessary. Afterwards, the new name,
+*polys*, was kept, see next section for a more detailed discussion.
+
+Historical background
+=====================
+
+At the very beginning, in 2006, |sympy| was lacking a separate module for polynomial manipulation.
+This was not a pity, because a well established module of this kind was necessary for making |sympy|
+grow and work on algorithms that depend on polynomials was a big struggle. A task for implementing
+polynomials in |sympy| was proposed by a German student for Google Summer of Code 2007. The student
+was selected for the task and developed a basic module during GSoC time frame. The module was called
+*polynomials* and featured elementary polynomial arithmetics, real root counting and root finding via
+radicals, GCD and LCM algorithms, square--free decomposition, univariate and multivariate factoring
+into irreducibles over rationals (Kronecker's algorithms) and |groebner| bases. Later the module was
+extended with fast modular factorization algorithm in the case of univariate polynomials. This was,
+unfortunately, last development in SymPy by the original author. For several months polynomials
+manipulation module was not maintained.
+
+The same year, in 2007, the author of this thesis was selected within Google Summer of Code for
+implementing, so called, *concrete mathematics* module in |sympy| [Graham1994concrete]_. At that
+time, the author was interested in automated methods for solving discrete problems, especially
+those involving recurrence relations [Nemes1997monthly]_. The task was to extend |sympy| with
+algorithms for finding closed forms of symbolic summations and solving recurrence relations
+[Petkovsek1997AeqB]_, [Abramov1995rational]_, [Petkovsek1992hyper]_. Although the preliminary
+developments were possible without direct usage of polynomials manipulation algorithms, later
+on the barrier between the two modules was shrinking very rapidly as new algorithms were scheduled
+for implementation in concrete mathematics module. The author was required several times to implement
+polynomials manipulation related tools on his own. Altogether, it was a great experience for the
+author, showing him the importance of polynomials and related algorithms in a symbolic manipulation
+system, not only as a standalone tool, but also as a component of other, often very complex, algorithms.
+
+It was a natural thing to takeover polynomials manipulation module after departure of its original
+author. At first the plan was just to maintain the existing code and improve speed of the module in
+a few places (e.g. implement better polynomial arithmetics). However, as |sympy| grown the need for
+more general and faster polynomial manipulation tools was also growing. The author soon realised that
+the original module didn't provide a sufficiently strong basis for new developments in this area. The
+decision was to implement a new module for polynomials manipulation in parallel with the existing one
+and reusing as much code as possible from the *polynomials* module. By reusing we mean taking most
+algorithms to assure correctness. During later stages of development some of the original algorithms
+were replaced with more general or faster ones.  Many bugs in the original code were revealed and fixed.
+Work on the new module was carried through 2008. During that time, |sympy| had two modules for polynomials
+manipulation. To avoid confusion, the new module was named *polys* and other modules were gradually
+refactored to use the new implementation.  At the end of 2008 the old module was removed and *polys*
+remained the main and the only module for polynomials manipulation. The name *polys* was kept, because
+of its short length, which is beneficial when experimenting with polynomials in interactive sessions.
+
+At that time, although the new module was a big step forward, the author realised that its design is
+still very limited and requires deep changes to make it an even better basis for future developments
+in |sympy|, that require strong support for polynomials. The first few new developments were done on
+top of *polys* module and preliminary results were presented during EuroSciPy 2009 conference. After
+the conference, in two months, a completely new structure of polynomials manipulation module was
+implemented which superseded the old design. All developments were done this time gradually on the
+existing module, however, the scale of changes soon gave a rise to a completely new module, which
+is the main actor of this thesis. To keep continuity in the naming convention, the name *polys*
+remained and there are no plans, in foreseeable future, to return to the original name.
+
+Hopefully, as the author predicts, this was the last major rewrite of polynomials manipulation module.
+The new structure allows to rewrite parts of the module, introducing better quality, without touching
+other parts. Also the public API seems to be quite stable at this point, however, till major version
+1.0.0 of |sympy|, significant changes to the API may still occur.
+
+Presentations of this work
+==========================
+
+Early results concerning polynomials manipulation module were presented at students conference in
+2009 [KNS2009]_, which was held at University of Technology in Wrocław, Poland. A more extensive
+talk (including a short tutorial) was given by the author of this thesis the same year at EuroSciPy
+conference [EuroSciPy2009]_, which was held in Leipzig, Germany. This was a general presentation
+about |sympy| with some remarks concerning polynomials manipulation in pure Python. In 2010, at Python
+for Scientists (py4science) meeting, the author had a talk and a tutorial [Py4Science2010]_ dedicated
+to polynomials manipulation. The event took place at University of California at Berkeley, CA, USA. In
+the presentation the author showed intermediate results of his work on polynomials manipulation module
+and of this thesis. For July 2010, the author has a talk scheduled at EuroSciPy conference [EuroSciPy2010]_,
+which will be held this time at Ecole Normale Supérieure in Paris, France. Final results will be presented
+during this talk.
+
+The structure of this thesis
+============================
+
+In this chapter we gave a brief introduction to SymPy and symbolic and algebraic computing in general.
+More importantly, we also described author's input to SymPy and defined the goals of this thesis. In
+the following chapters, in three, hopefully not too overlong, steps, we will discuss the issues that
+were pointed out in this chapter and how we solved them. Thus, in the next chapter we will discuss
+the details of the internal implementation of polynomials manipulation module, i.e. the heart of the
+module. In the third chapter we will briefly describe algorithms that where implemented in the module,
+giving many references to important literature. In the fourth chapter we will show that polynomials
+manipulation module can be employed for solving practical problems. This chapter will introduce the
+reader, in a tutorial like fashion, to the theory of |groebner| bases and will examine several
+interesting examples. In the final chapter we will sum up all what was said about computer algebra
+in pure Python and discuss future plans for the module.
+
+Acknowledgements
+================
+
+The author would like to thank members of |sympy|'s development team for their support, in particular
+Aaron Meuer and Criss Smith for their important input in discussion about the module and its internals
+and for many bugfixes and patches with improvements they submitted, and Ondřej Čertík for his help in
+general. The author would also like to thank the supervisor of this thesis, Krzysztof Juszczyszyn, for
+his patience concerning author's work on this thesis and his enthusiasm about the project.
 
