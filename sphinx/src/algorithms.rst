@@ -229,6 +229,8 @@ algorithm of Gao [Gao2003partial]_, which factors polynomials via partial differ
 However, at this point we do not see a need for implementing another algorithms, because there is
 still a lot room for improvements in our implementation of Wang's algorithm.
 
+.. _thesis-algebraic:
+
 Algebraic number fields
 -----------------------
 
