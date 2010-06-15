@@ -8,7 +8,7 @@
 
 The method of |groebner| bases is a powerful technique for solving problems in commutative
 algebra (polynomial ideal theory, algebraic geometry) that was introduced by Bruno Buchberger
-in his PhD thesis [Buchberder1965thesis]_ (for English translation see [Abramson2006translation]_
+in his PhD thesis [Buchberger1965thesis]_ (for English translation see [Abramson2006translation]_
 and for a historical background see [Abramson2009history]_). |groebner| bases provide a uniform
 approach for solving problems that can be expressed in terms of systems of multivariate polynomial
 equations. It happens that many practical problems, e.g.  in operational research (graph theory),
@@ -798,7 +798,7 @@ bivariate polynomial $f = x^2 + y^2$. Lets compute symmetric reduction of $f$::
 
 As the resulting remainder is zero, we proved that $f$ is a symmetric polynomial. :func:`symmetrize`
 was also able to rewrite $f$ in terms of bivariate elementary symmetric polynomials $s_1 = x + y$ and
-$s_2 = x⋅y$. To make this more visible, we can force :func:`symmetrize` to return results in a *formal*
+$s_2 = x y$. To make this more visible, we can force :func:`symmetrize` to return results in a *formal*
 form::
 
     >>> symmetrize(x**2 + y**2, formal=True)
@@ -1575,7 +1575,7 @@ of three polynomials in three variables:
 for which a |groebner| basis with respect to lexicographic ordering can't be computed in a *reasonable*
 time in |sympy|. However, if we switch to graded lexicographic ordering of monomials, |sympy| requires
 less than a second to construct the basis. For comparison, Mathematica can compute both bases at glance
-(refer to [Mathematica2009internal]_ for a description of its implementation of Buchberger algorithm).
+(refer to [MathematicaInternal]_ for a description of its implementation of Buchberger algorithm).
 
 However, as the examples showed us, there is often a lot of *structure* in the |groebner| bases found
 in practical applications, so many non--trivial and interesting |groebner| bases are relatively simple
