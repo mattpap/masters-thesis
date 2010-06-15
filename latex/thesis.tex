@@ -110,9 +110,52 @@
 \slowaKluczowe{symbolic manipulation, computer algebra, polynomials, SymPy, Python}
 \date{\number\the\year}
 
-\abstractSH{xxx}
-\abstractPL{yyy}
-\abstractEN{zzz}
+\abstractSH{In this thesis we will discuss design and implementation issues of an
+efficient polynomials manipulation module for SymPy --- a pure Python library for
+symbolic mathematics. We will also show several practical applications of the new
+module related to Gr\"{o}ebner bases theory.}
+
+%general purpose programming language, it allows to use symbolic algorithms without
+%the need for learning another domain specific. In this thesis we will discuss design
+%and implementation issues of an efficient polynomials manipulation module for SymPy.}
+%We will also show several practical applications of the new module.}
+
+\abstractEN{Polynomials are a fundamental tool of symbolic mathematics. They are useful
+on their own and as an important component of algorithms for symbolic manipulation. The
+author of this thesis implemented a module computing with polynomials in SymPy --- a pure
+Python library for symbolic mathematics. Pure Python approach, although has many benefits
+over the classical design of mathematical software, it results in very inefficient code.
+Thus, the task was to implement a module which will make SymPy faster in general and more
+competitive among other symbolic manipulation systems. In this thesis we will describe
+the details of how we made pure Python approach fast. We will also show several practical
+applications of the new module related to Gr\"{o}ebner bases theory.}
+
+\abstractPL{Wielomiany są podstawowym narzędziem systemów matematyki symbolicznej. Są one
+przydatne same w sobie oraz jak istotny element algorytmów symbolicznych. Author tej rozprawy
+stworzył moduł do wykonywania obliczeń na wielomianach dla SymPy --- biblioteki matematyki
+symbolicznej napisanej w całości w języku programowania Python. Chociaż podejście wykorzystujące
+wyłącznie język Python ma wiele zalet w stosunku do klasycznej architektury systemów tego typu,
+to jednak oprogramowanie tworzone w ten sposób jest bardzo nieefektywne. Zadanie, które postawił
+przed sobą autor tej rozprawy to, stworzenie modułu, który w ogólności przyśpieszy działanie
+SymPy i spowoduje, że ta biblioteka będzie się bardziej liczyć na rynku systemów matematycznych.
+W rozprawie tej zostaną opisane szczegóły architektury modułu jak również zostaną pokazane przykłady
+jego zastosowań, dotyczące głównie teorii baz Gr\"{o}ebner'a.}
+
+% \abstractEN{Since early 1960s, when the first symbolic mathematics systems were invented, the
+% standard approach to design of such systems required separation of a system into two levels.
+% On the botom level most time critical algorithms were implemented, usually in a fast, machine
+% oriented programming language, like Lisp, C or C++. The upper level consisted of user--friendly
+% tools, implemented in a new domain specific language, invented specially for a particular system.
+% This approach has the drawback that it does not allow the end user to experiment with all aspects
+% of such mathematical system. Thus, a group of students developed another symbolic manipulation
+% software, which does not share this problem. The idea was to implemented a mathematical library
+% from scratch in an interactive, interpreted, general purpose and very popular programming language:
+% Python. From the functional point of view the project was a success, but it was slow when compared
+% to other systems of this kind. To fix this issue, the author of this thesis, went ahead and implement
+% a new module for computing with polynomials in SymPy, which will be described in detail in this
+% thesis. Polynomials are fundamental in mathematical software because they posses enough structural
+% knowledge to allow efficient computations and most algorithms in a symbolic manipulation system
+% end up using polynomial manipulation algorithms at some point.}
 
 \maketitle
 \textpages

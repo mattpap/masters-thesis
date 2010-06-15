@@ -242,10 +242,10 @@
 		\begin{center}
 					\begin{tabular}{|c|c|c|c|}
 							 \hline
-							 \multirow{2}{*}{\small{Promotor:}}& \scriptsize{ } & \scriptsize{ } & \scriptsize{ } \\
+							 \multirow{2}{*}{\small{Supervisor:}}& \scriptsize{ } & \scriptsize{ } & \scriptsize{ } \\
 							  & \small{............................................} & \small{......................} & \small{.......................} \\
 							 \hline
-							 \ & \scriptsize\textit{imię i nazwisko} & \scriptsize\textit{ocena} & \scriptsize\textit{podpis} \\
+							 \ & \scriptsize\textit{name and surname} & \scriptsize\textit{grade} & \scriptsize\textit{signature} \\
 							 \hline
 					\end{tabular}
 		\end{center}
@@ -268,39 +268,39 @@
 %
 %      \vspace{4cm} \large Wroc\l aw \@date
 %   \end{center}
-\if@twoside
-   \clearpage
-
-
-	 \pagestyle{plain}
-	 ~ \vspace{\textheight} \\
-	 ~ \vspace{13cm} \\
-   %
-
-	 {
-
-	 		\begin{flushright}
-					\begin{tabular}{p{9.3cm}}
-							Składam serdeczne podziękowania Promotorowi, Panu \@advisor za okazaną życzliwość, zrozumienie, pomoc oraz cenne uwagi przekazywane w trakcie przygotowywania niniejszej pracy.
-
-							\\
-							\\
-
-							\@thanks
-					\end{tabular}
-			\end{flushright}
-
-
-
-			\begin{center}\small Niniejszy dokument zosta\l\ z\l o\.zony w systemie \LaTeX.\end{center}
-	 }
-
-   ~ \vspace{-3cm} \\
-   ~ \vspace{\textheight} \\
-   %{\begin{center}\small Niniejszy dokument zosta\l\ z\l o\.zony w systemie \LaTeX.\end{center}}
-\else
-	 \pagestyle{plain}
-\fi
+% \if@twoside
+%    \clearpage
+%
+%
+% 	 \pagestyle{plain}
+% 	 ~ \vspace{\textheight} \\
+% 	 ~ \vspace{13cm} \\
+%    %
+%
+% 	 {
+%
+% 	 		\begin{flushright}
+% 					\begin{tabular}{p{9.3cm}}
+% 							Składam serdeczne podziękowania Promotorowi, Panu \@advisor za okazaną życzliwość, zrozumienie, pomoc oraz cenne uwagi przekazywane w trakcie przygotowywania niniejszej pracy.
+%
+% 							\\
+% 							\\
+%
+% 							\@thanks
+% 					\end{tabular}
+% 			\end{flushright}
+%
+%
+%
+% 			\begin{center}\small Niniejszy dokument zosta\l\ z\l o\.zony w systemie \LaTeX.\end{center}
+% 	 }
+%
+%    ~ \vspace{-3cm} \\
+%    ~ \vspace{\textheight} \\
+%    %{\begin{center}\small Niniejszy dokument zosta\l\ z\l o\.zony w systemie \LaTeX.\end{center}}
+% \else
+% 	 \pagestyle{plain}
+% \fi
 
 
 
@@ -313,20 +313,19 @@
    \begin{center}
    \begin{tabular}{@{}l@{}c@{}}
       \begin{minipage}{\textwidth}
-         %\selectlanguage{polish}
-         \begin{abstract}
-            \noindent
-            \@abstractPL
-         \end{abstract}
-
-         \vspace{1.5cm}
-
-         %\selectlanguage{english}
          \begin{abstract}
             \noindent
             \@abstractEN
          \end{abstract}
-         %\selectlanguage{polish}
+
+         \vspace{1.5cm}
+
+         \selectlanguage{polish}
+         \begin{abstract}
+            \noindent
+            \@abstractPL
+         \end{abstract}
+         \selectlanguage{english}
       \end{minipage}
    &
       \begin{tabular}{@{}l@{}}\rule{0pt}{0.9\textheight}\end{tabular}
