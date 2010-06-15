@@ -1,5 +1,5 @@
 
-\section{Introduction}\label{thesis-introduction}
+\chapter{Introduction}\label{thesis-introduction}
 
 Design and implementation issues of a computer algebra in an interpreted dynamically typed programming language.
 
@@ -267,18 +267,18 @@ to be an expert in that subsystem, or otherwise it's difficult to fix the bug. A
 to a homogeneous system, written just in Python and possibly Cython.
 
 
-\subsection{What is symbolic manipulation?}
+\section{What is symbolic manipulation?}
 
 
-\subsection{And what is computer algebra?}
+\section{And what is computer algebra?}
 
 
-\subsection{The state of art in symbolic and algebraic computing}
+\section{The state of art in symbolic and algebraic computing}
 
 There is another term often used when speaking about symbolic manipulation
 
 
-\subsection{What is a polynomial?}
+\section{What is a polynomial?}
 
 Polynomials at the core of this thesis and it would be very unwise to proceed with any discussion about
 the internals of polynomials manipulation module without giving a definition of this fundamental concept.
@@ -289,7 +289,7 @@ But it this all? Hopfully not, because
 if we recognize the expression as a polynomial we can take advantage of this fact.
 
 
-\subsection{The current version}
+\section{The current version}
 
 Polynomials manipulation module is under continuous development, so the notion of, so called, current
 version of the module, which was used for writing this thesis, is a fluid concept and changed as this
@@ -298,7 +298,7 @@ branch, where \code{n} is a positive integer, currently \code{n = 9}, of git dev
 author: \code{http://github.com/mattpap/sympy-polys}.
 
 
-\subsection{Origin of module's name}
+\section{Origin of module's name}
 
 For most people, it would be more straightforward to name the module simply \emph{polynomials}, instead
 of the shorter name \emph{polys}, which is currently in use. There are two reasons for having the latter
@@ -313,7 +313,7 @@ polynomials manipulation in parallel, so a different name was necessary. Afterwa
 \emph{polys}, was kept.
 
 
-\subsection{Historical background}
+\section{Historical background}
 
 At the very beginning, in 2006, SymPy was lacking a separate module for polynomial manipulation.
 This wasn't a pity, because a well established module of this kind was necessary for making SymPy
@@ -373,7 +373,7 @@ other parts. Also the public API seems to be quite stable at this point, however
 1.0.0 of SymPy significant changes to the API may still occur.
 
 
-\subsection{Presentations of this work}
+\section{Presentations of this work}
 
 Early results concerning polynomials manipulation module were presented at Students Conference in
 2009 \cite{KNS2009}, which was held at University of Technology in Wrocław, Poland. A more extensive
@@ -387,7 +387,7 @@ and of this thesis. July 2010, the author has a talk scheduled at EuroSciPy conf
 which will be held this time at Ecole Normale Supérieure in Paris, France.
 
 
-\subsection{The structure of this thesis}
+\section{The structure of this thesis}
 
 In this chapter we gave a brief introduction to SymPy and symbolic and algebraic computing in general.
 More importantly, we also described author's input to SymPy and defined the goals of this thesis. In
@@ -401,9 +401,9 @@ tutorial like fashion, to the theory of Gröbner bases and will examine several 
 In the last fifth chapter we will sum up all what was said about computer algebra in pure Python and
 discuss future plans for the module.
 
-\hypertarget{--doc-src/internals}{}
 
-\section{Notes on the internal implementation}\label{thesis-internals}
+
+\chapter{Notes on the internal implementation}\label{thesis-internals}
 
 Knowing the goals of the project, lets now focus on the internal implementation of polynomials
 manipulation module and methods that were used to reach the goals. In this chapter we will describe
@@ -411,7 +411,7 @@ step--by--step all details concerning the design and implementation of the modul
 point of view. In the next chapter we will jump in the details of implemented algorithms.
 
 
-\subsection{Physical structure of the module}
+\section{Physical structure of the module}
 
 Polynomials manipulation module consists of a single, \code{sympy/polys},  directory with Python source
 files:
@@ -490,7 +490,7 @@ give exact measures because those statistics are not that important and are chan
 time.
 
 
-\subsection{Logical structure of the module}
+\section{Logical structure of the module}
 
 One of the main concerns when designing a symbolic manipulation library, especially one which is
 written in an interpreted general purpose programming language, is speed. Even the best equipped
@@ -558,7 +558,7 @@ L0 and L1, are used internally in the module. The other two levels form the publ
 module and are used extensively in other parts of SymPy and in interactive sessions.
 
 
-\subsubsection{Motivation}
+\subsection{Motivation}
 
 Why we need exactly four levels in polynomials manipulation module? Suppose we need to compute
 a factorization of polynomial $x^{10} - 1$. There are four levels, so we can perform the same
@@ -603,7 +603,7 @@ and from this perspective we do not save only fractions of seconds but we save s
 even minutes or hours of computation time.
 
 
-\subsubsection{The zeroth level: L0}
+\subsection{The zeroth level: L0}
 
 This is the lowest level of polynomials manipulation functionality, which is used only for internal
 purpose of the module. Most algorithms that the module implements, especially those which are most
@@ -627,16 +627,16 @@ groups, depending on which polynomial representation they belong to and what kin
 can be used with them. Currently there are four major groups, which can be distinguished by their
 special prefixes:
 \begin{itemize}
-\item {}
+\item {} 
 \code{gf\_} --- dense univariate polynomials over finite (Galois) fields
 
-\item {}
+\item {} 
 \code{dup\_} --- dense univariate polynomials over arbitrary domains
 
-\item {}
+\item {} 
 \code{dmp\_} --- dense multivariate polynomials over arbitrary domains
 
-\item {}
+\item {} 
 \code{sdp\_} --- sparse distributed polynomials over arbitrary domains
 
 \end{itemize}
@@ -714,7 +714,7 @@ functions, and \code{gf\_} will be transformed to a suffix, because still finite
 because specialized algorithms are needed for performing computations over this domain.
 
 
-\subsubsection{The first level: L1}
+\subsection{The first level: L1}
 
 This is the second level in polynomials manipulation module and the last level used for internal
 purpose. It is implemented in object--oriented style and wraps up functionality of the lowest
@@ -740,7 +740,7 @@ a self contained computational model for polynomials, which is later wrapped in 
 user friendly levels L2 and L3, which we will describe next.
 
 
-\subsubsection{The second level: L2}
+\subsection{The second level: L2}
 
 This is the first level in polynomials manipulation module that is oriented towards the end
 user. We implement only one class in L2, \code{Poly}, which wraps up by composition \code{GFP},
@@ -750,13 +750,13 @@ classes. If a certain operation is not supported by the underlying polynomial re
 then \code{OperationNotSupported} exception is raised.
 
 
-\subsubsection{The third level: L3}
+\subsection{The third level: L3}
 
 The \code{Poly} and all functions of L3 are called the public API of polynomials manipulation
 module.
 
 
-\subsubsection{Motivation for multiple--level design}
+\subsection{Motivation for multiple--level design}
 
 Suppose we are given a univariate polynomial with integer coefficients:
 \begin{gather}
@@ -996,7 +996,7 @@ In @PYGZlb[]19@PYGZrb[]: @%timeit dup@_factor@_list(f0, ZZ)
 \end{Verbatim}
 \noindent
 
-\subsection{Polynomial representations}
+\section{Polynomial representations}
 
 In the previous section, when we were discussing the multiple--level architecture of polynomials
 manipulation module, we introduced the term \emph{polynomial representations}, however, we did not
@@ -1017,17 +1017,17 @@ of such a polynomials is as large as $\frac{(n + k)!}{n! k!}$. For example, if $
 There is ultimate polynomial representation that would fit to all problems.
 
 
-\subsubsection{Dense polynomial representation}
+\subsection{Dense polynomial representation}
 
 This is currently the main polynomial representation
 
 
-\paragraph{The univariate case}
+\subsubsection{The univariate case}
 
 
-\paragraph{The multivariate case}
+\subsubsection{The multivariate case}
 \begin{enumerate}
-\item {}
+\item {} 
 GFP repr: {[}c\_n, ..., c\_0{]}
 \begin{quote}
 
@@ -1063,19 +1063,19 @@ DMP for u = 0 is DUP
 \end{enumerate}
 
 
-\subsubsection{Sparse polynomial representation}
+\subsection{Sparse polynomial representation}
 
 Currently this is the auxiliary polynomial representation that is mainly used for computing
 Gröbner bases. This is because it allows for using different orderings of monomials, which
 is an important part of Buchberger algorithm.
 
 
-\paragraph{The univariate case}
+\subsubsection{The univariate case}
 
 In the univariate case the sparse polynomial
 
 
-\paragraph{The multivariate case}
+\subsubsection{The multivariate case}
 \begin{enumerate}
 \item {} \begin{description}
 \item[SDP repr: {[}(M\_n, c\_n), ..., (M\_0, c\_0){]}] \leavevmode
@@ -1092,14 +1092,14 @@ K is any algebra
 \end{enumerate}
 
 
-\subsubsection{Comparing speed of both representations}
+\subsection{Comparing speed of both representations}
 
 This clearly indicates that sparse representation should be used as the main polynomial
 representation in near future, because it works better in the average case, especially
 when the
 
 
-\subsection{Categories, domains and types}
+\section{Categories, domains and types}
 
 To understand and use the properties of the coefficient domain (computation domain, ground domain)
 we need to somehow extract information about the common nature of all coefficients and store this
@@ -1112,7 +1112,7 @@ the more we know about the domain, the better algorithms we can pick up for doin
 \cite{Richardson1997zero}
 
 
-\subsubsection{Motivation}
+\subsection{Motivation}
 \begin{description}
 \item[Suppose we perform computations with polynomials that have coefficients in the ring of integers.] \leavevmode
 So, lets suppose we want to compute in integers ring. Then we have
@@ -1128,7 +1128,7 @@ are fast, but Integer is very slow.
 \end{description}
 
 
-\subsubsection{Basic definitions}
+\subsection{Basic definitions}
 
 The type system
 \begin{description}
@@ -1167,19 +1167,19 @@ also does not provide \code{gcd()} function in the standard library.
 \end{description}
 
 
-\subsubsection{The API for constructing domains}
+\subsection{The API for constructing domains}
 
 All domains in SymPy are classes, so to construct a domain the user needs
 
 
-\subsubsection{Automatic selection of an optimal domain}
+\subsection{Automatic selection of an optimal domain}
 
 It would be tedious to always specify the ground domain manually via \code{domain} option. However,
 when constructing a polynomial, e.g. from an expression, SymPy can figure out the best domain
 that contains all coefficients of the input polynomial.
 
 
-\subsubsection{Motivation}
+\subsection{Motivation}
 
 Python is a dynamically typed programming language and its users expect for it a
 \begin{quote}
@@ -1324,7 +1324,7 @@ int and QQ.dtype is Rational.
 
 Examples:
 \begin{enumerate}
-\item {}
+\item {} 
 Python 2.6 with gmpy
 
 \end{enumerate}
@@ -1332,7 +1332,7 @@ Python 2.6 with gmpy
 :math:{}` python2.6 bin/isympy -q
 IPython console for SymPy 0.6.7-git (Python 2.6.2) (types: gmpy)
 \begin{enumerate}
-\item {}
+\item {} 
 Python 2.6 w/o gmpy
 
 \end{enumerate}
@@ -1340,7 +1340,7 @@ Python 2.6 w/o gmpy
 {}` SYMPY\_GROUND\_TYPES=python python2.6 bin/isympy -q
 IPython console for SymPy 0.6.7-git (Python 2.6.2) (types: python)
 \begin{enumerate}
-\item {}
+\item {} 
 Python 2.4 w/o gmpy
 
 \end{enumerate}
@@ -1351,7 +1351,7 @@ Python console for SymPy 0.6.7-git (Python 2.4.4) (types: python/sympy)
 \end{quote}
 
 
-\subsection{Transforming expressions into polynomials}
+\section{Transforming expressions into polynomials}
 
 Before the user can take advantage of efficient algorithms and data structures for polynomials
 manipulation, expressions that are involved in computations have to be transformed to a form
@@ -1363,45 +1363,45 @@ like generators or coefficient domain. With expression parser we can understand 
 of an expression and construct a polynomial representation for it.
 
 
-\subsubsection{Expression parsing}
+\subsection{Expression parsing}
 
 \_dict\_from\_basic\_if\_gens
 \_dict\_from\_basic\_no\_gens
 
 
-\subsubsection{Greedy vs. non--greedy parsers}
+\subsection{Greedy vs. non--greedy parsers}
 
 By default, everything that is not an explicit number (an instance of \code{Number} class) is
 treated as a potential generator of a polynomial.
 
 
-\subsubsection{Speed related issues}
+\subsection{Speed related issues}
 
 Depending on the size of an input polynomial and the coefficient domain, expression parsing
 make take considerable amount of time.
 
 
-\subsection{Polynomial unification}
+\section{Polynomial unification}
 
 
-\subsection{Public APIs of the module}
+\section{Public APIs of the module}
 
 
-\subsection{Private APIs of the module}
+\section{Private APIs of the module}
 
 
-\subsection{Managing contexts of evaluation}
+\section{Managing contexts of evaluation}
 
 
-\subsection{Adjusting the internal configuration}
+\section{Adjusting the internal configuration}
 
 Previously there were two methods used for configuring what
 algorithms should be used and how they will perform:
 \begin{enumerate}
-\item {}
+\item {} 
 Passing keyword arguments around.
 
-\item {}
+\item {} 
 Setting up global variables.
 
 \end{enumerate}
@@ -1436,9 +1436,7 @@ Wall time: 0.05 s
 This way several low-level algorithms can be configured and, for
 example, benchmarking or algorithm parameters optimization was
 made a lot easier.
-\hypertarget{thesis-cython}{}
-
-\subsection{Using Cython internally}
+\section{Using Cython internally}\label{thesis-cython}
 
 Cython (www.cython.org) is a general purpose programming language that is based on Python
 (shares very similar syntax), but has extra language extensions to allow static typing and
@@ -1476,7 +1474,7 @@ length integers, so one has to be very careful about which variables are marked 
 avoid faulty code on certain platforms.
 
 
-\subsubsection{Pure mode Cython in SymPy}
+\subsection{Pure mode Cython in SymPy}
 
 To reduce the overhead of using pure mode Cython in SymPy to minimum, \code{@cythonized} decorator
 was introduced, which wraps original Cython's decorators and adjusts them to SymPy's needs. This
@@ -1561,7 +1559,7 @@ would store compiled modules in a separate directory, which would make running S
 compiled modules complicated.
 
 
-\subsubsection{Benchmarking pure mode Cython}
+\subsection{Benchmarking pure mode Cython}
 
 It is very cheap to employ pure mode Cython in Python code. Does it, however, bring any improvement
 over pure Python? First experiments with pure mode Cython, which we conducted in SymPy, showed that
@@ -1633,11 +1631,11 @@ small finite fields). How to achieve this, without compromising functionality an
 is a subject for future discussion.
 
 
-\subsection{Conclusions}
+\section{Conclusions}
 
-\hypertarget{--doc-src/algorithms}{}
 
-\section{Algorithms for algebraic computations}\label{thesis-algorithms}
+
+\chapter{Algorithms for algebraic computations}\label{thesis-algorithms}
 
 SymPy implements a wide variety of algorithms for polynomials manipulation, which ranges from
 relatively simple algorithms for doing arithmetics of polynomials, to advanced methods for
@@ -1658,7 +1656,7 @@ especially \cite{Knuth1985seminumerical}, and general books on algorithms and da
 when implementing special polynomials, e.g. orthogonal polynomials).
 
 
-\subsection{Arithmetics of polynomials}
+\section{Arithmetics of polynomials}
 
 Arithmetics, i.e. addition, subtraction, multiplication, exponentiation and division, for a basis
 for all other polynomials manipulation algorithms. In SymPy we currently implement only \emph{classical
@@ -1669,7 +1667,7 @@ slightly improve speed of computations over this very specific domain.
 
 An alternative to classical algorithms are, so called, \emph{fast algorithms}, which are sub--quadratic
 time algorithms for doing arithmetics polynomials \cite{Moenck1976practical}. Fast algorithms are usually
-limited to specific domains of computation, like integers or rationals. The family includes Karatsuba
+limited to specific domains of computation, like integers or rationals. The family includes Karatsuba's
 and FFT (Fast Fourier Transform) algorithms. The decision was made to use classical algorithms at this
 point, because it is not a trivial task to make fast algorithms really advantageous, especially for
 small or ill conditioned polynomials. In future, when the module will stabilize, we will consider
@@ -1686,7 +1684,7 @@ available on the system. One has to also be aware of the fact that transformatio
 may be very costly, especially for large polynomials.
 
 
-\subsection{Evaluation of polynomials}
+\section{Evaluation of polynomials}
 
 In SymPy we employ Horner scheme \cite{Geddes1992algorithms} for evaluation of univariate polynomials
 over arbitrary domains. Horner scheme was proved to be the optimal algorithm for evaluation, which
@@ -1704,7 +1702,7 @@ and rational transformations polynomials, and many other, which require some sor
 evaluation of polynomials.
 
 
-\subsection{The Greatest Common Divisor}
+\section{The Greatest Common Divisor}
 
 Another fundamental algorithm of polynomials manipulation is the GCD (Greatest Common Divisor)
 algorithm, which allows us to compute common factors of two or more polynomials. This is very
@@ -1752,7 +1750,7 @@ polynomial factorizations would have to be performed). Those univariate factoriz
 be computed in parallel, greatly improving speed of multivariate GCD algorithm.
 
 
-\subsection{Square--free decomposition}
+\section{Square--free decomposition}
 
 Given a polynomial $f$, square--free decomposition (factorization) of $f$ gives a list of
 polynomials (factors) $f_1$, $f_2$, $\ldots$, $f_n$, such that all pairs of polynomials
@@ -1770,7 +1768,7 @@ which leads to complications in the algorithm. In future we should implement Yun
 also in this case.
 
 
-\subsection{Factorization of polynomials}
+\section{Factorization of polynomials}
 
 Algorithms for computing factorizations of polynomials into irreducibles over various domains
 are the landmark of symbolic mathematics. The work in this area started early, in ninetieth
@@ -1796,11 +1794,11 @@ was invented, many other algorithms were invented, covering wider range of coeff
 introducing modular techniques (Hensel's lemma) to the case of multivariate polynomials.
 
 
-\subsubsection{Finite fields}
+\subsection{Finite fields}
 
 SymPy supports polynomial factorization over finite fields only in the univariate case, mostly because
 originally factorization over finite fields was needed only as a sub--algorithm of polynomial factoring
-algorithms over integers. In future we may extend support to multivariate as well, implementing (for
+algorithms over integers. In future we may extend support to multivariate case as well, implementing (for
 example) algorithm of \cite{Gathen1983polytime}. Over finite fields we have a wide variety of algorithms
 implemented. There is Berlekamp's algorithm implemented, which uses linear algebra and is suitable for
 small finite fields. We have also Cantor--Zassenhaus' algorithm, which uses polynomial algebra and is
@@ -1811,21 +1809,54 @@ efficient for large inputs \cite{Gathen1992frobenious}, \cite{Shoup1993reality},
 finite field is comparable to the degree of an input polynomial).
 
 
-\subsubsection{Integers and rationals}
+\subsection{Integers and rationals}
 
-\cite{Musser1975factor}
-\cite{Wang1975integers}
-\cite{Wang1978improved}
+Factorization algorithms of univariate and multivariate polynomials over integers and rationals are
+currently the most important tools among all factorization algorithms that were implemented in SymPy.
 
-\cite{Lenstra1982factor} LLL
-\cite{Abbott2000searching}
+Factorization of polynomials over rationals is done by clearing denominators of coefficients of an input
+polynomial and performing factorization over integers. As opposed other algorithms, here the results are
+not populated back with the common denominator, but integer coefficients are left in the input, and a
+rational common coefficient of all factors is left in front of others.
 
-\cite{vanHoeij2002knapsack}
+In the univariate case SymPy implements the algorithm of Zassenhaus, which is an exponential time
+algorithm, which works by transforming factorization problem over integers to factorization problem
+over a small finite field (optimally half--word coefficients, if possible). The resulting factors
+are later \emph{lifted} using Hensel's algorithm and combined using combinatorial search algorithm to
+form \emph{true} univariate factors over integers (searching phase). The
+last part of this algorithm makes it exponential time. However, as we previously said, the algorithm
+behaves as it had polynomial time complexity, and its true nature is visible only for specially
+constructed classes of polynomials (especially those which have very many factors over most finite
+fields). The unfortunate thing is that polynomials resulting from multivariate or algebraic factoring
+algorithms have often those properties. Many heuristics exist to improve the searching phase of
+Zassenhaus' algorithm and reduce overall execution time of the algorithm \cite{Abbott2000searching}.
 
-\cite{Gao2003partial}
+In 1982, a polynomial time algorithm for univariate factoring over integers of Lenstra, Lenstra and
+Lovash was invented \cite{Lenstra1982factor}. This was the first polynomial time algorithm for the task.
+However, it happens that exponential time algorithms are anyway superior for most inputs and the new
+algorithm is only beneficial for very large and very badly conditioned inputs. Thus we did not consider
+implementing this algorithm in SymPy. There is, however, an algorithm of van Hoeij \cite{vanHoeij2002knapsack},
+which uses a sub--algorithm of LLL factoring algorithm (latice basis reduction) to optimize the searching
+phase of Zassenhaus algorithm. van Hoeij's algorithm is actually a family of algorithms and proper
+parametrisation is significant to make the algorithm very efficient. Such parametrisation and some
+additional optimisations can be found in \cite{Belabas2004relative}. The algorithm has still exponential
+time but is superior to any other known algorithm for the taks of univariate polynomials factorization
+over integers. We plan to implement this algorithm in near future in SymPy.
+
+In the multivariate case we implement EEZ algorithm of Wang \cite{Wang1978improved}, which is an improved
+version of Musser's algorithm for multivariate polynomial factorization over integers \cite{Musser1975factor},
+\cite{Wang1975integers}. The algorithm works by finding a set of valid substitution integers for all but
+one variables. This way a univariate polynomial is constructed which is factored and the resulting
+factors are used to compute true multivariate factors of the input polynomial. Multivariate factors
+are constructed using very efficient parallel (variable--by--variable) Hensel lifting algorithm. The
+algorithm tries to predict some of the coefficients during each lifting step, reducing significantly
+this way execution times. There are other algorithms that could be implemented in SymPy, for example
+algorithm of Gao \cite{Gao2003partial}, which factors polynomials via partial differential equations.
+However, at this point we do not see a need for implementing another algorithm, because there is
+still a lot room for improvements in our implementation of Wang's algorithm.
 
 
-\subsubsection{Algebraic number fields}
+\subsection{Algebraic number fields}
 
 Currently we use the classical algorithm of Trager \cite{Trager1976algebraic} for computing factorizations
 of univariate and multivariate polynomials over algebraic number fields. The algorithm was invented as
@@ -1840,7 +1871,7 @@ and it is not clear if those algorithm are really an improvement, comparing to T
 (which is on the other hand much simpler in implementation).
 
 
-\subsection{Gröbner bases}
+\section{Gröbner bases}
 
 The method of Gröbner bases is a powerful technique for solving problems in commutative
 algebra (polynomial ideal theory, algebraic geometry). In chapter \ref{thesis-groebner}
@@ -1848,7 +1879,7 @@ we will describe Gröbner bases in very detail, so we skip any discussion in thi
 to avoid redundancy.
 
 
-\subsection{Root isolation}
+\section{Root isolation}
 
 Polynomials are solvable by radicals only up to degree 4 (inclusive). This is an unfortunate
 but well known consequence of Abel--Ruffini theorem. SymPy implements heuristic algorithms
@@ -1872,7 +1903,7 @@ but is always successful for arbitrary polynomials, giving, as the result, isola
 of the roots of a polynomial, in the real case, or isolation rectangles, in the complex case.
 
 
-\subsubsection{Real roots}
+\subsection{Real roots}
 
 For real root isolation SymPy implements the optimized version \cite{Akritas2008study},
 \cite{Akritas2008improving} of continued fractions algorithm \cite{Collins1976descarte}. This
@@ -1882,11 +1913,11 @@ whenever possible. For a detailed study of computational complexity of continued
 algorithm refer to \cite{Sharma2007complexity}.
 
 
-\subsubsection{Complex roots}
+\subsection{Complex roots}
 
 Isolation of complex roots is a much more demanding task. In SymPy we implemented the algorithm
 of Collins and Krandick \cite{Collins1992infallible}, the best currently known algorithm for symbolic
-complex root isolation (it is also implemented in Mathematica, see \cite{Mathematica2009internal} for
+complex root isolation (it is also implemented in Mathematica, see \cite{MathematicaInternal} for
 details).
 
 Collins--Krandick algorithm is an infallible (purely symbolic) algorithm for isolating complex
@@ -1949,7 +1980,7 @@ are required, then the domain of computation should be appropriately limited to 
 computations (for a detailed discussion see \cite{Collins1996complex}).
 
 
-\subsection{Conclusions}
+\section{Conclusions}
 
 In this chapter we gave a brief description to the most important algorithms of polynomials
 manipulation module. There are other algorithms that were implemented in the module, which
@@ -1960,13 +1991,13 @@ algorithms or seems promising for further developments in near future. We consid
 good starting point for people who would be interested in picking up some development tasks
 to improve the module.
 
-\hypertarget{--doc-src/groebner}{}
 
-\section{Gröbner bases and their applications}\label{thesis-groebner}
+
+\chapter{Gröbner bases and their applications}\label{thesis-groebner}
 
 The method of Gröbner bases is a powerful technique for solving problems in commutative
 algebra (polynomial ideal theory, algebraic geometry) that was introduced by Bruno Buchberger
-in his PhD thesis \cite{Buchberder1965thesis} (for English translation see \cite{Abramson2006translation}
+in his PhD thesis \cite{Buchberger1965thesis} (for English translation see \cite{Abramson2006translation}
 and for a historical background see \cite{Abramson2009history}). Gröbner bases provide a uniform
 approach for solving problems that can be expressed in terms of systems of multivariate polynomial
 equations. It happens that many practical problems, e.g.  in operational research (graph theory),
@@ -1984,7 +2015,7 @@ mathematical background will be needed in a particular example, then we will pro
 every time additional knowledge is needed.
 
 
-\subsection{Short introduction to Gröbner bases}
+\section{Short introduction to Gröbner bases}
 
 The Gröbner bases method is a very attractive tool in computer algebra because it is a very
 simple to understand and relatively simple to implement (implementation is SymPy consists of less
@@ -1997,26 +2028,26 @@ To introduce the concept of Gröbner bases, following \cite{Buchberger2001system
 a set $F$ of multivariate polynomial equations, i.e. $F = \{ f \in \K\Xn \}$, where $\K$ usually
 denotes a field of characteristic zero:
 \begin{enumerate}
-\item {}
+\item {} 
 we transform the set of polynomials $F$ into another set $G$
 
-\item {}
+\item {} 
 the obtained set $G$ is called a Gröbner basis of $F$
 
-\item {}
+\item {} 
 $G$ has some \emph{nice} properties that the set $F$ does not posses
 
-\item {}
+\item {} 
 $F$ and $G$ have exactly the same sets of solutions
 
 \end{enumerate}
 
 The Gröbner bases theory tells us that:
 \begin{enumerate}
-\item {}
+\item {} 
 problems which are difficult to solve in terms of $F$, are \emph{easy} to solve with $G$
 
-\item {}
+\item {} 
 there exists an algorithm for transforming arbitrary $F$ into an equivalent set $G$
 
 \end{enumerate}
@@ -2027,9 +2058,7 @@ set of polynomial equations explicitly. Often, however, our problem will be stat
 for example in terms of graphs or matrices, and we will need first to transform the original formulation
 into a system of polynomials. Then we will be able to reason about the nature of our initial problem by
 analyzing the Gröbner basis of the constructed set of polynomial.
-\hypertarget{gb-construct}{}
-
-\subsection{Construction of Gröbner bases}
+\section{Construction of Gröbner bases}\label{gb-construct}
 
 Suppose we are given a finite set of polynomials $F$. The question arises: how to find another set
 of polynomials $G$, a Gröbner basis of $F$, such that $F$ and $G$ have the same sets of solutions?
@@ -2039,7 +2068,7 @@ always terminate? These were tough questions as of the first half of the 20th ce
 an algorithm for constructing Gröbner bases.
 
 
-\subsubsection{The notion of s--polynomials}
+\subsection{The notion of s--polynomials}
 
 To introduce the algorithm for computing Gröbner bases, Buchberger defined first the notion of,
 so called, s--polynomials. Given two multivariate polynomials $f$ and $g$, suppose that $L$ is the
@@ -2063,7 +2092,7 @@ ordering of monomials? For now it is sufficient to assume that it exists and is 
 following sections we will investigate this in detail.
 
 
-\subsubsection{What is a Gröbner basis?}
+\subsection{What is a Gröbner basis?}
 
 Having the definition of s--polynomials, the fundamental theorem of Gröbner bases (also known as
 the Buchberger criterion) is as follows: a set of polynomials $G$ is a Gröbner basis if for all
@@ -2135,7 +2164,7 @@ observation leads to an algorithmic procedure for computing Gröbner bases, whic
 describe in \ref{gb-toy}.
 
 
-\subsubsection{Reduced Gröbner bases}
+\subsection{Reduced Gröbner bases}
 
 The definition of the concept of Gröbner bases, we gave so far, has one serious flaw. Suppose we
 are given two structurally distinct systems of polynomials $F$ and $F'$. We would like to know if
@@ -2156,9 +2185,7 @@ Following this definition, given a Gröbner basis $G$, one can compute a reduced
 simply by reducing each element $g \in G$ with respect to all other elements of the basis and, in
 the end, making all polynomials in $G$ monic. In the remainder of this chapter we will focus only
 on reduced Gröbner bases.
-\hypertarget{gb-toy}{}
-
-\subsubsection{Toy Buchberger algorithm}
+\subsection{Toy Buchberger algorithm}\label{gb-toy}
 
 We are ready to describe the Buchberger algorithm. The algorithm proceeds as follows: take a
 set of polynomials $F$ and set initially $G := F$, where $G$ will be the desired Gröbner
@@ -2218,7 +2245,7 @@ This is not an issue, because SymPy assumes \emph{lexicographic} ordering by def
 \emph{context managers} for configuring ordering post facto.
 
 
-\subsubsection{Termination of the algorithm}
+\subsection{Termination of the algorithm}
 
 Although the Buchberger algorithm is very simple, its termination isn't trivial. At the startup
 of this procedure there is only a finite number of pairs of polynomials for which the corresponding
@@ -2231,7 +2258,7 @@ postpone answer to this question till the end of chapter, where we will discuss 
 Buchberger algorithm and efficiency of SymPy`s Gröbner bases implementation.
 
 
-\subsection{Computing Gröbner bases with SymPy}
+\section{Computing Gröbner bases with SymPy}
 
 Although the toy implementation of the Buchberger algorithm, presented in the previous section, can
 be used for experimenting with Gröbner bases, its implementation is too naive to make it useful
@@ -2250,9 +2277,7 @@ Several criteria were invented by the author of the Gröbner bases method a few 
 algorithm was introduced. Later on, other more powerful elimination criteria were developed, for
 example, heuristic criteria for lexicographic ordering of monomials \cite{Czapor1991heuristic} or, so
 called, \emph{sugar flavour} (see \cite{Giovini1991sugar} for details).
-\hypertarget{thesis-orderings}{}
-
-\subsection{Admissible orderings of monomials}
+\section{Admissible orderings of monomials}\label{thesis-orderings}
 
 The main reason for our interest in Gröbner bases is that they have \emph{nicer} properties, compared
 to other systems of polynomials. Depending on what properties we actually need, we can compute a
@@ -2349,20 +2374,20 @@ also an important factor when computing Gröbner bases, as there are $n!$ specif
 given ordering of monomials (where $n$ is the number of variables involved in computations).
 
 
-\subsection{Specialization of Gröbner bases}
+\section{Specialization of Gröbner bases}
 
 The Gröbner bases algorithm specializes to:
 \begin{enumerate}
-\item {}
+\item {} 
 \emph{Gauss' algorithm} for linear polynomials
 
-\item {}
+\item {} 
 \emph{Euclid's algorithm} for univariate polynomials
 
 \end{enumerate}
 
 
-\subsubsection{Special case 1: Gauss' algorithm}
+\subsection{Special case 1: Gauss' algorithm}
 
 Lets consider the following system of linear equations:
 \begin{gather}
@@ -2414,9 +2439,7 @@ of polynomials manipulation module, whereas \code{solve()} uses inefficient impl
 of linear algebra in SymPy. This situation will change and the observed phenomenon will
 disappear in near future, when linear algebra module will be refactored (using similar
 approach to what was done with polynomials manipulation module).
-\hypertarget{thesis-euclid}{}
-
-\subsubsection{Special case 2: Euclid's algorithm}
+\subsection{Special case 2: Euclid's algorithm}\label{thesis-euclid}
 
 Lets now focus on the other case, i.e. on computation of greatest common divisors of polynomials.
 For this, consider two univariate polynomials \code{f} and \code{g}, both in the indeterminate \code{x},
@@ -2523,7 +2546,7 @@ good explanation of Gröbner bases machinery. Currently we use heuristic GCD alg
 for the task and there are plans to implement EEZ algorithm for this task.
 
 
-\subsection{Applications of Gröbner bases}
+\section{Applications of Gröbner bases}
 
 In the previous section we saw a few examples of applications of Gröbner bases, which one may
 consider a little artificial. This was, however, just a short prelude to the true importance of
@@ -2534,37 +2557,37 @@ credit for this state of art, because of his many publications and books which p
 in scientific and engineering communities. Following \cite{Buchberger1998applications}, below we present
 a list, thought incomplete, of the major areas in which Gröbner bases were applied with great success:
 \begin{itemize}
-\item {}
+\item {} 
 Algebraic Geometry
 
-\item {}
+\item {} 
 Coding Theory
 
-\item {}
+\item {} 
 Cryptography
 
-\item {}
+\item {} 
 Invariant Theory
 
-\item {}
+\item {} 
 Integer Programming
 
-\item {}
+\item {} 
 Graph Theory
 
-\item {}
+\item {} 
 Statistics
 
-\item {}
+\item {} 
 Symbolic Integration
 
-\item {}
+\item {} 
 Symbolic Summation
 
-\item {}
+\item {} 
 Differential Equations
 
-\item {}
+\item {} 
 Systems Theory
 
 \end{itemize}
@@ -2574,7 +2597,7 @@ In the following subsections we will examine several practical applications of t
 method and explain how to conduct all computations using SymPy`s polynomials manipulation module.
 
 
-\subsubsection{Solving systems of polynomial equations}
+\subsection{Solving systems of polynomial equations}
 
 In the previous section we showed that Gröbner bases can be used for solving systems
 of linear equations. This is an interesting, although not very useful result because we
@@ -2721,7 +2744,7 @@ a simpler coefficient domain but a larger system we pass to the Gröbner basis a
 Currently this approach isn't implemented is SymPy although seems promising for future use.
 
 
-\subsubsection{Algebraic relations in invariant theory}
+\subsection{Algebraic relations in invariant theory}
 
 Many problems in applied algebra have symmetries or are invariant under certain natural
 transformations. In particular, all geometric magnitudes and properties are invariant with
@@ -2857,7 +2880,7 @@ bivariate polynomial $f = x^2 + y^2$. Lets compute symmetric reduction of $f$:
 \noindent
 As the resulting remainder is zero, we proved that $f$ is a symmetric polynomial. \code{symmetrize()}
 was also able to rewrite $f$ in terms of bivariate elementary symmetric polynomials $s_1 = x + y$ and
-$s_2 = x*y$. To make this more visible, we can force \code{symmetrize()} to return results in a \emph{formal}
+$s_2 = x y$. To make this more visible, we can force \code{symmetrize()} to return results in a \emph{formal}
 form:
 
 \begin{Verbatim}[commandchars=@\[\]]
@@ -2944,7 +2967,7 @@ able to split the input polynomial into symmetric and non--symmetric parts and c
 reduction anyway.
 
 
-\subsubsection{Integer optimization}
+\subsection{Integer optimization}
 
 Suppose we are in possession of American coins: pennies, nickels, dimes and quarters. We would like to
 compose a certain quantity out of those coins, say 117, such that the \emph{number} of coins used is \emph{minimal}.
@@ -3027,7 +3050,7 @@ the general case of integer optimization, one has to invent a problem specific o
 the cost function of the problem. This can be easily done in SymPy by using \code{key}--functions.
 
 
-\subsubsection{Coloring of graphs}
+\subsection{Coloring of graphs}
 
 Graph coloring, which is one of the oldest and best--known subfields of graph theory, is an
 assigning values from a finite set, traditionally called colors, to elements (e.g. vertices,
@@ -3040,7 +3063,7 @@ i.e. there are no polynomial time algorithms for finding graph colorings (for a 
 discussion on this subject refer to \cite{Kubale2004color}).
 
 
-\paragraph{Classical vertex coloring}
+\subsubsection{Classical vertex coloring}
 
 To show how SymPy can be used for solving graph coloring problems using the Gröbner
 bases method, lets focus on the classical problem of vertex coloring of graphs. We follow
@@ -3198,7 +3221,7 @@ one--based indexing in SymPy, is to append a dummy element in front of a list, e
 way we could issue \code{Vx = {[}None{]} + Vx} and then \code{x3 = Vx{[}3{]}}.
 
 
-\paragraph{Vertex coloring using other systems}
+\subsubsection{Vertex coloring using other systems}
 
 We showed so far how to solve classical vertex coloring problem with SymPy. Lets now compare SymPy`s
 syntax and semantics of Gröbner bases functionality with three other mathematical software: Maxima,
@@ -3319,7 +3342,7 @@ useless critical pairs.
 \caption{Average timing for computing Gröbner basis of graph $\mathcal{G}(V, E)$.\label{fig-groebner-time-compare}}\end{figure}
 
 
-\paragraph{The structure of vertex coloring}
+\subsubsection{The structure of vertex coloring}
 
 Till this point we showed how to check with SymPy that a graph is $k$--colorable or not. However, using
 the Gröbner bases method, we can obtain a much more exciting result. Suppose that $G$ is a lexicographic
@@ -3495,7 +3518,7 @@ may lead to wrong results or at least can complicate analysis of solutions. If u
 function will do, always specify variables explicitly.
 
 
-\subsubsection{Algebraic geometry}
+\subsection{Algebraic geometry}
 
 Geometry is one of the primary subjects taught during elementary mathematics classes and using SymPy for
 studying theorems of Euclidean geometry seems a very promising idea. For example, lets consider a rhombus
@@ -3529,13 +3552,13 @@ assume that $A = (0, 0)$, $B = (x_B, 0)$, $C = (x_C, y_C)$ and $D = (x_D, y_D)$.
 taking rotational invariance of the geometric entity. We will prove that the diagonals of this rhombus,
 i.e. $AD$ and $BC$ are mutually perpendicular. We have the following conditions describing $ABCD$:
 \begin{enumerate}
-\item {}
+\item {} 
 Line $AD$ is parallel to $BC$, i.e. $AD \parallel BC$.
 
-\item {}
+\item {} 
 Sides of $ABCD$ are of the equal length, i.e. $AB = BC$.
 
-\item {}
+\item {} 
 The rhombus is non--degenerate, i.e. is not a line or a point.
 
 \end{enumerate}
@@ -3639,7 +3662,7 @@ handle much more complicated problems as well. One should refer to Winkler's pap
 examples, especially concerning issues with degenerate cases.
 
 
-\subsubsection{Other applications}
+\subsection{Other applications}
 
 So far several detailed examples of practical applications of the Gröbner bases method were
 presented, which explained most interesting features of Gröbner bases and their use patterns
@@ -3662,7 +3685,7 @@ factorizations of multivariate polynomials \cite{Gianni1985groebner} or evaluati
 and integrals \cite{Chyzak1998groebner}.
 
 
-\subsection{Complexity of computing Gröbner bases}
+\section{Complexity of computing Gröbner bases}
 
 Depending on our point of view, the complexity of the Gröbner bases method may vary. Gröbner
 bases can be considered easy when we are discussing the general idea that stands behind them, or
@@ -3692,7 +3715,7 @@ of three polynomials in three variables:
 for which a Gröbner basis with respect to lexicographic ordering can't be computed in a \emph{reasonable}
 time in SymPy. However, if we switch to graded lexicographic ordering of monomials, SymPy requires
 less than a second to construct the basis. For comparison, Mathematica can compute both bases at glance
-(refer to \cite{Mathematica2009internal} for a description of its implementation of Buchberger algorithm).
+(refer to \cite{MathematicaInternal} for a description of its implementation of Buchberger algorithm).
 
 However, as the examples showed us, there is often a lot of \emph{structure} in the Gröbner bases found
 in practical applications, so many non--trivial and interesting Gröbner bases are relatively simple
@@ -3715,7 +3738,7 @@ computing Gröbner bases. Thus F5 is considered to be at least one order of magn
 fastest algorithm previously available.
 
 
-\subsection{Conclusions}
+\section{Conclusions}
 
 The Gröbner bases method is a powerful tool in symbolic and algebraic computing, which is currently
 not yet fully utilized in SymPy. Also implementation of Buchberger's algorithm is quite limited at
@@ -3724,50 +3747,70 @@ in symbolic mathematics, specifically problems which involve solving systems of 
 that, in foreseeable future, improved algorithms for computing Gröbner bases will be implemented,
 so that SymPy will be able to tackle more complex problems.
 
-\hypertarget{--doc-src/conclusions}{}
-
-\section{Final words and conclusions}\label{thesis-conclusions}
 
 
-\subsection{Future plans}
+\chapter{Final words and conclusions}\label{thesis-conclusions}
 
-Is this the
+In this thesis the author tried to sum up three years of his work on computer algebra part
+of SymPy. Not everything could be added to this volume however, the author hopes that
+this text gives at least basic view of what polynomials manipulation module is, what were
+problem we faced at theh begining of development of this module, what we did and have it
+was done. In the remainder of this chapter we will briefly describe the future of the
+module and possible extensions.
 
 
-\subsubsection{Polynomial arithmetics}
+\section{Future plans}
+
+After three years of development and after a milestone as master's thesis is, a question
+arises: is this the end? Depending on the point of view we could say that fortunatelly
+or unfortunatelly (crossout unneeded) there is still a lot of work to be done to make
+the module even more useful. The main concern is to make the module faster. As we shoed
+in the previous section, SymPy in some cases can already beat Maxima. However, we this
+not enogh, improvements are necessary.
+
+
+\subsection{Polynomial arithmetics}
 
 \cite{Monagan2009parallel}
 \cite{Monagan2007heaps}
 \cite{Bernstein2008fast}
 
 
-\subsubsection{Power series expansion}
+\subsection{Power series expansion}
 
-\cite{Gruntz1996limits}
+SymPy implements algorithms for computing limits \cite{Gruntz1996limits} and power series
+(Taylor and Laurent series).
+
+When the algorithms were implemented, polynomials manipulation module was almost non--existent
+so everything was implemented using slow symbolic core.
+
+The current implementation of power series is very inefficient, because although power
+series are polynomials (in the case of Laurent series up to a finite number of terms,
+which number is usually much smaller than then number of Taylor terms).
+
+It would be benefitial to use
 \cite{Zippel1976expansions}
 \cite{Brent1978fps}
 \cite{Brent1975series}
 
 
-\subsubsection{Partial fraction decomposition}
+\subsection{Partial fraction decomposition}
 
 \cite{Bronstein1993partial}
 \cite{Wang1981partial}
 
 
-\subsubsection{Simplification of expressions}
+\subsection{Simplification of expressions}
 
 \cite{Monagan2006modulo}
 \cite{Pearce2001relations}
 \cite{Moses1971simplification}
 
 
-\subsubsection{Factorization of polynomials}
-
-\cite{Gathen1983polytime}
+\subsection{Factorization of polynomials}
 
 
-\subsubsection{Cylindrical algebraic decomposition}
+\subsection{Cylindrical algebraic decomposition}
 
 Current a big weakness of polynomials manipulation module is lack of solver for multivariate
 inequalities and systems of inequalities.
@@ -3781,12 +3824,12 @@ CAD can be also used for efficient elimination of quantifiers from second--order
 expressions and thus is a very useful tool in simplification of expressions and assumptions engine.
 
 
-\subsubsection{Multiple algebraic extensions}
+\subsection{Multiple algebraic extensions}
 
 \cite{vanHoeij2002modgcd}
 
 
-\subsubsection{Using modular techniques elsewhere}
+\subsection{Using modular techniques elsewhere}
 
 \cite{Gerhard2006modular}
 
