@@ -184,7 +184,7 @@ latex_documents = [
    'sympy.tex',
    u'Polynomials Manipulation Module Documentation',
    u'Mateusz Paprocki',
-   'book',
+   'manual',
   ),
 ]
 
@@ -194,7 +194,7 @@ latex_documents = [
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-#latex_use_parts = False
+latex_use_parts = False
 
 # Additional stuff for the LaTeX preamble.
 latex_preamble = """
