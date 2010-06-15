@@ -3,6 +3,9 @@
 ARG=$1
 INPUT="$ARG.tex"
 
+sed -i -e "1,/\\\hypertarget{--doc-src\/introduction}{}/ d" $INPUT
+sed -i -e "/\\\hypertarget{--doc-src\/glossary}{}/,$ d" $INPUT
+
 sed -i -e "s/⋅/*/g" $INPUT
 sed -i -e "s/⎠/\//g" $INPUT
 sed -i -e "s/⎡/[/g" $INPUT
@@ -44,5 +47,6 @@ sed -i -e "s/hyperlink{[^}]\+}{{\[}\([^{]\+\){]}}/cite{\1}/g" $INPUT
 
 sed -i -e "/end{Verbatim}$/{N; s/$/\\\noindent/}" $INPUT
 
-sed -i -e "s/\\\end{document}/\\\bibliographystyle{acm}\n\\\bibliography{$ARG}\n\\\end{document}/" $INPUT
+../../fixrefs.py $INPUT
+cp $INPUT ../../../latex/content.tex
 
