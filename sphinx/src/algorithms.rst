@@ -14,22 +14,23 @@ manipulation module in |sympy|. The descriptions will include a brief note on th
 applications of a particular algorithm. Where possible, we will also discuss computational
 complexity of an algorithm and possibility for parallelization.
 
-In this chapter we will give references to the most influential literature (papers, books,
-proceedings, etc.) about every algorithm that will be described in this study. Besides those
-domain specific sources, during development of polynomials manipulation module, we also took
-advantage of several classical books of symbolic and algebraic computing: [Davenport1988systems]_,
-[Geddes1992algorithms]_, [Gathen1999modern]_ and [Grabmeier2003algebra]_, which are considered the
-ultimate source of algorithmic knowledge in this field. We also took advantage of Knuth's books,
-especially [Knuth1985seminumerical]_, and general books on algorithms and data structures, like
-[Cormen2001algorithms]_, and mathematical tables [Abramowitz1964handbook]_ (which was very useful
-when implementing special polynomials, e.g. orthogonal polynomials).
+We will also give references to the most influential literature (papers, books, proceedings, etc.)
+about every algorithm that will be described in this study. Besides theses bibliographical items,
+during development of polynomials manipulation module, we also used several classical books on the
+topic of symbolic and algebraic computing: [Davenport1988systems]_, [Geddes1992algorithms]_,
+[Gathen1999modern]_ and [Grabmeier2003algebra]_, to name a few, which are considered to be the
+main source of knowledge on algorithms and data structures in this field. We also took advantage
+of Donald Knuth's famous books, especially the volume concerning semi--numerical algorithms
+[Knuth1985seminumerical]_. We also used general books on algorithms and data structures, like
+[Cormen2001algorithms]_, and mathematical tables, e.g [Abramowitz1964handbook]_ (which was very
+useful when implementing special polynomials, e.g. orthogonal polynomials).
 
 Arithmetics of polynomials
 ==========================
 
-Arithmetics, i.e. addition, subtraction, multiplication, exponentiation and division, for a basis
-for all other polynomials manipulation algorithms. In |sympy| we currently implement only *classical
-algorithms* for doing arithmetics of polynomials, i.e. repeated squaring algorithm for exponentiation,
+Arithmetics, i.e. addition, subtraction, multiplication, exponentiation and division, of polynomials
+form a basis for all other polynomials manipulation algorithms. In |sympy| we currently implement only,
+so called, *classical algorithms* for this purpose, i.e. repeated squaring algorithm for exponentiation,
 and $O(n^2)$ algorithms for multiplication and division, where $n$ is the maximal number of terms in
 the set of input polynomials. Over finite fields we use algorithms of [Monagan1993inplace]_, which
 slightly improve speed of computations over this very specific domain.
@@ -40,8 +41,8 @@ limited to specific domains of computation, like integers or rationals. The fami
 and FFT (Fast Fourier Transform) algorithms. The decision was made to use classical algorithms at this
 point, because it is not a trivial task to make fast algorithms really advantageous, especially for
 small or ill conditioned polynomials. In future, when the module will stabilize, we will consider
-implementing fast algorithms, as a companion to classical algorithms, and use them where it is
-advantageous.
+implementing fast algorithms, as a companion to classical algorithms, and use them where it makes
+sense.
 
 There are other ideas to improve arithmetics of polynomials, especially over integers and rationals.
 An interesting example of such optimisation is algorithm of [Fateman2005encoding]_, where polynomials
@@ -56,18 +57,19 @@ Evaluation of polynomials
 =========================
 
 In |sympy| we employ Horner scheme [Geddes1992algorithms]_ for evaluation of univariate polynomials
-over arbitrary domains. Horner scheme was proved to be the optimal algorithm for evaluation, which
-takes minimum number of additions and multiplications. In the multivariate case, Horner scheme is
-non--unique, thus there are many different schemes possible, which lead to different evaluation
-times. Currently we use a *natural* scheme, which is a consequence of using by default recursive
-polynomial representation. In the past we experimented with greedy algorithms for optimizing
-multivariate Horner scheme [Ceberio2004greedy]_, however, without much success. This was because,
-although evaluation was considerably faster comparing to the default scheme, however optimisation
-times were often comparable to computation times. In future we may reconsider using some sort of
-optimisation of polynomial evaluation algorithm in the multivariate case.
+over arbitrary domains. The algorithm of Horner was proved to be the optimal method for evaluation
+of polynomials, which takes minimum number of additions and multiplications necessary to compute
+a result. In the multivariate case, Horner scheme is non--unique, thus there are many different
+schemes possible, which lead to different evaluation times. Currently we use a *natural* scheme,
+which is a consequence of using by default recursive polynomial representation. In the past we
+experimented with greedy algorithms for optimizing multivariate Horner scheme [Ceberio2004greedy]_,
+however, without much success. This was because, although evaluation was considerably faster comparing
+to the standard scheme, however optimisation times were often comparable to computation times. In future
+we may reconsider using some sort of optimisation of polynomial evaluation algorithm in the multivariate
+case.
 
 Horner scheme is a very general algorithm, which is also used in |sympy| for computing compositions
-and rational transformations polynomials, and many other, which require some sort of efficient
+and rational transformations of polynomials, and many other, which require some sort of efficient
 evaluation of polynomials.
 
 The Greatest Common Divisor
@@ -79,9 +81,9 @@ useful on its own and as a component of other algorithms, e.g. square--free deco
 simplification of rational expressions.
 
 We implement three algorithms for computing GCDs. The most general algorithm is based on
-subresultants (special case of polynomial remainder sequences) and can be used regardless
+subresultants (a special case of polynomial remainder sequences) and can be used regardless
 of the ground domain and polynomial representation. This is also the slowest algorithm, but
-very useful if other algorithms fail or are not applicable. Where possible we use heuristic
+very useful if other algorithms fail or are not applicable. Where possible, we use heuristic
 GCD algorithm [Liao1995heuristic]_, which transforms a problem of computing GCD of polynomials
 to integer GCD problem. Although the algorithm is heuristic, with current parametrization it
 never failed in |sympy|. Daily practice shows that this approach is superior to the algorithm
@@ -93,17 +95,18 @@ historically the first implementation of multivariate polynomial GCD algorithm i
 (see section :ref:`thesis-euclid` for details).
 
 In future we plan to implement EEZ--GCD algorithm of Wang [Wang1980eezgcd]_, [Moses1973ezgcd]_,
-which we hope will improve computation of GCDs of very sparse multivariate polynomials over
-integers and rationals. Implementation of EEZ--GCD algorithm should be rather straightforward,
-because we already have EEZ polynomial factorization algorithm implemented, and both algorithms
-share a common core (parallel variable--by--variable Hensel lifting algorithm), and they differ
-main in the initialization phase.
+which we hope will improve computation of GCDs of sparse multivariate polynomials over integers
+and rationals. Implementation of EEZ--GCD algorithm should be rather straightforward, because
+we already have EEZ polynomial factorization algorithm implemented, and both algorithms share
+a common core (variable--by--variable Hensel lifting algorithm), and they differ mainly in the
+initialization phase. Having a fast algorithm for sparse polynomials is very important, because
+most polynomials that we encounter in real life problems are sparse.
 
 An alternative would be to implement sparse modular algorithm (SPMOD) of Zippel, which is also
 optimized for sparse multivariate case. This algorithm is even more interesting in the light
 of recent developments [Monagan2004algebraic]_, [Javadi2007spmod]_, where the algorithm was
 successfully employed over algebraic number and function fields. Although there is a simple
-idea standing behind SPMOD, this algorithm is considered in the literature to be very hard
+idea standing behind SPMOD, this algorithm is considered, in the literature, to be very hard
 to implement, because there are many special cases, which have to properly worked out. Thus,
 at least for optimizing GCD computations over integers and rationals, we see EEZ algorithm
 more beneficial at the moment.
@@ -114,9 +117,9 @@ to compute the GCD in the original domain. For example this is the case in EEZ--
 where, as one of initialization steps, we need to compute several univariate GCDs to compute
 the original multivariate GCD. Those univariate GCDs can be very costly, but we have to do
 several such computations (at least three) to guarantee correctness of EEZ algorithm (otherwise
-it the algorithm may fail and will have to be restarted and another sequence of univariate
-polynomial factorizations would have to be performed). Those univariate factorization can
-be computed in parallel, greatly improving speed of multivariate GCD algorithm.
+the algorithm may fail and would have to be restarted and another sequence of univariate
+polynomial GCDs would have to be computed). Those univariate GCDs can be computed in parallel,
+greatly improving speed of multivariate GCD algorithm.
 
 Square--free decomposition
 ==========================
@@ -128,20 +131,20 @@ $f_i$ has no repeated roots. Note that square--free decomposition does not give 
 factorization into irreducibles, although is a very important step in any factorization
 algorithm (which we will describe in the following section).
 
-In |sympy| we implement a fast algorithm of Yun [Yun1976squarefree]_ for computing square--free
-decompositions. The cost of computing square--free decomposition is equivalent to computation
-of the greatest common divisor of $f$ and its derivative. Over finite fields we currently use
-less efficient algorithm, due to odd but well known behaviour of derivatives over finite fields,
-where $f'$ might vanish even if $f$ is non--constant polynomial (e.g. $f = x^k$ over $\F_k$),
-which leads to complications in the algorithm. In future we should implement Yun's algorithm
-also in this case.
+In |sympy| we implement the fast algorithm of Yun [Yun1976squarefree]_ for computing square--free
+decompositions in domains of characteristic zero. The cost of computing square--free decomposition
+is equivalent to the computation of the greatest common divisor of $f$ and its derivative. Over
+finite fields we currently use less efficient algorithm, due to odd but well known behaviour of
+derivatives over domains with finite number of elements, where $f'$ might vanish even if $f$ is
+non--constant polynomial (e.g. $f = x^k$ over $\F_k$, for any $k >= 2$), which leads to complications
+in the algorithm. In future we should implement Yun's algorithm also in this case as well.
 
 Factorization of polynomials
 ============================
 
 Algorithms for computing factorizations of polynomials into irreducibles over various domains
 are the landmark of symbolic mathematics. The work in this area started early, in ninetieth
-century, and algorithms for factoring univariate and multivariate polynomials over rationals
+century, and algorithms for factoring of univariate and multivariate polynomials over rationals
 were invented by Kronecker. Those algorithms had exponential time complexity and were impractical
 for any real--life computations. Kronecker's algorithms were the first polynomial factorization
 algorithms that were implemented in |sympy|.
@@ -151,7 +154,7 @@ focusing their research on univariate polynomials with integer coefficients. A p
 came with Hensel's lemma (Hensel lifting algorithm), which allowed to perform computations with integer
 valued polynomials over finite fields. Thus, an integer polynomial problem can be transformed into
 finite field polynomial problem, then computations can be done in a much smaller (finite) domain and
-results can be transformed (lifted) back to the integer domain.
+results can be transformed (lifted) back to the integer polynomial domain.
 
 In 1967, Berlekamp gave first complete factorization algorithm over finite fields. Moreover, this
 algorithm had polynomial time complexity. Soon after, Zassenhaus combined Berlekamp's algorithm and
@@ -165,63 +168,65 @@ introducing modular techniques (Hensel's lemma) to the case of multivariate poly
 Finite fields
 -------------
 
-|sympy| supports polynomial factorization over finite fields only in the univariate case, mostly because
-originally factorization over finite fields was needed only as a sub--algorithm of polynomial factoring
-algorithms over integers. In future we may extend support to multivariate case as well, implementing (for
+|sympy| supports factoring of polynomials over finite fields only in the univariate case (mostly because
+originally factoring over finite fields was needed only as a sub--algorithm of polynomial factorization
+routines over integers. In future, we may extend support to multivariate case as well, implementing (for
 example) algorithm of [Gathen1983polytime]_. Over finite fields we have a wide variety of algorithms
-implemented. There is Berlekamp's algorithm implemented, which uses linear algebra and is suitable for
-small finite fields. We have also Cantor--Zassenhaus' algorithm, which uses polynomial algebra and is
-the default factorization algorithm over this domain, because it performs best for average inputs. There
-is also algorithm due to Shoup, Gathen and Kaltofen, which is a sub--quadratic time algorithm, very
-efficient for large inputs [Gathen1992frobenious]_, [Shoup1993reality]_, [Kaltofen1995subquadratic]_,
+implemented. There is Berlekamp's algorithm, which uses linear algebra techniques and is suitable for
+factoring over small finite fields. We have also Cantor--Zassenhaus' algorithm, which uses polynomial
+algebra and is the default factorization algorithm over this domain, because it performs best for average
+inputs. There is also algorithm due to Shoup, Gathen and Kaltofen, which is a sub--quadratic time algorithm,
+very efficient for large inputs [Gathen1992frobenious]_, [Shoup1993reality]_, [Kaltofen1995subquadratic]_,
 [Shoup1995factor]_ (especially for large finite fields, where the binary logarithm of the size of a
-finite field is comparable to the degree of an input polynomial).
+finite field is comparable to the degree of an input polynomial). User can switch between different
+algorithms at runtime by setting appropriate options in module's configuration.
 
 Integers and rationals
 ----------------------
 
-Factorization algorithms of univariate and multivariate polynomials over integers and rationals are
-currently the most important tools among all factorization algorithms that were implemented in |sympy|.
+Factoring algorithms of univariate and multivariate polynomials over integers and rationals are
+currently the most important tools among all factorization routines that were implemented in |sympy|.
 
 Factorization of polynomials over rationals is done by clearing denominators of coefficients of an input
 polynomial and performing factorization over integers. As opposed other algorithms, here the results are
-not populated back with the common denominator, but integer coefficients are left in the input, and a
-rational common coefficient of all factors is left in front of others.
+not populated back with the common denominator, but integer coefficients are left in the output, and a
+rational common multiplicative coefficient of all factors is left in front of others.
 
 In the univariate case |sympy| implements the algorithm of Zassenhaus, which is an exponential time
 algorithm, which works by transforming factorization problem over integers to factorization problem
 over a small finite field (optimally half--word coefficients, if possible). The resulting factors
-are later *lifted* using Hensel's algorithm and combined using combinatorial search algorithm to
-form *true* univariate factors over integers (searching phase). The
-last part of this algorithm makes it exponential time. However, as we previously said, the algorithm
-behaves as it had polynomial time complexity, and its true nature is visible only for specially
-constructed classes of polynomials (especially those which have very many factors over most finite
-fields). The unfortunate thing is that polynomials resulting from multivariate or algebraic factoring
-algorithms have often those properties. Many heuristics exist to improve the searching phase of
-Zassenhaus' algorithm and reduce overall execution time of the algorithm [Abbott2000searching]_.
+are later *lifted* using Hensel's lemma and combined using combinatorial search algorithm to form
+*true* univariate factors over integers (also known as searching phase). The last part of this
+algorithm makes it exponential time. However, as we previously said, the algorithm behaves as it
+had polynomial time complexity, and its true nature is visible only for specially constructed classes
+of polynomials (especially those which have very many factors over most or all finite fields). The
+unfortunate thing is that polynomials resulting from multivariate or algebraic factoring algorithms
+have often exactly those properties. Many heuristics exist to improve the searching phase of Zassenhaus'
+algorithm and reduce overall execution time of this method [Abbott2000searching]_.
 
 In 1982, a polynomial time algorithm for univariate factoring over integers of Lenstra, Lenstra and
-Lovash was invented [Lenstra1982factor]_. This was the first polynomial time algorithm for the task.
+Lovász was invented [Lenstra1982factor]_. This was the first polynomial time algorithm for the task.
 However, it happens that exponential time algorithms are anyway superior for most inputs and the new
 algorithm is only beneficial for very large and very badly conditioned inputs. Thus we did not consider
 implementing this algorithm in SymPy. There is, however, an algorithm of van Hoeij [vanHoeij2002knapsack]_,
-which uses a sub--algorithm of LLL factoring algorithm (latice basis reduction) to optimize the searching
-phase of Zassenhaus algorithm. van Hoeij's algorithm is actually a family of algorithms and proper
-parametrisation is significant to make the algorithm very efficient. Such parametrisation and some
-additional optimisations can be found in [Belabas2004relative]_. The algorithm has still exponential
-time but is superior to any other known algorithm for the taks of univariate polynomials factorization
-over integers. We plan to implement this algorithm in near future in |sympy|.
+which uses a sub--algorithm of LLL, exactly speaking it uses latice basis reduction, to optimize the
+searching phase of Zassenhaus algorithm. van Hoeij's algorithm is actually a family of algorithms and
+proper parametrisation is significant to make the algorithm very efficient. A parametrisation and some
+additional optimisations, which greatly improve van Hoeij's algorithm, can be found in [Belabas2004relative]_.
+The algorithm has still exponential time complexity, but is superior to any other known algorithm for the
+taks of univariate polynomials factorization over integers. We plan to implement this algorithm in near
+future in |sympy|.
 
 In the multivariate case we implement EEZ algorithm of Wang [Wang1978improved]_, which is an improved
 version of Musser's algorithm for multivariate polynomial factorization over integers [Musser1975factor]_,
 [Wang1975integers]_. The algorithm works by finding a set of valid substitution integers for all but
 one variables. This way a univariate polynomial is constructed which is factored and the resulting
-factors are used to compute true multivariate factors of the input polynomial. Multivariate factors
+factors are used to compute *true* multivariate factors of the input polynomial. Multivariate factors
 are constructed using very efficient parallel (variable--by--variable) Hensel lifting algorithm. The
 algorithm tries to predict some of the coefficients during each lifting step, reducing significantly
 this way execution times. There are other algorithms that could be implemented in |sympy|, for example
 algorithm of Gao [Gao2003partial]_, which factors polynomials via partial differential equations.
-However, at this point we do not see a need for implementing another algorithm, because there is
+However, at this point we do not see a need for implementing another algorithms, because there is
 still a lot room for improvements in our implementation of Wang's algorithm.
 
 Algebraic number fields
@@ -236,7 +241,7 @@ factorization problem, which can lead to very large, ill suited polynomials that
 algebraic extensions by computing a primitive element of all extensions involved. There are other
 algorithms, e.g. due to Wang [Wang1976algebraic]_ or Zhi [Zhi1997optimal]_, which can factor with
 multiple extensions without computing primitive elements. Benchmarks are, however, not convincing
-and it is not clear if those algorithm are really an improvement, comparing to Trager's algorithm
+and it is not clear if those algorithms are really an improvement, comparing to Trager's algorithm
 (which is on the other hand much simpler in implementation).
 
 |groebner| bases
@@ -244,8 +249,8 @@ and it is not clear if those algorithm are really an improvement, comparing to T
 
 The method of |groebner| bases is a powerful technique for solving problems in commutative
 algebra (polynomial ideal theory, algebraic geometry). In chapter :ref:`thesis-groebner`
-we will describe |groebner| bases in very detail, so we skip any discussion in this section
-to avoid redundancy.
+we will describe |groebner| bases in very detail, so we will skip any further discussion
+on this topic in this section, to avoid redundancy.
 
 Root isolation
 ==============
@@ -259,25 +264,24 @@ factorization and decomposition algorithms, and pattern matching.
 This is an obviously limited approach and there is a need, in various areas of symbolic
 mathematics, e.g. when solving of systems of polynomial equations [Strzebonski1997computing]_,
 to compute values of roots of a polynomial to a desired precision. This could be done by using
-numerical root finding algorithms, like Durand--Kerner's, which is has its implementation
-in mpmath library and is exposed to the top--level via :func:`nroots` function. However, in
-pathological cases, numerical algorithms may fail to compute correct values of polynomials'
-roots.
+numerical root finding algorithms, like Durand--Kerner's, which has its implementation in mpmath
+library and is exposed to the top--level via :func:`nroots` function. However, in pathological
+cases, numerical algorithms may fail to compute correct values of polynomials' roots.
 
 To tackle this problem, when the user needs guaranteed error bounds of the computed roots,
-symbolic root isolation algorithms can be used. |sympy| can isolate roots of a polynomial with
+symbolic root isolation algorithms should be used. |sympy| can isolate roots of polynomials with
 rational coefficients over real and complex domains, taking advantage of most recent algorithmic
-solutions in the field. Symbolic root isolation is not that efficient as numerical root finding,
-but is always successful for arbitrary polynomials, giving, as the result, isolation intervals
+developments in the field. Symbolic root isolation is not that efficient as numerical root finding,
+but it is always successful for arbitrary polynomials, giving, as the result, isolation intervals
 of the roots of a polynomial, in the real case, or isolation rectangles, in the complex case.
 
 Real roots
 ----------
 
-For real root isolation |sympy| implements the optimized version [Akritas2008study]_,
+For real root isolation |sympy| implements an optimized version [Akritas2008study]_,
 [Akritas2008improving]_ of continued fractions algorithm [Collins1976descarte]_. This
 approach allows convergence rate to a solution equivalent to convergence rate of continued
-fraction expansion of an algebraic number, giving exact results (points instead of intervals)
+fraction expansion of a real number, giving exact results (points instead of intervals)
 whenever possible. For a detailed study of computational complexity of continued fractions
 algorithm refer to [Sharma2007complexity]_.
 
@@ -286,7 +290,7 @@ Complex roots
 
 Isolation of complex roots is a much more demanding task. In |sympy| we implemented the algorithm
 of Collins and Krandick [Collins1992infallible]_, the best currently known algorithm for symbolic
-complex root isolation (it is also implemented in Mathematica, see [Mathematica2009internal]_ for
+complex root isolation (it is also implemented in Mathematica, see [MathematicaInternal]_ for
 details).
 
 Collins--Krandick algorithm is an infallible (purely symbolic) algorithm for isolating complex
