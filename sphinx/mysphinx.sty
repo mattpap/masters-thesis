@@ -1,0 +1,59 @@
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\ProvidesPackage{mysphinx}[2008/05/01 LaTeX package (Sphinx markup)]
+
+\RequirePackage{fancyvrb}
+\RequirePackage{framed}
+\RequirePackage{color}
+
+\newcommand{\strong}[1]{{\bf #1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\bfcode}[1]{\code{\bfseries#1}}
+\newcommand{\samp}[1]{`\code{#1}'}
+\newcommand{\email}[1]{\textsf{#1}}
+
+\definecolor{VerbatimColor}{rgb}{1,1,1}
+\definecolor{VerbatimBorderColor}{rgb}{1,1,1}
+
+% Redefine the Verbatim environment to allow border and background colors.
+% The original environment is still used for verbatims within tables.
+\let\OriginalVerbatim=\Verbatim
+\let\endOriginalVerbatim=\endVerbatim
+
+% Play with vspace to be able to keep the indentation.
+\newlength\distancetoright
+\newlength\leftsidespace
+\def\mycolorbox#1{%
+  \setlength\leftsidespace{\@totalleftmargin}%
+  \setlength\distancetoright{\textwidth}%
+  \advance\distancetoright -\@totalleftmargin %
+  \noindent\hspace*{\@totalleftmargin}%
+  \fcolorbox{VerbatimBorderColor}{VerbatimColor}{%
+  \begin{minipage}{\distancetoright}%
+    \smallskip%
+    \noindent\hspace*{-\leftsidespace}%
+    #1
+  \end{minipage}%
+  }%
+}
+\def\FrameCommand{\mycolorbox}
+
+\renewcommand{\Verbatim}[1][1]{%
+  % The list environement is needed to control perfectly the vertical
+  % space.
+  \list{}{%
+  \setlength\parskip{0pt}%
+  \setlength\itemsep{0ex}%
+  \setlength\topsep{0ex}%
+  \setlength\partopsep{0pt}%
+  \setlength\leftmargin{0pt}%
+  }%
+  \item\MakeFramed {\FrameRestore}%
+     \small%
+    \OriginalVerbatim[#1]%
+}
+\renewcommand{\endVerbatim}{%
+    \endOriginalVerbatim%
+  \endMakeFramed%
+  \endlist%
+}
+
