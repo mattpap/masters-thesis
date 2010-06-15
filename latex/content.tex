@@ -3,6 +3,12 @@
 
 Design and implementation issues of a computer algebra in an interpreted dynamically typed programming language.
 
+Where numerical methods fail or are incompetent, giving only local view of the problem
+domain, computer algebra systems, or CAS for short, arise. Hamming {[}9{]} said, concerning
+numerical computations, that \emph{``The purpose of computing is insight, not numbers''}, meaning
+that besides obtaining some raw results, which we can call data, we ought to learn something,
+hopefully new, from the results we get.
+
 \cite{Ulmer1996kovacic}
 \cite{Frink2001large}
 \cite{Wang1976teaching}
@@ -175,12 +181,6 @@ for example in teaching, because it allows for analysis and
 modification of the implemented algorithms and data structures, on any
 level, even by people with only moderate programming experience and
 knowledge of Python.
-
-Where numerical methods fail or are incompetent, giving only local view of the problem
-domain, computer algebra systems, or CAS for short, arise. Hamming {[}9{]} said, concerning
-numerical computations, that \emph{``The purpose of computing is insight, not numbers''}, meaning
-that besides obtaining some raw results, which we can call data, we ought to learn something,
-hopefully new, from the results we get.
 \begin{quote}
 
 SymPy is not the first approach to the problem of designing a computer algebra
@@ -292,10 +292,11 @@ if we recognize the expression as a polynomial we can take advantage of this fac
 \section{The current version}
 
 Polynomials manipulation module is under continuous development, so the notion of, so called, current
-version of the module, which was used for writing this thesis, is a fluid concept and changed as this
-thesis was being written. In general, as the current version we can understand the HEAD of the \code{polysn}
-branch, where \code{n} is a positive integer, currently \code{n = 9}, of git development repository of the
-author: \code{http://github.com/mattpap/sympy-polys}.
+version of the module, which was used for writing this thesis, was a fluid concept and changed as this
+thesis was being written. As of the finalization of this thesis, the current version was the HEAD of
+branch \emph{polys9} in development repository of the author, located at \href{http://github.com/mattpap/sympy-polys}{http://github.com/mattpap/sympy-polys}.
+All stable results of this branch were already merged with \emph{master} branch of official repository of
+SymPy and are scheduled for release with the upcoming 0.7.0 release of SymPy.
 
 
 \section{Origin of module's name}
@@ -310,37 +311,35 @@ and confusion for inexperienced SymPy`s users. The other reason is less trivial 
 background. The first module for polynomial manipulation was developed during Google Summer of Code
 2007, and later, when a new module was under implementation, for a year there were to modules for
 polynomials manipulation in parallel, so a different name was necessary. Afterwards, the new name,
-\emph{polys}, was kept.
+\emph{polys}, was kept, see next section for a more detailed discussion.
 
 
 \section{Historical background}
 
 At the very beginning, in 2006, SymPy was lacking a separate module for polynomial manipulation.
-This wasn't a pity, because a well established module of this kind was necessary for making SymPy
-grow and implementation of algorithms that depend on polynomials was a big struggle. A task for
-implementing polynomials in SymPy was proposed by a German student for Google Summer of Code 2007.
-The student was selected for the task and developed a basic module during GSoC time frame. The module
-was called \emph{polynomials} and featured elementary polynomial arithmetics, real root counting and root
-finding via radicals, GCD and LCM algorithms, square--free decomposition, univariate and multivariate
-factorization into irreducibles over rationals (Kronecker algorithms) and Gröbner bases. Later the
-module was extended with fast modular factorization algorithm of univariate polynomials. This was,
-unfortunately, last development in SymPy of the original author. For several months polynomials
-manipulation module wasn't maintained.
-
-\cite{Abramov1995rational},
-\cite{Petkovsek1992hyper},
-\cite{Nemes1997monthly},
-\cite{Petkovsek1997AeqB}
+This was not a pity, because a well established module of this kind was necessary for making SymPy
+grow and work on algorithms that depend on polynomials was a big struggle. A task for implementing
+polynomials in SymPy was proposed by a German student for Google Summer of Code 2007. The student
+was selected for the task and developed a basic module during GSoC time frame. The module was called
+\emph{polynomials} and featured elementary polynomial arithmetics, real root counting and root finding via
+radicals, GCD and LCM algorithms, square--free decomposition, univariate and multivariate factoring
+into irreducibles over rationals (Kronecker's algorithms) and Gröbner bases. Later the module was
+extended with fast modular factorization algorithm in the case of univariate polynomials. This was,
+unfortunately, last development in SymPy by the original author. For several months polynomials
+manipulation module was not maintained.
 
 The same year, in 2007, the author of this thesis was selected within Google Summer of Code for
-implementing, so called, \emph{concrete mathematics} module in SymPy. The task was to extend SymPy
-with algorithms for finding closed forms of symbolic summations and solving recurrence relations.
-Although the preliminary developments were possible without direct usage of polynomial manipulation
-algorithms, later on the barrier between the two modules was shrinking very rapidly as new algorithms
-were scheduled for implementation in concrete mathematics module. The author was required several
-times to implement polynomial manipulation related tools on his own. Altogether it was a great
-experience for the author, showing importance of polynomials and related algorithms, not only as
-a standalone tool, but also as a component of other, often very complex, algorithms.
+implementing, so called, \emph{concrete mathematics} module in SymPy \cite{Graham1994concrete}. At that
+time, the author was interested in automated methods for solving discrete problems, especially
+those involving recurrence relations \cite{Nemes1997monthly}. The task was to extend SymPy with
+algorithms for finding closed forms of symbolic summations and solving recurrence relations
+\cite{Petkovsek1997AeqB}, \cite{Abramov1995rational}, \cite{Petkovsek1992hyper}. Although the preliminary
+developments were possible without direct usage of polynomials manipulation algorithms, later
+on the barrier between the two modules was shrinking very rapidly as new algorithms were scheduled
+for implementation in concrete mathematics module. The author was required several times to implement
+polynomials manipulation related tools on his own. Altogether, it was a great experience for the
+author, showing him the importance of polynomials and related algorithms in a symbolic manipulation
+system, not only as a standalone tool, but also as a component of other, often very complex, algorithms.
 
 It was a natural thing to takeover polynomials manipulation module after departure of its original
 author. At first the plan was just to maintain the existing code and improve speed of the module in
@@ -370,21 +369,22 @@ remained and there are no plans, in foreseeable future, to return to the origina
 Hopefully, as the author predicts, this was the last major rewrite of polynomials manipulation module.
 The new structure allows to rewrite parts of the module, introducing better quality, without touching
 other parts. Also the public API seems to be quite stable at this point, however, till major version
-1.0.0 of SymPy significant changes to the API may still occur.
+1.0.0 of SymPy, significant changes to the API may still occur.
 
 
 \section{Presentations of this work}
 
-Early results concerning polynomials manipulation module were presented at Students Conference in
+Early results concerning polynomials manipulation module were presented at students conference in
 2009 \cite{KNS2009}, which was held at University of Technology in Wrocław, Poland. A more extensive
-talk (including a short tutorial) was given by the author of this thesis at EuroSciPy conference
-\cite{EuroSciPy2009} the same year, which was held in Leipzig, Germany. This was a general presentation
+talk (including a short tutorial) was given by the author of this thesis the same year at EuroSciPy
+conference \cite{EuroSciPy2009}, which was held in Leipzig, Germany. This was a general presentation
 about SymPy with some remarks concerning polynomials manipulation in pure Python. In 2010, at Python
-for Scientists (py4science) meeting, the author had a talk and a tutorial \cite{py4science2010} dedicated
+for Scientists (py4science) meeting, the author had a talk and a tutorial \cite{Py4Science2010} dedicated
 to polynomials manipulation. The event took place at University of California at Berkeley, CA, USA. In
 the presentation the author showed intermediate results of his work on polynomials manipulation module
-and of this thesis. July 2010, the author has a talk scheduled at EuroSciPy conference \cite{EuroSciPy2010},
-which will be held this time at Ecole Normale Supérieure in Paris, France.
+and of this thesis. For July 2010, the author has a talk scheduled at EuroSciPy conference \cite{EuroSciPy2010},
+which will be held this time at Ecole Normale Supérieure in Paris, France. Final results will be presented
+during this talk.
 
 
 \section{The structure of this thesis}
@@ -395,11 +395,20 @@ the following chapters, in three, hopefully not too overlong, steps, we will dis
 were pointed out in this chapter and how we solved them. Thus, in the next chapter we will discuss
 the details of the internal implementation of polynomials manipulation module, i.e. the heart of the
 module. In the third chapter we will briefly describe algorithms that where implemented in the module,
-giving many references to literature. In the fourth chapter we will show that polynomials manipulation
-module can be employed for solving practical problems. This chapter will introduce the reader, in a
-tutorial like fashion, to the theory of Gröbner bases and will examine several interesting examples.
-In the last fifth chapter we will sum up all what was said about computer algebra in pure Python and
-discuss future plans for the module.
+giving many references to important literature. In the fourth chapter we will show that polynomials
+manipulation module can be employed for solving practical problems. This chapter will introduce the
+reader, in a tutorial like fashion, to the theory of Gröbner bases and will examine several
+interesting examples. In the final chapter we will sum up all what was said about computer algebra
+in pure Python and discuss future plans for the module.
+
+
+\section{Acknowledgements}
+
+The author would like to thank members of SymPy`s development team for their support, in particular
+Aaron Meuer and Criss Smith for their important input in discussion about the module and its internals
+and for many bugfixes and patches with improvements they submitted, and Ondřej Čertík for his help in
+general. The author would also like to thank the supervisor of this thesis, Krzysztof Juszczyszyn, for
+his patience concerning author's work on this thesis and his enthusiasm about the project.
 
 
 
@@ -1645,34 +1654,35 @@ manipulation module in SymPy. The descriptions will include a brief note on the 
 applications of a particular algorithm. Where possible, we will also discuss computational
 complexity of an algorithm and possibility for parallelization.
 
-In this chapter we will give references to the most influential literature (papers, books,
-proceedings, etc.) about every algorithm that will be described in this study. Besides those
-domain specific sources, during development of polynomials manipulation module, we also took
-advantage of several classical books of symbolic and algebraic computing: \cite{Davenport1988systems},
-\cite{Geddes1992algorithms}, \cite{Gathen1999modern} and \cite{Grabmeier2003algebra}, which are considered the
-ultimate source of algorithmic knowledge in this field. We also took advantage of Knuth's books,
-especially \cite{Knuth1985seminumerical}, and general books on algorithms and data structures, like
-\cite{Cormen2001algorithms}, and mathematical tables \cite{Abramowitz1964handbook} (which was very useful
-when implementing special polynomials, e.g. orthogonal polynomials).
+We will also give references to the most influential literature (papers, books, proceedings, etc.)
+about every algorithm that will be described in this study. Besides theses bibliographical items,
+during development of polynomials manipulation module, we also used several classical books on the
+topic of symbolic and algebraic computing: \cite{Davenport1988systems}, \cite{Geddes1992algorithms},
+\cite{Gathen1999modern} and \cite{Grabmeier2003algebra}, to name a few, which are considered to be the
+main source of knowledge on algorithms and data structures in this field. We also took advantage
+of Donald Knuth's famous books, especially the volume concerning semi--numerical algorithms
+\cite{Knuth1985seminumerical}. We also used general books on algorithms and data structures, like
+\cite{Cormen2001algorithms}, and mathematical tables, e.g \cite{Abramowitz1964handbook} (which was very
+useful when implementing special polynomials, e.g. orthogonal polynomials).
 
 
 \section{Arithmetics of polynomials}
 
-Arithmetics, i.e. addition, subtraction, multiplication, exponentiation and division, for a basis
-for all other polynomials manipulation algorithms. In SymPy we currently implement only \emph{classical
-algorithms} for doing arithmetics of polynomials, i.e. repeated squaring algorithm for exponentiation,
+Arithmetics, i.e. addition, subtraction, multiplication, exponentiation and division, of polynomials
+form a basis for all other polynomials manipulation algorithms. In SymPy we currently implement only,
+so called, \emph{classical algorithms} for this purpose, i.e. repeated squaring algorithm for exponentiation,
 and $O(n^2)$ algorithms for multiplication and division, where $n$ is the maximal number of terms in
 the set of input polynomials. Over finite fields we use algorithms of \cite{Monagan1993inplace}, which
 slightly improve speed of computations over this very specific domain.
 
 An alternative to classical algorithms are, so called, \emph{fast algorithms}, which are sub--quadratic
-time algorithms for doing arithmetics polynomials \cite{Moenck1976practical}. Fast algorithms are usually
-limited to specific domains of computation, like integers or rationals. The family includes Karatsuba's
-and FFT (Fast Fourier Transform) algorithms. The decision was made to use classical algorithms at this
-point, because it is not a trivial task to make fast algorithms really advantageous, especially for
-small or ill conditioned polynomials. In future, when the module will stabilize, we will consider
-implementing fast algorithms, as a companion to classical algorithms, and use them where it is
-advantageous.
+time algorithms for doing arithmetics polynomials \cite{Moenck1976practical}, \cite{Bernstein2008fast}. Fast
+algorithms are usually limited to specific domains of computation, like integers or rationals. The
+family includes Karatsuba's and FFT (Fast Fourier Transform) algorithms. The decision was made to use
+classical algorithms at this point, because it is not a trivial task to make fast algorithms really
+advantageous, especially for small or ill conditioned polynomials. In future, when the module will
+stabilize, we will consider implementing fast algorithms, as a companion to classical algorithms,
+and use them where it makes sense.
 
 There are other ideas to improve arithmetics of polynomials, especially over integers and rationals.
 An interesting example of such optimisation is algorithm of \cite{Fateman2005encoding}, where polynomials
@@ -1687,18 +1697,19 @@ may be very costly, especially for large polynomials.
 \section{Evaluation of polynomials}
 
 In SymPy we employ Horner scheme \cite{Geddes1992algorithms} for evaluation of univariate polynomials
-over arbitrary domains. Horner scheme was proved to be the optimal algorithm for evaluation, which
-takes minimum number of additions and multiplications. In the multivariate case, Horner scheme is
-non--unique, thus there are many different schemes possible, which lead to different evaluation
-times. Currently we use a \emph{natural} scheme, which is a consequence of using by default recursive
-polynomial representation. In the past we experimented with greedy algorithms for optimizing
-multivariate Horner scheme \cite{Ceberio2004greedy}, however, without much success. This was because,
-although evaluation was considerably faster comparing to the default scheme, however optimisation
-times were often comparable to computation times. In future we may reconsider using some sort of
-optimisation of polynomial evaluation algorithm in the multivariate case.
+over arbitrary domains. The algorithm of Horner was proved to be the optimal method for evaluation
+of polynomials, which takes minimum number of additions and multiplications necessary to compute
+a result. In the multivariate case, Horner scheme is non--unique, thus there are many different
+schemes possible, which lead to different evaluation times. Currently we use a \emph{natural} scheme,
+which is a consequence of using by default recursive polynomial representation. In the past we
+experimented with greedy algorithms for optimizing multivariate Horner scheme \cite{Ceberio2004greedy},
+however, without much success. This was because, although evaluation was considerably faster comparing
+to the standard scheme, however optimisation times were often comparable to computation times. In future
+we may reconsider using some sort of optimisation of polynomial evaluation algorithm in the multivariate
+case.
 
 Horner scheme is a very general algorithm, which is also used in SymPy for computing compositions
-and rational transformations polynomials, and many other, which require some sort of efficient
+and rational transformations of polynomials, and many other, which require some sort of efficient
 evaluation of polynomials.
 
 
@@ -1710,9 +1721,9 @@ useful on its own and as a component of other algorithms, e.g. square--free deco
 simplification of rational expressions.
 
 We implement three algorithms for computing GCDs. The most general algorithm is based on
-subresultants (special case of polynomial remainder sequences) and can be used regardless
+subresultants (a special case of polynomial remainder sequences) and can be used regardless
 of the ground domain and polynomial representation. This is also the slowest algorithm, but
-very useful if other algorithms fail or are not applicable. Where possible we use heuristic
+very useful if other algorithms fail or are not applicable. Where possible, we use heuristic
 GCD algorithm \cite{Liao1995heuristic}, which transforms a problem of computing GCD of polynomials
 to integer GCD problem. Although the algorithm is heuristic, with current parametrization it
 never failed in SymPy. Daily practice shows that this approach is superior to the algorithm
@@ -1724,17 +1735,18 @@ historically the first implementation of multivariate polynomial GCD algorithm i
 (see section \ref{thesis-euclid} for details).
 
 In future we plan to implement EEZ--GCD algorithm of Wang \cite{Wang1980eezgcd}, \cite{Moses1973ezgcd},
-which we hope will improve computation of GCDs of very sparse multivariate polynomials over
-integers and rationals. Implementation of EEZ--GCD algorithm should be rather straightforward,
-because we already have EEZ polynomial factorization algorithm implemented, and both algorithms
-share a common core (parallel variable--by--variable Hensel lifting algorithm), and they differ
-main in the initialization phase.
+which we hope will improve computation of GCDs of sparse multivariate polynomials over integers
+and rationals. Implementation of EEZ--GCD algorithm should be rather straightforward, because
+we already have EEZ polynomial factorization algorithm implemented, and both algorithms share
+a common core (variable--by--variable Hensel lifting algorithm), and they differ mainly in the
+initialization phase. Having a fast algorithm for sparse polynomials is very important, because
+most polynomials that we encounter in real life problems are sparse.
 
 An alternative would be to implement sparse modular algorithm (SPMOD) of Zippel, which is also
 optimized for sparse multivariate case. This algorithm is even more interesting in the light
 of recent developments \cite{Monagan2004algebraic}, \cite{Javadi2007spmod}, where the algorithm was
 successfully employed over algebraic number and function fields. Although there is a simple
-idea standing behind SPMOD, this algorithm is considered in the literature to be very hard
+idea standing behind SPMOD, this algorithm is considered, in the literature, to be very hard
 to implement, because there are many special cases, which have to properly worked out. Thus,
 at least for optimizing GCD computations over integers and rationals, we see EEZ algorithm
 more beneficial at the moment.
@@ -1745,9 +1757,9 @@ to compute the GCD in the original domain. For example this is the case in EEZ--
 where, as one of initialization steps, we need to compute several univariate GCDs to compute
 the original multivariate GCD. Those univariate GCDs can be very costly, but we have to do
 several such computations (at least three) to guarantee correctness of EEZ algorithm (otherwise
-it the algorithm may fail and will have to be restarted and another sequence of univariate
-polynomial factorizations would have to be performed). Those univariate factorization can
-be computed in parallel, greatly improving speed of multivariate GCD algorithm.
+the algorithm may fail and would have to be restarted and another sequence of univariate
+polynomial GCDs would have to be computed). Those univariate GCDs can be computed in parallel,
+greatly improving speed of multivariate GCD algorithm.
 
 
 \section{Square--free decomposition}
@@ -1759,20 +1771,20 @@ $f_i$ has no repeated roots. Note that square--free decomposition does not give 
 factorization into irreducibles, although is a very important step in any factorization
 algorithm (which we will describe in the following section).
 
-In SymPy we implement a fast algorithm of Yun \cite{Yun1976squarefree} for computing square--free
-decompositions. The cost of computing square--free decomposition is equivalent to computation
-of the greatest common divisor of $f$ and its derivative. Over finite fields we currently use
-less efficient algorithm, due to odd but well known behaviour of derivatives over finite fields,
-where $f'$ might vanish even if $f$ is non--constant polynomial (e.g. $f = x^k$ over $\F_k$),
-which leads to complications in the algorithm. In future we should implement Yun's algorithm
-also in this case.
+In SymPy we implement the fast algorithm of Yun \cite{Yun1976squarefree} for computing square--free
+decompositions in domains of characteristic zero. The cost of computing square--free decomposition
+is equivalent to the computation of the greatest common divisor of $f$ and its derivative. Over
+finite fields we currently use less efficient algorithm, due to odd but well known behaviour of
+derivatives over domains with finite number of elements, where $f'$ might vanish even if $f$ is
+non--constant polynomial (e.g. $f = x^k$ over $\F_k$, for any $k >= 2$), which leads to complications
+in the algorithm. In future we should implement Yun's algorithm also in this case as well.
 
 
 \section{Factorization of polynomials}
 
 Algorithms for computing factorizations of polynomials into irreducibles over various domains
 are the landmark of symbolic mathematics. The work in this area started early, in ninetieth
-century, and algorithms for factoring univariate and multivariate polynomials over rationals
+century, and algorithms for factoring of univariate and multivariate polynomials over rationals
 were invented by Kronecker. Those algorithms had exponential time complexity and were impractical
 for any real--life computations. Kronecker's algorithms were the first polynomial factorization
 algorithms that were implemented in SymPy.
@@ -1782,7 +1794,7 @@ focusing their research on univariate polynomials with integer coefficients. A p
 came with Hensel's lemma (Hensel lifting algorithm), which allowed to perform computations with integer
 valued polynomials over finite fields. Thus, an integer polynomial problem can be transformed into
 finite field polynomial problem, then computations can be done in a much smaller (finite) domain and
-results can be transformed (lifted) back to the integer domain.
+results can be transformed (lifted) back to the integer polynomial domain.
 
 In 1967, Berlekamp gave first complete factorization algorithm over finite fields. Moreover, this
 algorithm had polynomial time complexity. Soon after, Zassenhaus combined Berlekamp's algorithm and
@@ -1796,67 +1808,67 @@ introducing modular techniques (Hensel's lemma) to the case of multivariate poly
 
 \subsection{Finite fields}
 
-SymPy supports polynomial factorization over finite fields only in the univariate case, mostly because
-originally factorization over finite fields was needed only as a sub--algorithm of polynomial factoring
-algorithms over integers. In future we may extend support to multivariate case as well, implementing (for
+SymPy supports factoring of polynomials over finite fields only in the univariate case (mostly because
+originally factoring over finite fields was needed only as a sub--algorithm of polynomial factorization
+routines over integers. In future, we may extend support to multivariate case as well, implementing (for
 example) algorithm of \cite{Gathen1983polytime}. Over finite fields we have a wide variety of algorithms
-implemented. There is Berlekamp's algorithm implemented, which uses linear algebra and is suitable for
-small finite fields. We have also Cantor--Zassenhaus' algorithm, which uses polynomial algebra and is
-the default factorization algorithm over this domain, because it performs best for average inputs. There
-is also algorithm due to Shoup, Gathen and Kaltofen, which is a sub--quadratic time algorithm, very
-efficient for large inputs \cite{Gathen1992frobenious}, \cite{Shoup1993reality}, \cite{Kaltofen1995subquadratic},
+implemented. There is Berlekamp's algorithm, which uses linear algebra techniques and is suitable for
+factoring over small finite fields. We have also Cantor--Zassenhaus' algorithm, which uses polynomial
+algebra and is the default factorization algorithm over this domain, because it performs best for average
+inputs. There is also algorithm due to Shoup, Gathen and Kaltofen, which is a sub--quadratic time algorithm,
+very efficient for large inputs \cite{Gathen1992frobenious}, \cite{Shoup1993reality}, \cite{Kaltofen1995subquadratic},
 \cite{Shoup1995factor} (especially for large finite fields, where the binary logarithm of the size of a
-finite field is comparable to the degree of an input polynomial).
+finite field is comparable to the degree of an input polynomial). User can switch between different
+algorithms at runtime by setting appropriate options in module's configuration.
 
 
 \subsection{Integers and rationals}
 
-Factorization algorithms of univariate and multivariate polynomials over integers and rationals are
-currently the most important tools among all factorization algorithms that were implemented in SymPy.
+Factoring algorithms of univariate and multivariate polynomials over integers and rationals are
+currently the most important tools among all factorization routines that were implemented in SymPy.
 
 Factorization of polynomials over rationals is done by clearing denominators of coefficients of an input
 polynomial and performing factorization over integers. As opposed other algorithms, here the results are
-not populated back with the common denominator, but integer coefficients are left in the input, and a
-rational common coefficient of all factors is left in front of others.
+not populated back with the common denominator, but integer coefficients are left in the output, and a
+rational common multiplicative coefficient of all factors is left in front of others.
 
 In the univariate case SymPy implements the algorithm of Zassenhaus, which is an exponential time
 algorithm, which works by transforming factorization problem over integers to factorization problem
 over a small finite field (optimally half--word coefficients, if possible). The resulting factors
-are later \emph{lifted} using Hensel's algorithm and combined using combinatorial search algorithm to
-form \emph{true} univariate factors over integers (searching phase). The
-last part of this algorithm makes it exponential time. However, as we previously said, the algorithm
-behaves as it had polynomial time complexity, and its true nature is visible only for specially
-constructed classes of polynomials (especially those which have very many factors over most finite
-fields). The unfortunate thing is that polynomials resulting from multivariate or algebraic factoring
-algorithms have often those properties. Many heuristics exist to improve the searching phase of
-Zassenhaus' algorithm and reduce overall execution time of the algorithm \cite{Abbott2000searching}.
+are later \emph{lifted} using Hensel's lemma and combined using combinatorial search algorithm to form
+\emph{true} univariate factors over integers (also known as searching phase). The last part of this
+algorithm makes it exponential time. However, as we previously said, the algorithm behaves as it
+had polynomial time complexity, and its true nature is visible only for specially constructed classes
+of polynomials (especially those which have very many factors over most or all finite fields). The
+unfortunate thing is that polynomials resulting from multivariate or algebraic factoring algorithms
+have often exactly those properties. Many heuristics exist to improve the searching phase of Zassenhaus'
+algorithm and reduce overall execution time of this method \cite{Abbott2000searching}.
 
 In 1982, a polynomial time algorithm for univariate factoring over integers of Lenstra, Lenstra and
-Lovash was invented \cite{Lenstra1982factor}. This was the first polynomial time algorithm for the task.
+Lovász was invented \cite{Lenstra1982factor}. This was the first polynomial time algorithm for the task.
 However, it happens that exponential time algorithms are anyway superior for most inputs and the new
 algorithm is only beneficial for very large and very badly conditioned inputs. Thus we did not consider
 implementing this algorithm in SymPy. There is, however, an algorithm of van Hoeij \cite{vanHoeij2002knapsack},
-which uses a sub--algorithm of LLL factoring algorithm (latice basis reduction) to optimize the searching
-phase of Zassenhaus algorithm. van Hoeij's algorithm is actually a family of algorithms and proper
-parametrisation is significant to make the algorithm very efficient. Such parametrisation and some
-additional optimisations can be found in \cite{Belabas2004relative}. The algorithm has still exponential
-time but is superior to any other known algorithm for the taks of univariate polynomials factorization
-over integers. We plan to implement this algorithm in near future in SymPy.
+which uses a sub--algorithm of LLL, exactly speaking it uses latice basis reduction, to optimize the
+searching phase of Zassenhaus algorithm. van Hoeij's algorithm is actually a family of algorithms and
+proper parametrisation is significant to make the algorithm very efficient. A parametrisation and some
+additional optimisations, which greatly improve van Hoeij's algorithm, can be found in \cite{Belabas2004relative}.
+The algorithm has still exponential time complexity, but is superior to any other known algorithm for the
+taks of univariate polynomials factorization over integers. We plan to implement this algorithm in near
+future in SymPy.
 
 In the multivariate case we implement EEZ algorithm of Wang \cite{Wang1978improved}, which is an improved
 version of Musser's algorithm for multivariate polynomial factorization over integers \cite{Musser1975factor},
 \cite{Wang1975integers}. The algorithm works by finding a set of valid substitution integers for all but
 one variables. This way a univariate polynomial is constructed which is factored and the resulting
-factors are used to compute true multivariate factors of the input polynomial. Multivariate factors
+factors are used to compute \emph{true} multivariate factors of the input polynomial. Multivariate factors
 are constructed using very efficient parallel (variable--by--variable) Hensel lifting algorithm. The
 algorithm tries to predict some of the coefficients during each lifting step, reducing significantly
 this way execution times. There are other algorithms that could be implemented in SymPy, for example
 algorithm of Gao \cite{Gao2003partial}, which factors polynomials via partial differential equations.
-However, at this point we do not see a need for implementing another algorithm, because there is
+However, at this point we do not see a need for implementing another algorithms, because there is
 still a lot room for improvements in our implementation of Wang's algorithm.
-
-
-\subsection{Algebraic number fields}
+\subsection{Algebraic number fields}\label{thesis-algebraic}
 
 Currently we use the classical algorithm of Trager \cite{Trager1976algebraic} for computing factorizations
 of univariate and multivariate polynomials over algebraic number fields. The algorithm was invented as
@@ -1867,7 +1879,7 @@ factorization problem, which can lead to very large, ill suited polynomials that
 algebraic extensions by computing a primitive element of all extensions involved. There are other
 algorithms, e.g. due to Wang \cite{Wang1976algebraic} or Zhi \cite{Zhi1997optimal}, which can factor with
 multiple extensions without computing primitive elements. Benchmarks are, however, not convincing
-and it is not clear if those algorithm are really an improvement, comparing to Trager's algorithm
+and it is not clear if those algorithms are really an improvement, comparing to Trager's algorithm
 (which is on the other hand much simpler in implementation).
 
 
@@ -1875,8 +1887,8 @@ and it is not clear if those algorithm are really an improvement, comparing to T
 
 The method of Gröbner bases is a powerful technique for solving problems in commutative
 algebra (polynomial ideal theory, algebraic geometry). In chapter \ref{thesis-groebner}
-we will describe Gröbner bases in very detail, so we skip any discussion in this section
-to avoid redundancy.
+we will describe Gröbner bases in very detail, so we will skip any further discussion
+on this topic in this section, to avoid redundancy.
 
 
 \section{Root isolation}
@@ -1890,25 +1902,24 @@ factorization and decomposition algorithms, and pattern matching.
 This is an obviously limited approach and there is a need, in various areas of symbolic
 mathematics, e.g. when solving of systems of polynomial equations \cite{Strzebonski1997computing},
 to compute values of roots of a polynomial to a desired precision. This could be done by using
-numerical root finding algorithms, like Durand--Kerner's, which is has its implementation
-in mpmath library and is exposed to the top--level via \code{nroots()} function. However, in
-pathological cases, numerical algorithms may fail to compute correct values of polynomials'
-roots.
+numerical root finding algorithms, like Durand--Kerner's, which has its implementation in mpmath
+library and is exposed to the top--level via \code{nroots()} function. However, in pathological
+cases, numerical algorithms may fail to compute correct values of polynomials' roots.
 
 To tackle this problem, when the user needs guaranteed error bounds of the computed roots,
-symbolic root isolation algorithms can be used. SymPy can isolate roots of a polynomial with
+symbolic root isolation algorithms should be used. SymPy can isolate roots of polynomials with
 rational coefficients over real and complex domains, taking advantage of most recent algorithmic
-solutions in the field. Symbolic root isolation is not that efficient as numerical root finding,
-but is always successful for arbitrary polynomials, giving, as the result, isolation intervals
+developments in the field. Symbolic root isolation is not that efficient as numerical root finding,
+but it is always successful for arbitrary polynomials, giving, as the result, isolation intervals
 of the roots of a polynomial, in the real case, or isolation rectangles, in the complex case.
 
 
 \subsection{Real roots}
 
-For real root isolation SymPy implements the optimized version \cite{Akritas2008study},
+For real root isolation SymPy implements an optimized version \cite{Akritas2008study},
 \cite{Akritas2008improving} of continued fractions algorithm \cite{Collins1976descarte}. This
 approach allows convergence rate to a solution equivalent to convergence rate of continued
-fraction expansion of an algebraic number, giving exact results (points instead of intervals)
+fraction expansion of a real number, giving exact results (points instead of intervals)
 whenever possible. For a detailed study of computational complexity of continued fractions
 algorithm refer to \cite{Sharma2007complexity}.
 
@@ -3751,85 +3762,130 @@ so that SymPy will be able to tackle more complex problems.
 
 \chapter{Final words and conclusions}\label{thesis-conclusions}
 
-In this thesis the author tried to sum up three years of his work on computer algebra part
-of SymPy. Not everything could be added to this volume however, the author hopes that
-this text gives at least basic view of what polynomials manipulation module is, what were
-problem we faced at theh begining of development of this module, what we did and have it
-was done. In the remainder of this chapter we will briefly describe the future of the
-module and possible extensions.
+In this thesis the author summed up three years of his work on computer algebra module for
+SymPy, a library for symbolic mathematics in pure Python. We showed the state of art in
+symbolic and algebraic computing, and described SymPy and its goals as a side effect. We
+also introduced polynomials manipulation module, which was the central part of this thesis.
+In three chapters we described the internal design and algorithms of the module, and showed
+some practical examples of its applications. Not everything could have be written in this
+volume, due to its limited capacity, however, the author hopes that this text have given
+at least basic insight into what symbolic and algebraic computing in pure Python is. Time
+and users' interest (or not) in SymPy and its polynomials manipulation module, will show
+if it was the right decision to design and implement such software from scratch, in an
+interpreted, dynamically typed programming language. In the remainder of this chapter we
+will briefly describe the future of the module and possible further developments.
 
 
 \section{Future plans}
 
-After three years of development and after a milestone as master's thesis is, a question
-arises: is this the end? Depending on the point of view we could say that fortunatelly
-or unfortunatelly (crossout unneeded) there is still a lot of work to be done to make
-the module even more useful. The main concern is to make the module faster. As we shoed
-in the previous section, SymPy in some cases can already beat Maxima. However, we this
-not enogh, improvements are necessary.
+After three years of development and, especially, after such an important milestone as master's
+thesis is, a question arises: is this the end? Or, if this is not an end, how much work is still
+in front of us? In this thesis we already often speculated about future developments that could,
+or better should, be done to improve polynomials manipulation module. In the field of symbolic
+and algebraic computing, tree years are not enough to catch up with other software that is on
+the market for 20, 30 or even 40 years. We hope that SymPy and its computer algebra module
+will steadily grow and more cutting edge algorithms will be implemented in it. To point out
+some of the future ways in which the module might be heading, we devote the rest of this section
+to list some ideas for future development. This is obviously and more ideas can be found in
+the source code, documentation and SymPy`s web pages, especially those concerning Google
+Summer of Code program.
 
 
 \subsection{Polynomial arithmetics}
 
-\cite{Monagan2009parallel}
-\cite{Monagan2007heaps}
-\cite{Bernstein2008fast}
+We already said quite a lot about arithmetics of polynomials, also about possible improvements
+in this area. Improvements that are commonly known the many people, not necessarily interested
+very much in computer algebra. However, there are other, less familiar algorithms for doing
+polynomial arithmetics, especially of large sparse multivariate polynomials, which are not
+limited to integer or rational domains. A nice example are algorithms for polynomial multiplication
+and division based on heaps \cite{Monagan2007heaps}. Experimental data reveals that this is currently
+the best approach to compute with sparse polynomials in many variables (which is actually the
+most important case when computing with polynomials). The algorithm can also be relatively
+easily parallelized, see \cite{Monagan2009parallel} for detailed discussion.
 
 
 \subsection{Power series expansion}
 
-SymPy implements algorithms for computing limits \cite{Gruntz1996limits} and power series
-(Taylor and Laurent series).
+SymPy implements a very modern algorithm of Gruntz for computing limits symbolically \cite{Gruntz1996limits},
+thus, as a side effect, SymPy is quite comprehensible in computing truncated power series of elementary
+and special functions (Taylor and Laurent series). When the algorithms for those two tasks were implemented,
+polynomials manipulation module was almost non--existent, so everything was implemented using slow symbolic
+core. This makes any computations concerning limits and power series very slow, because the underlying
+algorithms are implemented in an inefficient way. Many benchmarks show that SymPy can be enormously slow
+when computing series expansions of composite functions or when many terms are requested.
 
-When the algorithms were implemented, polynomials manipulation module was almost non--existent
-so everything was implemented using slow symbolic core.
-
-The current implementation of power series is very inefficient, because although power
-series are polynomials (in the case of Laurent series up to a finite number of terms,
-which number is usually much smaller than then number of Taylor terms).
-
-It would be benefitial to use
-\cite{Zippel1976expansions}
-\cite{Brent1978fps}
-\cite{Brent1975series}
+It would be beneficial to improve this picture by employing efficient polynomials manipulation algorithms
+whenever possible, when computing limits and power series. Additional algorithms would have to be added
+to the module, to allow efficient compositions and reversions of power series \cite{Zippel1976expansions},
+\cite{Brent1975series}, \cite{Brent1978fps}. This would be very advantageous for SymPy, because limits and
+truncated power series are ubiquitous in other algorithms of symbolic mathematics and are also very
+useful as standalone tools in many practical problems.
 
 
 \subsection{Partial fraction decomposition}
 
-\cite{Bronstein1993partial}
-\cite{Wang1981partial}
+Decomposition algorithms of rational functions into partial fractions are also very useful tools
+in symbolic mathematics. In SymPy we currently implement an algorithm of Manuel Bronstein
+\cite{Bronstein1993partial}, which allows to compute full partial fraction decompositions purely
+formally, without introducing algebraic numbers. This is a spectacular approach, but also a
+quite inefficient one. It would be beneficial to incorporate modular techniques into partial
+fraction decomposition algorithms, for example using methods of \cite{Wang1981partial}. This would
+allow computations of partial fractions efficiently whenever possible and Bronstein's algorithm
+would be used as a fallback.
 
 
 \subsection{Simplification of expressions}
 
-\cite{Monagan2006modulo}
-\cite{Pearce2001relations}
-\cite{Moses1971simplification}
-
-
-\subsection{Factorization of polynomials}
+Polynomial manipulation algorithms have a natural area of application, which is simplification
+of expressions \cite{Moses1971simplification}. Currently we already employ algorithms related to
+polynomials for this task, but we do not utilize their full potential in this case. Expression
+simplification is ubiquitous in symbolic mathematics systems, thus it must be general on hand but
+also very efficient on the other. One very interesting case is simplification of rational functions
+with polynomial side relations (modulo polynomial ideals), which was already studied in detail in
+literature \cite{Pearce2001relations}, \cite{Monagan2006modulo}. This kind of simplification would allow
+the user to compute efficiently with expressions like trigonometric polynomials, which are an
+important tool in geometry and robotics.
 
 
 \subsection{Cylindrical algebraic decomposition}
 
-Current a big weakness of polynomials manipulation module is lack of solver for multivariate
-inequalities and systems of inequalities.
+Currently one of big weaknesses of polynomials manipulation module is lack of solvers for multivariate
+polynomial inequalities and systems of polynomial inequalities. SymPy can solve many kinds of problems
+related to polynomial equations and systems of polynomial equations, thanks to the Gröbner bases
+method. It can also handle univariate inequalities via root isolation. However, multivariate inequalities,
+especially over reals, are currently a no--go for SymPy. The real case is very important, because it is
+related to the problem of quantifier elimination and theorem proving in algebraic geometry.
 
-Cylindrical algebraic decomposition
-
-\cite{Arnon1984basic}
-\cite{Jirstrand1995cylindrical}
-
-CAD can be also used for efficient elimination of quantifiers from second--order logical
-expressions and thus is a very useful tool in simplification of expressions and assumptions engine.
+A tool that is needed to allow SymPy for handling multivariate inequalities is cylindrical algebraic
+decomposition \cite{Arnon1984basic}, \cite{Jirstrand1995cylindrical}, or CAD for short. Given a multivariate
+polynomial inequality or system of inequalities, CAD decomposes those inequalities to form a system
+of inequalities that are easier to reason about. This has many applications in, already mentioned,
+quantifier elimination and algebraic geometry, but also when evaluating multiple integrals and in
+assumptions engine.
 
 
 \subsection{Multiple algebraic extensions}
 
-\cite{vanHoeij2002modgcd}
+In section \ref{thesis-algebraic} we said that SymPy currently requires to compute a primitive
+element of a field extension if multiple extensions are provided, when computing with algebraic
+numbers. We also gave references to articles concerning polynomial factoring algorithms, which
+can work directly with multiple extensions. There are, however, algorithms for other areas of
+symbolic mathematics, for example for computing GCDs of polynomials \cite{vanHoeij2002modgcd}, that
+also do not require primitive element computations. Although, it is uncertain if those algorithms
+are truly advantageous, it might be still worthwhile to experiment with them.
 
 
 \subsection{Using modular techniques elsewhere}
 
-\cite{Gerhard2006modular}
+Work on polynomials manipulation module revealed that, so called, modular or p--adic techniques
+\cite{Yun1976padic}, give very encouraging results when concerned about speed of computations. Many
+classes of algorithms already benefit from this in SymPy, most notable are factorization and
+resultant algorithms, and other, like polynomial GCD algorithms, will be in future implemented.
+
+Following this success, we should incorporate modular techniques outside polynomials manipulation
+module. We already pointed out a method for computing partial fraction decomposition, but there
+are other areas where those methods are applicable. A good examples are algorithms for symbolic
+summation and integration \cite{Gerhard2006modular}. Modular method limit the range of application
+of algorithms to integers and rationals, but those are the most commonly used domains in SymPy,
+so the hassle is definitely worthwhile.
 
