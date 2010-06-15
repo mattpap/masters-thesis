@@ -217,39 +217,6 @@ latex_preamble = """
 \\newcommand{\\spoly}[0]{\\operatorname{s-polynomial}}
 \\newcommand{\\floor}[1]{\\left\\lfloor {#1} \\right\\rfloor}
 \\newcommand{\\ceil}[1]{\\left\\lceil {#1} \\right\\rceil}
-\\DeclareUnicodeCharacter{22C5}{\ensuremath{\cdot}}
-\\DeclareUnicodeCharacter{23A0}{x}
-\\DeclareUnicodeCharacter{23A1}{x}
-\\DeclareUnicodeCharacter{23A2}{x}
-\\DeclareUnicodeCharacter{23A3}{x}
-\\DeclareUnicodeCharacter{23A4}{x}
-\\DeclareUnicodeCharacter{23A5}{x}
-\\DeclareUnicodeCharacter{23A6}{x}
-\\DeclareUnicodeCharacter{23A7}{x}
-\\DeclareUnicodeCharacter{23A8}{x}
-\\DeclareUnicodeCharacter{23A9}{x}
-\\DeclareUnicodeCharacter{23AB}{x}
-\\DeclareUnicodeCharacter{23AC}{x}
-\\DeclareUnicodeCharacter{23AD}{x}
-\\DeclareUnicodeCharacter{239A}{x}
-\\DeclareUnicodeCharacter{239B}{x}
-\\DeclareUnicodeCharacter{239C}{x}
-\\DeclareUnicodeCharacter{239D}{x}
-\\DeclareUnicodeCharacter{239E}{x}
-\\DeclareUnicodeCharacter{239F}{x}
-\\DeclareUnicodeCharacter{2500}{x}
-\\DeclareUnicodeCharacter{2571}{x}
-\\DeclareUnicodeCharacter{2572}{x}
-\\DeclareUnicodeCharacter{2080}{x}
-\\DeclareUnicodeCharacter{2081}{x}
-\\DeclareUnicodeCharacter{2082}{x}
-\\DeclareUnicodeCharacter{2083}{x}
-\\DeclareUnicodeCharacter{2084}{x}
-\\DeclareUnicodeCharacter{2085}{x}
-\\DeclareUnicodeCharacter{2086}{x}
-\\DeclareUnicodeCharacter{2087}{x}
-\\DeclareUnicodeCharacter{2088}{x}
-\\DeclareUnicodeCharacter{2089}{x}
 """
 
 # Documents to append as an appendix to all manuals.
