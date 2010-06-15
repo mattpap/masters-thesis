@@ -2,273 +2,160 @@
 
 .. _thesis-introduction:
 
-Design and implementation issues of a computer algebra in an interpreted dynamically typed programming language.
-
 ============
 Introduction
 ============
 
+Hamming [Hamming1987numerical]_, in his famous book about numerical algorithms, said that
+*"The purpose of computing is insight, not numbers"*, which means that we should not blindly
+acquire and process raw data, but we should also learn something from it, more importantly,
+something new. Numerical computing is significant in engineering and computational sciences,
+because most problems, that we encounter in real--life, do not have exact solutions, however,
+they can be solved to some desired precision using numerical methods. Methods of this kind
+give only data. We can plot this data, we can analyze it, we can analyze the outcome of the
+computations we did. But, in any case, maybe besides those trivial and not interesting at all,
+we will not learn about the nature of the studied problem. This is were exact, symbolic methods
+arise, which, when used properly, can give us this insight to problems we are solving.
 
+This is one, lets say educational reason, why engineers and scientists should be interested,
+at least partially, in symbolic methods. There is, however, another much more simple reason
+for this: numerical methods can simply fail to compute correct results. Properly implemented
+symbolic methods do not share this issue, always giving correct answers. Although, they need
+more time, then numerical methods, to find a solution.
 
-Where numerical methods fail or are incompetent, giving only local view of the problem
-domain, computer algebra systems, or CAS for short, arise. Hamming [9] said, concerning
-numerical computations, that *"The purpose of computing is insight, not numbers"*, meaning
-that besides obtaining some raw results, which we can call data, we ought to learn something,
-hopefully new, from the results we get.
+We should, however, remember that usually only small instances of particular, interesting
+problems can be solved using symbolic methods. The Optimal solution is to combine both kinds
+of methods, using symbolic algorithms as long as it is feasible, for example to pre--process
+equations of a problem, to make them more easily solvable numerically, and then solve them
+using validated numerical methods.
 
-
-[Ulmer1996kovacic]_
-[Frink2001large]_
-[Wang1976teaching]_
-
-One of the youngest symbolic manipulation systems is |sympy|.
-
-
-Another approach to symbolic mathematics is SymPy, which is available
-from http://sympy.org.  SymPy is a library written in pure Python,
-which aims to become a full-featured symbolic mathematics package
-while keeping the code as simple as possible in order to be
-comprehensible and easily extensible. Moreover, SymPy does not depend,
-by default, on any external software besides a Python interpreter,
-although additional dependencies like GMPY, Cython or Pyglet (for
-plotting) are optional. This way it is straightforward to use SymPy's
-mathematical functionality in environments like Google App Engine or
-Jython (Python in Java). It is also fairly easy for people to include
-SymPy in their projects.
-
-SymPy can be used either as a standalone library, or inside `Sage
-<http://sagemath.org/>`_ (or other similar distributions like `FEMhub
-<http://femhub.org/>`_). It is also part of most of the Linux
-distributions and the OS X Fink package system. There is also an
-installer for Windows available.
-
-The fundamental difference between SymPy and many other mathematical
-packages is that SymPy is written from scratch in a simple,
-interpreted, general purpose programming language: Python.  There is
-no separation between the core and user libraries, which are usually
-implemented in different programming languages, the core in a compiled
-(machine oriented) one and libraries in an interpreted one. This gives
-great flexibility and allows the user to experiment with every detail
-of SymPy, without any need for compiling code, which leads to a much
-faster development cycle.
-
-Below we use IPython, which is a feature rich version of the standard
-Python shell, equipped with syntax highlighting, auto-completion, many
-*magic* functions and a rich API (for details refer to
-http://ipython.scipy.org). Lets consider a simple SymPy session using
-IPython::
-
-    In [1]: from sympy import var, sin, integrate, pi
-
-    In [2]: var('x')
-    Out[2]: x
-
-    In [3]: sin(x)
-    Out[3]: sin(x)
-
-    In [4]: sin(x).diff(x)
-    Out[4]: cos(x)
-
-    In [5]: integrate(sin(x), x)
-    Out[5]: -cos(x)
-
-    In [6]: integrate(sin(x), (x, 0, pi))
-    Out[6]: 2
-
-First we need to import all classes and functions that we will take
-advantage of in this session. We could alternatively import everything
-that SymPy exports by default, by issuing ``from sympy import *``;
-however, this approach is not recommended if the user plans to use
-SymPy in parallel with other libraries, like NumPy, in a single
-session. We are using a general purpose programming language, so we
-need to declare all symbols that we will use. In this case we declare
-one symbol ``x``, using :func:`var` function, which is clever enough
-to inject ``x`` into the current namespace, saving us a little
-typing. From this point we can start computing with symbolics, either
-by using procedural (see :func:`integrate`) or object oriented (see
-:func:`diff`) styles. For users convenience, both ways are usually
-available, as users may have different backgrounds and may be
-accustomed to different styles.
-
-For a detailed explanation of SymPy's functionality and its semantics,
-refer to SymPy's documentation, which is available at
-http://docs.sympy.org. If help is needed, then one may ask questions
-at SymPy's mailing list sympy@googlegroups.com or IRC channel
-``#sympy`` at irc.freenode.net.
-
-The same behavior can be obtained from inside Sage. There is full
-interoperability between Sage's and SymPy's functionality. For
-example, the user can create Sage's expressions and use them with
-SymPy's classes and functions, and then use the computed results back
-in Sage. All conversions, in both directions, are done automatically.
-
-There exists a similar link between SymPy and mpmath, a library for
-arbitrary precision numerical computing in Python (see the following
-section for more details). SymPy is a symbolic mathematics library,
-but it also allows for numerical evaluation thanks to the mpmath
-library, which is included by default in SymPy. For example, SymPy
-implements a symbolic integrator and the user can compute various
-classes of integrals in a purely symbolic way. It is easy to also
-compute similar integrals numerically using mpmath.  The bindings are
-sufficiently strong so that the user doesn't have to do any manual
-conversions or even use mpmath's functionality directly, although if
-needed, anything specific can be imported explicitly from mpmath.
-
-SymPy ships with a simple script called ``isympy``, which can be used
-to run SymPy as a standalone application. The script chooses the best
-Python shell installed on the system (e.g., IPython, if available, and
-falls back to a standard Python shell otherwise), imports SymPy,
-setups pretty printing and injects some predefined symbols and
-functions declarations into the current namespace, for user
-convenience.
-
-Although the project started in 2006, SymPy already implements a wide
-variety of algorithms and data structures for symbolic
-manipulation. SymPy can do basic arithmetic, calculus
-(differentiation, integration, limits), simplification of expressions,
-polynomials (factoring, expansion, Gröbner bases), pattern matching,
-solving (algebraic, difference and differential equations, and systems
-of equations), symbolic matrices (determinants, LU decomposition,
-eigenvalues/eigenvectors), 2D and 3D plotting, Unicode pretty printing
-of expressions and more. Lets consider a few nontrivial examples of
-SymPy's capabilities::
-
-    In [1]: from sympy import *
-
-    In [2]: var('x')
-    Out[2]: x
-
-    In [3]: sqrt3 = lambda x: x**(S(1)/3)
-
-    In [4]: limit((sqrt3(x**2) - 2*sqrt3(x) + 1)/(x - 1)**2, x, 1)
-    Out[4]: 1/9
-
-    In [5]: f = (x - tan(x)) / tan(x)**2  +  tan(x)
-
-    In [6]: integrate(f, x)
-    Out[6]: log(1 + tan(x)**2)/2 - x/tan(x) - x**2/2
-
-    In [7]: ratsimp(diff(_, x)) == f
-    Out[7]: True
-
-This example shows one important point about SymPy and the pure Python
-approach. In the third input we wrote ``S(1)/3`` to get the rational
-one over three. Why couldn't we simply write ``1/3``? This is because
-``1`` and ``3`` are Python objects and division of those objects will
-either give an integer (floor division) or a floating--point value
-(this depends on the version of Python interpreter and its
-configuration). In this particular case we have to tell Python that
-``1`` should be a SymPy's object, so we need to write ``S(1)``.  ``S``
-is a shorthand for :func:`sympify` function, which converts objects
-and strings into SymPy's objects. We could write alternatively
-``S('1/3')`` or ``Rational(1, 3)``, but never ``1/3`` directly. This
-is a cost associated with the approach we took when designing SymPy.
-In contrast, in Sage this problem is automatically dealt with via a
-preparser.
-
-    sage: 1/3
-    1/3
-
-There is another frequently asked question concerning any library
-written entirely in an interpreted programming language for the very
-demanding task of symbolic manipulation: is SymPy at all efficient?
-Compared to Pynac, which uses an optimized core written in C++ (a
-fast, machine-oriented programming language), SymPy can be considered
-slow, because of the significant overhead of interpretation of the
-Python language.  In some areas SymPy can already compete with other
-mathematical software, for example with Maxima when computing certain
-classes of Gröbner bases. There are efforts ongoing to make SymPy
-faster, e.g., by using pure mode Cython (this approach allows us to
-compile Python source code, while keeping a single source base). We
-are also considering writing tiny auxiliary modules in Cython for time
-critical parts of SymPy.
-
-Besides those issues, the pure Python approach seems very promising,
-for example in teaching, because it allows for analysis and
-modification of the implemented algorithms and data structures, on any
-level, even by people with only moderate programming experience and
-knowledge of Python.
-
-
-
-
-   SymPy is not the first approach to the problem of designing a computer algebra
-system, nor the last. First CAS emerged in early 1960s as the requirement of
-theoretical physics and research into artificial intelligence. For a detailed historical
-insight refer to an interview [8] with Gaston Gonnet, a key figure in computer algebra
-systems design, co–creator of Maple, a leading third–party CAS. The early systems,
-which provide basis for modern tools, include, amongst others, Reduce, Macsyma,
-AXIOM and Derive. The more recent are Maple, Singular, Mathematica, Magma,
-Maxima, Yacas, GiNaC, SAGE etc.
-
-    The standard approach [10] to computer algebra systems design was to separate the
-system into a core (engine) and a mathematical library. The core was written in
-a higher–level, compiled (to machine code) programming language, like Lisp, C or
-C + +, and implemented low–level primitives, resource demanding algorithms, but
-also, a compiler (to machine independent byte code) of a new extension (domain
-specific) language, or DSL for short, and its evaluator (virtual machine). The
-mathematical library implemented actual algorithms, transformation rules etc., using
-the newly invented language.
-    In our view this approach is unfortunate, because it implies additional burden of
-setting up whole grammar, parsing mechanisms, evaluation etc. of the new DSL and
-requires users to learn this new language to use the system. The situation gets even
-worse when there are several computer algebra systems that each specialize in
-different fields of science and each having its own scripting language, usually with
-many subtle differences from others (e.g. operator precedence). Most notable
-exceptions to this rule are GiNaC and SAGE.
-    GiNaC is a C + + library designed to allow the creation of integrated systems that
-embed symbolic manipulations together with more established areas of computer
-science, like computation–intense numeric applications, graphical interfaces, etc.,
-under one roof [2]. Although GiNaC does not introduce a new a new domain specific
-language, it is a very inefficient practice to script GiNaC directly in C + +, due to its
-non--dynamic characteristic and lack of interactiveness (compilation required).
-    To overcome this difficulty several Python based interfaces were developed. The
-most notable implementations are pyginac and swiginac. Although both allow its users
-to access GiNaC features from an interactive environment, still all modifications of
-the core of GiNaC are needed to be written in C + +.
-    SAGE [15] goes a step further and provides a coherent interface, written in Python
-and Cython (a static compiled to C version of Python), to several computer algebra
-systems and scientific libraries in the market, both open source and third--party. Note
-that SymPy is included in SAGE as a part of the distribution. SAGE also provides
-many additional features like interactive web notebooks, similar to Mathematica's
-notebook but much more powerful. However the preferred way to work with SAGE is
-using a preparser of a Python--like language.
-    Combining best features of many existing systems, which are being considered as
-leaders in their fields of expertise, in a single environment seems very appealing, as
-user is no more required to learn the language of choice of each single system that
-SAGE maps to, and each system incorporates its optimum of computing power in its
-field. This gives an impressive tool for doing both numeric and symbolic
-computations.
-    There are however deficiencies of this model. SAGE itself can not be called an
-algebra system but rather a software distribution, very large in size, as all subsystems
-are included in appropriate versions to build APIs. Being built as a glue to bind
-together heterogeneous subsystems, if there is a bug in one of those systems, one has
-to be an expert in that subsystem, or otherwise it's difficult to fix the bug. As opposed
-to a homogeneous system, written just in Python and possibly Cython.
-
-What is symbolic manipulation?
-==============================
-
-
-And what is computer algebra?
+Symbolic manipulation systems
 =============================
 
-The state of art in symbolic and algebraic computing
-====================================================
+Systems which implement symbolic methods are called symbolic manipulation systems, also known
+as symbolic mathematics or computer algebra systems, or CAS for short. In this thesis we will
+use those terms interchangeably, however, some systems are more symbolic and some are more
+algebraic. First symbolic mathematics systems emerged in early 1960s as the requirement of
+theoretical physics and research into artificial intelligence. Those were very basic systems,
+usually implemented in Lisp programming language. Over the years more symbolic methods were
+invented and the design of mathematical systems improved, giving a rise to modern systems,
+amongst others Reduce, Macsyma, AXIOM and Derive, and more recent including Maple, Singular,
+Mathematica, Magma, Maxima, GiNaC, and many others. For a very detailed historical insight
+refer to an interview [Haigh2005interview]_ with Gaston Gonnet, a key figure in computer
+algebra systems design, co--creator of Maple, a leading third--party mathematical software
+on the market.
 
-There is another term often used when speaking about symbolic manipulation
+The typical design approach to most of those systems is to implement two levels of software.
+On the first level, called a kernel, which is usually developed in a fast, machine oriented,
+compiled programming language like Lisp, C or C++, the most commonly used, core, algorithms
+are implemented. This level is not accessible to the end user, disallowing users investigate
+the details of the particular implementation of mathematical algorithms. On the contrary, the
+other level is usually implemented in a user--friendly programming language, which is also
+used for interaction with the user. On this level advanced and configurable mathematical tools
+are implemented. The language for this purpose is usually and newly invented, for a particular,
+symbolic manipulation system, domain specific programming language, oriented towards ease of
+expressing mathematical formulations in it. This adds a cost when learning such systems, because
+one has not only to understand the system it self, its semantics and behaviour, but yet another
+programming language, which will be useless outside the system. Those domain specific languages
+(DSLs) are often very fancy and hard to learn.
 
+A different approach was chosen in GiNaC a library for symbolic mathematics, which was written
+in C++ programming language [Frink2001large]_. Both the kernel and mathematical libraries were
+implemented in this language, so users who are familiar with C++, can more easily use it than
+standalone systems, described previously. Having a library has also the benefit, that one can
+easily create his own programs which simply link to a single, relatively small dynamically
+linked library. GiNaC is fast, but implements only very basic symbolic algorithms. Also, C++
+is not a user--friendly programming language, so it might be a barier for non--programmers.
 
-What is a polynomial?
-=====================
+An idea emerged to use a very interactive, simple and easy to learn programming language,
+Python (http://www.python.org) and expose GiNaC functionality in it. This way we arrive
+with Pynac. At first this seems a great approach because we use a very fast C++ and use
+well known language, which popularity is steadily growing. The disadvantage of this approach
+is that once again we arrive with two languages and the C++ core is still not easily accessible
+for the users. Also writing bindings to C++ libraries in Python is not that easy (there is a
+need for an intermediate programming language for this).
 
-Polynomials at the core of this thesis and it would be very unwise to proceed with any discussion about
-the internals of polynomials manipulation module without giving a definition of this fundamental concept.
-Suppose we are given an expression $7*x**3 + x*y + 11$. Is it a polynomial? A high school student can
-answer this question affirmatively: yes, this is a polynomial.
+The pure Python approach
+========================
 
-But it this all? Hopfully not, because
-if we recognize the expression as a polynomial we can take advantage of this fact.
+The next step in exposing internals of a symbolic manipulation system the user, was to
+write such system entirely in Python. This is how |sympy| (http://www.sympy.org) was born.
+The idea was very simple: lets reinvent the wheel for the 37th time and create a library
+for symbolic mathematics which will be written in pure Python. Thus, |sympy| is yet another
+approach to symbolic mathematics, a library written from scratch in Python, an interactive,
+interpreted, dynamically typed, general purpose programming language, which aims to become
+a full--featured symbolic mathematics package while keeping the code as simple as possible
+in order to be comprehensible and easily extensible. Moreover, SymPy does not depend, by
+default, on any external software besides a Python interpreter program, although additional
+dependencies like GMPY, Cython or Pyglet (for plotting) are optional. This way it is
+straightforward to use SymPy's mathematical functionality in environments like Google App
+Engine or Jython (Python in Java). It is also fairly easy for people to include SymPy in
+their projects.
+
+To give |sympy| a try, lets consider a simple session in a standard Python's interpreter.
+Suppose we would like to compute the following indefinite integral:
+.. math::
+
+    \int \frac{x - \tan(x)}{\tan(x)^2 + \tan(x)} dx
+
+and later differentiate integration result, simplify and check if the result from the
+integrator was correct, by comparing to the original function. A sample session would
+look as follows::
+
+    >>> from sympy import var, tan, integrate, ratsimp
+
+    >>> var('x')
+    x
+
+    >>> f = (x - tan(x)) / tan(x)**2 + tan(x)
+
+    >>> integrate(f, x)
+    log(1 + tan(x)**2)/2 - x/tan(x) - x**2/2
+
+    >>> ratsimp(_.diff(x)) == f
+    True
+
+First we need to import all classes and functions that we will take advantage of in this
+session. We could alternatively import everything that SymPy exports by default, by issuing
+``from sympy import *``, however, this approach is not recommended if the user plans to use
+SymPy in parallel with other libraries, like NumPy, in a single session. We are using a
+general purpose programming language, so we need to declare all symbols that we will use.
+In this case we declare one symbol ``x``, using :func:`var` function, which is clever enough
+to inject ``x`` into the current namespace, saving us a little typing. From this point we can
+start computing with symbolics, either by using procedural (see :func:`integrate`) or object
+oriented (see :func:`diff`) styles. For users convenience, both ways are usually available,
+as users may have different backgrounds and may be accustomed to different styles. The ``_``
+symbol, in the last input line, stands for the previous output.
+
+The main advantage of a library written entirely in Python, is that the user have access
+to all algorithms and data structures that were implemented in |sympy|, can analyze them
+or experiment with them, or even provide his own implementations. This is straightforward
+even for non--programmers, because there is no need to learn machine depended details. A
+lot was said in the past about educational aspects of mathematical software, mostly on the
+level of solving problems with such systems [Wang1976teaching]_. However, with |sympy| we
+can achieve more, because we not only can compute with it but we can see exactly how each
+part of |sympy| does work and were the nicely formatted results come. Thus we see |sympy|
+as a promising candidate for teaching mathematics in future.
+
+The pure Python approach has also weaknesses. The biggest problem is efficiency of such
+solution. Python is an interpreted programming language, thus it is significantly slower
+compiled languages. The question arises: is it at all feasible to solve any practical
+problems in |sympy|. It happens that currently we can solve only problems of very small
+size, because of wrong design decisions in the past. With each release overall efficiency
+of |sympy| increases, but we are still far from other mathematical software.
+
+There are other issues with pure Python approach. Suppose we would like to enter a fraction
+one over three into |sympy|. Can we simply write ``1/3`` in an interpreter? Unfortunately
+not, because ``1`` and ``3`` are Python objects and division of those objects will either
+give an integer (floor division) or a floating--point value (this depends on the version
+of Python interpreter and its configuration). In this particular case we have to tell Python
+that at least one of ``1`` and ``3`` have to be a |sympy|'s object, so we have to write
+``S(1)/3``, or equivalently ``S('1/3')`` or ``Rational(1, 3)``, where ``S`` is a shorthand
+for :func:`sympify` function, which converts objects and strings into SymPy's objects. In
+other mathematical software that use Python, for example in Sage (http://www.sage-math.org),
+this problem is resolved by using a preparser, which alters Python's semantics and allows
+for automatic conversions of this kind. However, we consider using by default a preparser
+as actually constructing a new language, because those tiny differences might be tricky.
 
 
 The current version
