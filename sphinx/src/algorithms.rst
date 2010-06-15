@@ -36,13 +36,13 @@ the set of input polynomials. Over finite fields we use algorithms of [Monagan19
 slightly improve speed of computations over this very specific domain.
 
 An alternative to classical algorithms are, so called, *fast algorithms*, which are sub--quadratic
-time algorithms for doing arithmetics polynomials [Moenck1976practical]_. Fast algorithms are usually
-limited to specific domains of computation, like integers or rationals. The family includes Karatsuba's
-and FFT (Fast Fourier Transform) algorithms. The decision was made to use classical algorithms at this
-point, because it is not a trivial task to make fast algorithms really advantageous, especially for
-small or ill conditioned polynomials. In future, when the module will stabilize, we will consider
-implementing fast algorithms, as a companion to classical algorithms, and use them where it makes
-sense.
+time algorithms for doing arithmetics polynomials [Moenck1976practical]_, [Bernstein2008fast]_. Fast
+algorithms are usually limited to specific domains of computation, like integers or rationals. The
+family includes Karatsuba's and FFT (Fast Fourier Transform) algorithms. The decision was made to use
+classical algorithms at this point, because it is not a trivial task to make fast algorithms really
+advantageous, especially for small or ill conditioned polynomials. In future, when the module will
+stabilize, we will consider implementing fast algorithms, as a companion to classical algorithms,
+and use them where it makes sense.
 
 There are other ideas to improve arithmetics of polynomials, especially over integers and rationals.
 An interesting example of such optimisation is algorithm of [Fateman2005encoding]_, where polynomials
