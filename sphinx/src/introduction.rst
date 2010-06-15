@@ -157,6 +157,26 @@ this problem is resolved by using a preparser, which alters Python's semantics a
 for automatic conversions of this kind. However, we consider using by default a preparser
 as actually constructing a new language, because those tiny differences might be tricky.
 
+The author's role
+=================
+
+To solve, at least partially, the first of the listed problems and to greatly improve
+|sympy|'s functionality in general, the author of this thesis started work on a computer
+algebra module for |sympy|, which eventually will be described in this thesis. The task
+was relatively simple: create a new module for manipulation of polynomials, which will
+implement mathematical domains, will allow multiple representations of polynomials and,
+most importantly, will be enough fast, so that other developers could build efficient
+symbolic manipulation algorithms on top of it.
+
+This way ``sympy.polys`` module was born, which supersedes the original module for polynomials
+manipulation in |sympy| --- ``sympy.polynomials``. In the rest of this thesis we will discuss
+internal implementation of the module, mathematical algorithms that were implemented and, at
+the end, we will show some practical applications the new module. We will not provide any direct
+comparisons between those two modules, because of very different capabilities of those modules
+and the fact that the plan was to make |sympy| comparable, in this area, with other mathematical
+software. Thus it was obvious that the new module has to be significantly faster than old one,
+often by orders of magnitude. This way we had much better and very effective motivation to make
+deep changes to our original approach to pure Python design.
 
 The current version
 ===================

@@ -195,4 +195,6 @@ Literature
 .. [Sturmfels1996lectures]
 .. [Grabmeier2003algebra]
 .. [Graham1994concrete]
+.. [Haigh2005interview]
+.. [Hamming1987numerical]
 
