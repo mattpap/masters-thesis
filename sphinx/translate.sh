@@ -49,4 +49,5 @@ sed -i -e "/end{Verbatim}$/{N; s/$/\\\noindent/}" $INPUT
 
 ../../fixrefs.py $INPUT
 cp $INPUT ../../../latex/content.tex
+cp *.pdf ../../../latex/
 
