@@ -20,13 +20,13 @@ arise, which, when used properly, can give us this insight to problems we are so
 This is one, lets say educational reason, why engineers and scientists should be interested,
 at least partially, in symbolic methods. There is, however, another much more simple reason
 for this: numerical methods can simply fail to compute correct results. Properly implemented
-symbolic methods do not share this issue, always giving correct answers. Although, they need
-more time, then numerical methods, to find a solution.
+symbolic methods do not share this issue, always giving correct answers. They need, however,
+more time to find a solution, than numerical methods.
 
-We should, however, remember that usually only small instances of particular, interesting
-problems can be solved using symbolic methods. The Optimal solution is to combine both kinds
-of methods, using symbolic algorithms as long as it is feasible, for example to pre--process
-equations of a problem, to make them more easily solvable numerically, and then solve them
+We should remember that usually only small instances of particular, interesting problems can
+be solved using symbolic methods. The optimal solution is to combine both kinds of methods,
+taking advantage of symbolic algorithms as long as it is feasible, for example to pre--process
+equations of a problem to make them more easily solvable numerically, and then solve them
 using validated numerical methods.
 
 Symbolic manipulation systems
@@ -39,7 +39,7 @@ algebraic. First symbolic mathematics systems emerged in early 1960s as the requ
 theoretical physics and research into artificial intelligence. Those were very basic systems,
 usually implemented in Lisp programming language. Over the years more symbolic methods were
 invented and the design of mathematical systems improved, giving a rise to modern systems,
-amongst others Reduce, Macsyma, AXIOM and Derive, and more recent including Maple, Singular,
+amongst others Reduce, Macsyma, Axiom and Derive, and more recent including Maple, Singular,
 Mathematica, Magma, Maxima, GiNaC, and many others. For a very detailed historical insight
 refer to an interview [Haigh2005interview]_ with Gaston Gonnet, a key figure in computer
 algebra systems design, co--creator of Maple, a leading third--party mathematical software
@@ -48,32 +48,32 @@ on the market.
 The typical design approach to most of those systems is to implement two levels of software.
 On the first level, called a kernel, which is usually developed in a fast, machine oriented,
 compiled programming language like Lisp, C or C++, the most commonly used, core, algorithms
-are implemented. This level is not accessible to the end user, disallowing users investigate
-the details of the particular implementation of mathematical algorithms. On the contrary, the
-other level is usually implemented in a user--friendly programming language, which is also
-used for interaction with the user. On this level advanced and configurable mathematical tools
-are implemented. The language for this purpose is usually and newly invented, for a particular,
-symbolic manipulation system, domain specific programming language, oriented towards ease of
-expressing mathematical formulations in it. This adds a cost when learning such systems, because
-one has not only to understand the system it self, its semantics and behaviour, but yet another
-programming language, which will be useless outside the system. Those domain specific languages
-(DSLs) are often very fancy and hard to learn.
+are implemented. This level is not accessible to the end user, disallowing users to investigate
+the details of the particular implementations of mathematical algorithms. On the contrary,
+the other level is usually implemented in a user--friendly programming language, which is also
+used for interaction with the user. On this level, advanced and configurable mathematical tools
+are implemented. The language for this purpose is usually a newly invented domain specific
+programming language, oriented towards the ease of expressing mathematical formulations in it,
+designed for a particular symbolic manipulation system. This adds a cost when learning such
+systems, because one has not only to understand the system it self, its semantics and behaviour,
+but has to learn yet another programming language, which will be useless outside the system.
+Those domain specific languages (DSLs) are often very fancy and hard to learn.
 
 A different approach was chosen in GiNaC a library for symbolic mathematics, which was written
 in C++ programming language [Frink2001large]_. Both the kernel and mathematical libraries were
-implemented in this language, so users who are familiar with C++, can more easily use it than
-standalone systems, described previously. Having a library has also the benefit, that one can
-easily create his own programs which simply link to a single, relatively small dynamically
-linked library. GiNaC is fast, but implements only very basic symbolic algorithms. Also, C++
-is not a user--friendly programming language, so it might be a barier for non--programmers.
+implemented in this language, so users who are familiar with C++ can more easily use it than
+standalone systems that were described previously. Having a library has also the benefit, that
+one can easily create his own programs which simply link to a single dynamically linked library.
+GiNaC is fast, but implements only very basic algorithms of symbolic mathematics. Also, C++ is
+not a user--friendly programming language, so it might be a barier for non--programmers.
 
 An idea emerged to use a very interactive, simple and easy to learn programming language,
-Python (http://www.python.org) and expose GiNaC functionality in it. This way we arrive
-with Pynac. At first this seems a great approach because we use a very fast C++ and use
-well known language, which popularity is steadily growing. The disadvantage of this approach
-is that once again we arrive with two languages and the C++ core is still not easily accessible
-for the users. Also writing bindings to C++ libraries in Python is not that easy (there is a
-need for an intermediate programming language for this).
+Python (http://www.python.org) and expose GiNaC functionality in it. This way we arrived
+with Pynac. At first this seemed a great approach because we use very fast C++ for the core
+and well a known language, which popularity is steadily growing, for interaction with the user.
+The disadvantage of this approach is that once again we arrive with two languages, the C++ core
+is still not easily accessible for the users. Also writing bindings to C++ libraries in Python
+is not that easy and there is a need for an intermediate programming language for this.
 
 The pure Python approach
 ========================
@@ -83,11 +83,11 @@ write such system entirely in Python. This is how |sympy| (http://www.sympy.org)
 The idea was very simple: lets reinvent the wheel for the 37th time and create a library
 for symbolic mathematics which will be written in pure Python. Thus, |sympy| is yet another
 approach to symbolic mathematics, a library written from scratch in Python, an interactive,
-interpreted, dynamically typed, general purpose programming language, which aims to become
+interpreted, dynamically typed, general purpose programming language. |sympy| aims to become
 a full--featured symbolic mathematics package while keeping the code as simple as possible
 in order to be comprehensible and easily extensible. Moreover, SymPy does not depend, by
 default, on any external software besides a Python interpreter program, although additional
-dependencies like GMPY, Cython or Pyglet (for plotting) are optional. This way it is
+dependencies like gmpy, Cython or Pyglet (for plotting) are optional. This way it is
 straightforward to use SymPy's mathematical functionality in environments like Google App
 Engine or Jython (Python in Java). It is also fairly easy for people to include SymPy in
 their projects.
@@ -99,9 +99,9 @@ Suppose we would like to compute the following indefinite integral:
 
     \int \frac{x - \tan(x)}{\tan(x)^2 + \tan(x)} dx
 
-and later differentiate integration result, simplify and check if the result from the
-integrator was correct, by comparing to the original function. A sample session would
-look as follows::
+and later differentiate integration result, simplify it and check if the result from the
+integrator was correct, by comparing the outcome to the original function. A sample session
+would look as follows::
 
     >>> from sympy import var, tan, integrate, ratsimp
 
@@ -129,18 +129,18 @@ as users may have different backgrounds and may be accustomed to different style
 symbol, in the last input line, stands for the previous output.
 
 The main advantage of a library written entirely in Python, is that the user have access
-to all algorithms and data structures that were implemented in |sympy|, can analyze them
+to all algorithms and data structures that were implemented in |sympy|. He can analyze them
 or experiment with them, or even provide his own implementations. This is straightforward
 even for non--programmers, because there is no need to learn machine depended details. A
 lot was said in the past about educational aspects of mathematical software, mostly on the
 level of solving problems with such systems [Wang1976teaching]_. However, with |sympy| we
-can achieve more, because we not only can compute with it but we can see exactly how each
-part of |sympy| does work and were the nicely formatted results come. Thus we see |sympy|
-as a promising candidate for teaching mathematics in future.
+can achieve more, because we not only can compute with it, but we can see exactly how each
+part of |sympy| does work and were the nicely formatted results come from. Thus we see
+|sympy| as a promising candidate for teaching mathematics in future.
 
 The pure Python approach has also weaknesses. The biggest problem is efficiency of such
 solution. Python is an interpreted programming language, thus it is significantly slower
-compiled languages. The question arises: is it at all feasible to solve any practical
+than compiled languages. The question arises: is it at all feasible to solve any practical
 problems in |sympy|. It happens that currently we can solve only problems of very small
 size, because of wrong design decisions in the past. With each release overall efficiency
 of |sympy| increases, but we are still far from other mathematical software.
@@ -156,7 +156,8 @@ for :func:`sympify` function, which converts objects and strings into SymPy's ob
 other mathematical software that use Python, for example in Sage (http://www.sage-math.org),
 this problem is resolved by using a preparser, which alters Python's semantics and allows
 for automatic conversions of this kind. However, we consider using by default a preparser
-as actually constructing a new language, because those tiny differences might be tricky.
+as actually constructing a new language, because those tiny differences might be tricky
+to learn, especially for newcomers.
 
 The author's role
 =================
@@ -172,12 +173,12 @@ symbolic manipulation algorithms on top of it.
 This way ``sympy.polys`` module was born, which supersedes the original module for polynomials
 manipulation in |sympy| --- ``sympy.polynomials``. In the rest of this thesis we will discuss
 internal implementation of the module, mathematical algorithms that were implemented and, at
-the end, we will show some practical applications the new module. We will not provide any direct
-comparisons between those two modules, because of very different capabilities of those modules
-and the fact that the plan was to make |sympy| comparable, in this area, with other mathematical
-software. Thus it was obvious that the new module has to be significantly faster than old one,
-often by orders of magnitude. This way we had much better and very effective motivation to make
-deep changes to our original approach to pure Python design.
+the end, we will show some practical applications of the new module. We will not provide any
+direct comparisons between those two modules, because of very different capabilities of those
+modules and the fact that the plan was to make |sympy| comparable, in this area, with other
+mathematical software. Thus it was obvious that the new module has to be significantly faster
+than old one, often by orders of magnitude. This way we had much better and very effective
+motivation to make deep changes to our original approach to pure Python design.
 
 The current version
 ===================
@@ -295,7 +296,7 @@ in pure Python and discuss future plans for the module.
 A word on time measurement
 ==========================
 
-Throughout this thesis we will measure time of various function and code blocks. For this purpose,
+Throughout this thesis we will measure time of various functions and code blocks. For this purpose,
 we use IPython's built--in timing functions: ``%time`` and ``%timeit``. In the cases where we are
 only interested in approximate results to show the scale of a problem, especially when computations
 take a lot of time, about half a minute or more, we will use the first variant. For precise time
@@ -305,17 +306,17 @@ function, to give precise and valid results. In any case we can not say anything
 of such measurements, because each run is influenced but fluctuations generated by the operating
 system, as we can not guarantee that for each run, there will be exactly 100% of CPU time available.
 However, all timings were done with no background applications running, minimising risk of getting
-invalid time measurement. We used standard functionality of IPython for doing benchmarks, to allow
-the reader to follow code examples we will show in this thesis and verify them on reader's computer
-(all benchmarks of this thesis were done on a single core Intel Pentium--M 1.7 GHz CPU with 1 GiB
-of memory, running Gentoo Linux, with kernel 2.6 series, operating system).
+invalid time measurements. We used standard functionality of IPython for doing benchmarks to allow
+the reader to follow code examples that we will show in this thesis and verify them on reader's
+computer (all benchmarks of this thesis were done on a single core Intel Pentium--M 1.7 GHz CPU
+with 1 GiB of memory, running Gentoo Linux, with kernel 2.6 series, operating system).
 
 Acknowledgements
 ================
 
 The author would like to thank members of |sympy|'s development team for their support, in particular
 Aaron Meurer and Criss Smith for their important input in discussion about the module and its internals
-and for many bugfixes and patches with improvements they submitted, and Ondřej Čertík for his help in
-general. The author would also like to thank the supervisor of this thesis, Krzysztof Juszczyszyn, for
+and for many bugfixes and patches with improvements they submitted, and Ondřej Čertík for his general
+advice. The author would also like to thank the supervisor of this thesis, Krzysztof Juszczyszyn, for
 his patience concerning author's work on this thesis and his enthusiasm about the project.
 

@@ -757,13 +757,13 @@ and :ref:`fig-ground-factor-large`.
 .. figure:: ../img/plot/ground-factor-small.*
     :align: center
 
-    Benchmark: factorization of $x^n - 1$ (small coefficients)
+    Benchmark: Factorization of $x^n - 1$ (small coefficients)
 
 .. _fig-ground-factor-large:
 .. figure:: ../img/plot/ground-factor-large.*
     :align: center
 
-    Benchmark: factorization of $(1234 x + 123 y + 12 z + 1)^n$ (large coefficients)
+    Benchmark: Factorization of $(1234 x + 123 y + 12 z + 1)^n$ (large coefficients)
 
 In the case of both benchmarks we see that computations with coefficients based on |sympy|'s
 ``Integer`` type are the slowest. This is because, ``Integer`` is a wrapper if Python's ``int``
@@ -952,13 +952,13 @@ exponents and degrees, respectively.
 .. figure:: ../img/plot/cython-power.*
     :align: center
 
-    Benchmark: exponentiation of $(27 x + y^2 - 15 z)^n$
+    Benchmark: Exponentiation of $(27 x + y^2 - 15 z)^n$
 
 .. _fig-cython-factor:
 .. figure:: ../img/plot/cython-factor.*
     :align: center
 
-    Benchmark: factorization of $x^n - 1$ over integers
+    Benchmark: Factorization of $x^n - 1$ over integers
 
 In future we expect even better improvements when native variables will be used for coefficient
 arithmetics. Every algorithm which uses modular approach, which include algorithms for factoring
@@ -975,5 +975,5 @@ This was done in three steps, by introducing multiple--level structure, using va
 and taking advantage of pure mode Cython. The approach we utilized in polynomials manipulation module
 was a success and was an important improvement to |sympy| in general. In future we may employ similar
 techniques in other parts of our library, for example to improve linear algebra module, which has
-shares many similarities of polynomials module.
+shares many similarities with polynomials module.
 
