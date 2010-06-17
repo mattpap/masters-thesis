@@ -225,7 +225,7 @@
 	\hline
 	 & &\large{\bfseries{\rule{0pt}{0.5cm}\ Faculty of Computer Science and Management}} \\[3pt]
 	 & &\ \ \large{degree course: Computer Science}\\
-	 & &\ \ speciality: Studium Podstawowych Problemów Informatyki\\
+	 & &\ \ speciality: Fundamental Problems of Computer Science\\
 	 & &\multicolumn{1}{c}{\rule{0pt}{2.5cm} \Large{Master's Thesis}} \\
 	 & &\multicolumn{1}{p{13.5cm}}{\rule{0pt}{2cm}\centering\bfseries\sc\Large{\@title}} \\
 	 & &\multicolumn{1}{c}{\rule{0pt}{1.5cm}\large\@author} \\
@@ -242,8 +242,8 @@
 		\begin{center}
 					\begin{tabular}{|c|c|c|c|}
 							 \hline
-							 \multirow{2}{*}{\small{Supervisor:}}& \scriptsize{ } & \scriptsize{ } & \scriptsize{ } \\
-							  & \small{............................................} & \small{......................} & \small{.......................} \\
+							 \multirow{2}{*}{\small{Supervisor:}} & \multirow{2}{*}{\small{dr inż. Krzysztof Juszczyszyn}} & \scriptsize{ } & \scriptsize{ } \\
+							  &  & \small{......................} & \small{.......................} \\
 							 \hline
 							 \ & \scriptsize\textit{name and surname} & \scriptsize\textit{grade} & \scriptsize\textit{signature} \\
 							 \hline
