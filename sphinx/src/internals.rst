@@ -600,18 +600,18 @@ with non--zero coefficients as a list of tuples:
 
 .. math::
 
-    \left[\left(monom_n, coeff_n\right), \ldots, \left(monom_0, coeff_0\right)\right]
+    \left[\left(\mbox{monom}_n, \mbox{coeff}_n\right), \ldots, \left(\mbox{monom}_0, \mbox{coeff}_0\right)\right]
 
-where $monom_i$, for $i \in \{0, \ldots, n\}$, is a tuple consisting of exponents of
-all variables --- a monomial; and $coeff_i$ is the coefficient which stands towards
-the $i$--th monomial. This is called sparse distributed polynomial representation,
-but as we have only one sparse representation, we usually skip distributed in its name.
-We can not use dictionaries instead of lists, because dictionaries are unordered in
-Python and we would have to suffer from linear access to terms, e.g. the leading term.
-To avoid this odd and slow behaviour, we lists to store sparse representation and we
-keep their elements ordered. This is an additional but insignificant cost because often
-we case replace sorting by bisection algorithm and soring is fast in Python because it
-is implemented in the interpreter (on C level).
+where $\mbox{monom}_i$, for $i \in \{0, \ldots, n\}$, is a tuple consisting of exponents of
+all variables --- a monomial; and $\mbox{coeff}_i$ is the coefficient which stands towards
+the $i$--th monomial. This is called sparse distributed polynomial representation, but as
+we have only one sparse representation, we usually skip distributed in its name.  We can
+not use dictionaries instead of lists, because dictionaries are unordered in Python and
+we would have to suffer from linear access to terms, e.g. the leading term.  To avoid this
+odd and slow behaviour, we lists to store sparse representation and we keep their elements
+ordered. This is an additional but insignificant cost because often we case replace sorting
+by bisection algorithm and soring is fast in Python because it is implemented in the
+interpreter (on C level).
 
 As we use soring, we can provide different comparison functions (or key functions) to
 customize the output of soring algorithm. This way we can have different orderings of
@@ -912,7 +912,7 @@ those experiments was :func:`divisors`` function. Those experiments were, howeve
 for real--life cases speedup is not that big, but still worthy consideration, especially we take
 the tiny cost of pure mode Cython (one additional line per function or method).
 
-Suppose we expand a non--trivial expression $((x + y + z)^15 + 1) \cdot ((x + y + z)^15 + 2)$ and
+Suppose we expand a non--trivial expression $((x + y + z)^{15} + 1) \cdot ((x + y + z)^{15} + 2)$ and
 then we want to factor the result back. We are interested only in factorization time. We perform
 the same computation in pure Python and pure mode Cython:
 
@@ -952,13 +952,13 @@ exponents and degrees, respectively.
 .. figure:: ../img/plot/cython-power.*
     :align: center
 
-    Benchmark: exponentiation of $(27 x + y^2 - 15 z)^n$.
+    Benchmark: exponentiation of $(27 x + y^2 - 15 z)^n$
 
 .. _fig-cython-factor:
 .. figure:: ../img/plot/cython-factor.*
     :align: center
 
-    Benchmark: factorization of $x^n - 1$ over integers.
+    Benchmark: factorization of $x^n - 1$ over integers
 
 In future we expect even better improvements when native variables will be used for coefficient
 arithmetics. Every algorithm which uses modular approach, which include algorithms for factoring

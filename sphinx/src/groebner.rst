@@ -1036,7 +1036,7 @@ with three other symbolic manipulation systems on the market: Maxima, Axiom and 
 .. figure:: ../img/tikz/graph-nocolor.*
     :align: center
 
-    The graph $\mathcal{G}(V, E)$.
+    The graph $\mathcal{G}(V, E)$
 
 The question, if $\mathcal{G}$ is $3$--colorable or not, is easy to answer by trial and error. We
 are, however, an interested in algorithmic solution to the problem, so lets first encode $V$ and
@@ -1093,7 +1093,7 @@ required to color the original graph could be lowered to $2$ colors.
 .. figure:: ../img/tikz/graph-color.*
     :align: center
 
-    A sample $3$--coloring of the graph $\mathcal{G}(V, E)$.
+    A sample $3$--coloring of the graph $\mathcal{G}(V, E)$
 
 Before we compare |sympy|'s syntax for computing |groebner| bases with other systems, let us clarify an
 issue arising around list indexing (e.g. why we write ``x3 = Vx[2]``). |sympy| is a library built on top
@@ -1226,7 +1226,7 @@ useless critical pairs.
 .. figure:: ../img/plot/groebner-time-compare.*
     :align: center
 
-    Average timing for computing |groebner| basis of graph $\mathcal{G}(V, E)$.
+    Average timing for computing |groebner| basis of graph $\mathcal{G}(V, E)$
 
 ..
     +----------+-------+--------+-------+-------------+
@@ -1421,7 +1421,7 @@ and derive automatically non--degeneracy conditions.
 .. figure:: ../img/tikz/geometry-rhombus.*
     :align: center
 
-    A rhombus in a fixed coordinate system.
+    A rhombus in a fixed coordinate system
 
 Lets consider the rhombus of figure :ref:`fig-geometry-rhombus`. This geometric entity consists of four
 points $A$, $B$, $C$ and $D$. To setup a fixed coordinate system, without loss of generality, we can
