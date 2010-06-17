@@ -5,6 +5,8 @@ TEXSRC=thesis
 BIBSRC=thesis
 OUTDIR=output
 
+CONTENT=content.tex
+
 TEXOUT=$(OUTDIR)/$(TEXSRC)
 
 DVILATEX=latex
@@ -22,7 +24,7 @@ all: pdf
 dvi: $(TEXOUT).dvi
 pdf: $(TEXOUT).pdf
 
-$(TEXOUT).pdf: $(TEXSRC).tex $(BIBSRC).bib
+$(TEXOUT).pdf: $(TEXSRC).tex $(CONTENT) $(BIBSRC).bib
 	$(make-pdflatex)
 
 define make-pdflatex
