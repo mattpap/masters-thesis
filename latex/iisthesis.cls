@@ -147,7 +147,7 @@
 		  \def\@evenhead{\vtop{%
 		      \hb@xt@\textwidth{%
 		        %\reset@font\strut\thepage\hfil\heading@font\leftmark}%
-		        \reset@font{\footnotesize\strut\thepage\hfil\heading@font\@title}}
+		        \reset@font{\footnotesize\strut\thepage\hfil\heading@font\@shorttitle}}
 		        \vskip2pt\hrule \vskip-2.4pt}}%
 		  \let\@evenfoot\@empty
 		}
@@ -210,6 +210,8 @@
 
 \def\slowaKluczowe#1{\gdef\@slowaKluczowe{#1}}
 \def\instituteLogo#1{\gdef\@instituteLogo{#1}}
+
+\def\shorttitle#1{\gdef\@shorttitle{#1}}
 
 \instituteLogo{logos/pwr}
 
