@@ -6,87 +6,89 @@
 Notes on the internal implementation
 ====================================
 
-Knowing the goals of the project, lets now focus on the internal implementation of polynomials
-manipulation module and methods that were used to reach the goals. In this chapter we will describe
-step--by--step all details concerning the design and implementation of the module, from the technical
-point of view. In the next chapter we will jump in the details of implemented algorithms.
+Knowing the goals of the project, lets now focus on the details of internal implementation
+of polynomials manipulation module and methods that were used to reach those goals. In this
+chapter we will describe step--by--step all the details concerning the design and implementation
+of the module, from the technical point of view. In the next chapter we will jump in the details
+of the implemented algorithms.
 
 Physical structure of the module
 ================================
 
-Polynomials manipulation module consists of a single, ``sympy/polys``,  directory with Python source
-files:
+Polynomials manipulation module ``sympy.polys`` consists of a single directory, ``sympy/polys``,
+in |sympy|'s source base and contains the following Python source files:
 
-``sympy/polys/__init__.py``
+``__init__.py``
     Contains imports of the public API.
 
-``sympy/polys/algebratools.py``
+``algebratools.py``
     Definitions of categories and domains.
 
-``sympy/polys/densearith.py``
+``densearith.py``
     Arithmetics algorithms for dense polynomial representation.
 
-``sympy/polys/densebasic.py``
-    Basic (e.g. conversion) algorithms for dense polynomial representation.
+``densebasic.py``
+    Basic algorithms for dense polynomial representation.
 
-``sympy/polys/densetools.py``
-    Advanced (e.g. GCD, SQF) algorithms for dense polynomial representation.
+``densetools.py``
+    Advanced algorithms for dense polynomial representation.
 
-``sympy/polys/factortools.py``
+``factortools.py``
     Low--level algorithms for polynomial factorization.
 
-``sympy/polys/galoistools.py``
-    Implementation of efficient univariate polynomials over finite fields.
+``galoistools.py``
+    Implementation of univariate polynomials over finite fields.
 
-``sympy/polys/groebnertools.py``
-    Sparse distributed polynomials and |groebner| bases (Buchberger) algorithm.
+``groebnertools.py``
+    Sparse distributed polynomials and |groebner| bases.
 
-``sympy/polys/monomialtools.py``
-    Functions and classes for enumerating and manipulating monomials.
+``monomialtools.py``
+    Functions for enumerating and manipulating monomials.
 
-``sympy/polys/numberfields.py``
+``numberfields.py``
     Tools for computations in algebraic number fields.
 
-``sympy/polys/orthopolys.py``
+``orthopolys.py``
     Functions for generating orthogonal polynomials.
 
-``sympy/polys/polyclasses.py``
+``polyclasses.py``
     OO layer over low--level polynomial manipulation functions.
 
-``sympy/polys/polyconfig.py``
+``polyconfig.py``
     Tools for configuring functionality of the module.
 
-``sympy/polys/polycontext.py``
+``polycontext.py``
     Tools for managing contexts of evaluation.
 
-``sympy/polys/polyerrors.py``
+``polyerrors.py``
     Definitions of polynomial specific exceptions.
 
-``sympy/polys/polyoptions.py``
+``polyoptions.py``
     Managers of options that can used with the public API.
 
-``sympy/polys/polyroots.py``
+``polyroots.py``
     Algorithms for root finding, specifically via radicals.
 
-``sympy/polys/polytools.py``
+``polytools.py``
     The main part of the public API of polynomials manipulation module.
 
-``sympy/polys/polyutils.py``
+``polyutils.py``
     Internal utilities for expression parsing, handling generators etc.
 
-``sympy/polys/rootisolation.py``
+``rootisolation.py``
     Low--level algorithms for symbolic real and complex root isolation.
 
-``sympy/polys/rootoftools.py``
+``rootoftools.py``
     Tools for formal handling of polynomial roots: ``RootOf`` and ``RootSum``.
 
-``sympy/polys/specialpolys.py``
+``specialpolys.py``
     A collection of functions for generating special sorts of polynomials.
 
 There are also two subdirectories with tests and benchmarks. Altogether there are about 1900
-functions and methods, and about 90 classes in about 30 thousandth lines of code. We don not
+functions and methods, and about 90 classes in about 30 thousandth lines of code. We do not
 give exact measures because those statistics are not that important and are changing all the
-time.
+time and the module is developed. Also, many features are implemented outside the module, for
+example solvers, expression simplification tools and partial fraction decomposition algorithms.
 
 Logical structure of the module
 ===============================
@@ -155,6 +157,8 @@ On the lowest level we test correctness of the implementations of algorithms of 
 on other levels we test (mostly) APIs and correctness of argument passing. The first two levels,
 L0 and L1, are used internally in the module. The other two levels form the public API of the
 module and are used extensively in other parts of |sympy| and in interactive sessions.
+
+.. _thesis-struct-motivation:
 
 Motivation
 ----------
@@ -331,19 +335,44 @@ user friendly levels L2 and L3, which we will describe next.
 The second level: L2
 --------------------
 
-This is the first level in polynomials manipulation module that is oriented towards the end
-user. We implement only one class in L2, :class:`Poly`, which wraps up by composition ``GFP``,
-``DUP``, ``DMP`` and ``SDP`` classes of L1. We call L2 classes, in this setup, polynomial
-representations. :class:`Poly` implements the union of all functions that are available in L2
-classes. If a certain operation is not supported by the underlying polynomial representation
-then :exc:`OperationNotSupported` exception is raised.
+This is the first level in polynomials manipulation module that is oriented towards the end user.
+We implement only one class in L2, :class:`Poly`, which wraps up by composition ``GFP``, ``DUP``,
+``DMP`` and ``SDP`` classes of L1, which we call, in this setup, polynomial representations. The
+class of L2 implements the union of all methods that are available in L1 classes. If certain
+operation is not supported by an underlying representation, :exc:`OperationNotSupported` exception
+is raised. Otherwise, during a method call of :class:`Poly` high--level input arguments are converted
+to lower--level representations and passed to L1 level. When L1 finishes, output is converted back
+to high--level representations.
 
+:class:`Poly` implements expression parser, which allows to construct polynomials not only from
+raw polynomial representations, e.g. a list of coefficients, but it can also parse |sympy|'s
+expressions and translate them to a desired polynomial representation. It is also possible to
+automatically derive as much information as possible about an expression, without forcing the
+user to provide additional information manually. For example :class:`Poly` can figure out the
+generators and the domain of expression on its own. This is very useful functionality, especially
+in interactive sessions, because it allows to significantly cut on typing.
 
 The third level: L3
 -------------------
 
-The :class:`Poly` and all functions of L3 are called the public API of polynomials manipulation
-module.
+To make the functionality, provided by the module, more accessible by the user, most methods of
+:class:`Poly` are exposed to the top--level via global functions of L3 level. Those functions
+allow to use procedural interface to the module, making it appealing to users, who have already
+some experience in other symbolic mathematics software. There are also some additional functions,
+which wrap more general functions and allow to take advantage of their behaviour in some specific
+way. For example, there is a method of L2 and a function of L3, :func:`factor_list`, which returns
+a list of irreducible factors of a polynomial. L3 implements an additional function :func:`factor`
+which uses :func:`factor_list` to compute factorization of a polynomial, but instead of returning
+a list, it returns an expression in factored (multiplicative) form.
+
+The :class:`Poly` and all functions exposed by L3 level are called the public API of polynomials
+manipulation module. The public API is the outcome of ``from sympy.polys import *`` statement. It
+is, however, not an issue to import other functions and classes from the module. The user should
+be aware that only the public API implements user--friendly interface and using lower--level tools
+might be a pain, for example in interactive sessions. To cut on redundancy, the reader should refer
+to section :ref:`thesis-struct-motivation` to see example of the same computation done on different
+levels of polynomials manipulation module. During the typical usage of |sympy|, only the public API,
+i.e. levels L2 and L3, are be necessary.
 
 Multiple--levels in practice
 ----------------------------
@@ -355,17 +384,18 @@ Suppose we are given a univariate polynomial with integer coefficients:
     f = 3 x^{17} + 3 x^5 - 20 x^2 + x + 17
 
 We ask what is the value of $f$ at some specific point, say $15$. We can achieve this by
-substituting $15$ for $x$ using :func:`subs` method of ``Basic``. This might not seem to
-be the optimal solution for the problem, because :func:`subs` does not take advantage of
-the structure of the input expression, just applies blindly pattern matching and SymPy's
-built--in evaluation rules. But this is the first thing we can come out with. Lets try it::
+substituting $15$ for $x$ using :func:`subs` method of ``Basic`` (the root class in |sympy|).
+This might not seem to be the optimal solution for the problem, because :func:`subs` does not
+take advantage of the structure of an input expression, just applies blindly pattern matching
+and SymPy's built--in evaluation rules. This is, however, the first approach we can come out
+with, so lets try it::
 
     >>> f = 3*x**17 + 3*x**5 - 20*x**2 + x + 17
 
     >>> f.subs(x, 15)
     295578376007082351782
 
-As the solution we obtained a very large number which is greater than $2^64$, i.e. can't fit
+As the solution we obtained a very large number which is greater than $2^{64}$, i.e. can't fit
 into CPU registers of modern machines. This is not an issue, because SymPy reuses Python's
 arbitrary length integers, which are only bounded by the size of available memory. The size
 of the computed value might, however, raise a question concerning the speed of evaluation. As
@@ -374,21 +404,19 @@ we said, :func:`subs` is a very naive function. Lets see how fast it can be::
     >>> %timeit f.subs(x, 15);
     1000 loops, best of 3: 992 us per loop
 
-We used ``%timeit`` magic function from IPython. It adaptively chooses the right number of
-function executions, so that we don't have to wait ages but also we get comprehensive timings.
-
 It takes :func:`subs` about one millisecond to compute $f(15)$. This seems not that bad at all,
-especially in an interactive session. Lets check if we get the same behaviour for much larger
-evaluation points::
+especially in an interactive session, because one millisecond is not measurable about of time
+for the user. Lets check if we get the same behaviour for much larger evaluation points::
 
     >>> %timeit f.subs(x, 15**20);
     1000 loops, best of 3: 1.03 ms per loop
 
-We chose a relatively large number $15^20$ for this test and obtained increase in evaluation
+We chose a relatively large number $15^{20}$ for this test and obtained increase in evaluation
 time by a very small fraction. This is still fine in an interactive session, but would it be
-acceptable if :func:`subs` was used as a component of another algorithm? Lets consider a more
-demanding example. We now use :func:`random_poly` function to generate polynomials of large
-degree to see how :func:`subs` scales when the size of the problem increases::
+acceptable if :func:`subs` was used as a component of another algorithm, which requires several
+thousandths of evaluations? Lets consider a more demanding example. We now use :func:`random_poly`
+function to generate a polynomial of large degree to see how :func:`subs` scales when the size of
+the problem increases::
 
     >>> g = random_poly(x, 1000, -10, 10)
 
@@ -396,12 +424,10 @@ degree to see how :func:`subs` scales when the size of the problem increases::
     CPU times: user 7.03 s, sys: 0.00 s, total: 7.03 s
     Wall time: 7.20 s
 
-This time the results are not encouraging at all. We had to switch to IPython's ``%time`` magic
-function for timing this evaluation only once, because it would take too long to use ``%timeit``
-here. As all timings are done without caching mechanism and in a stable environment, were safe
-to get correct timings. The resulting $7$ seconds, for a polynomial of the degree $1000$ with
-integer coefficients bounded by $-10$ and $10$, are not acceptable even in an interactive
-session.  It gets even worse if we do the computation using the larger evaluation point::
+This time the results are not encouraging at all. We got $7$ seconds of evaluation time, for a
+polynomial of the degree $1000$ with integer coefficients bounded by $-10$ and $10$. This is not
+acceptable even in an interactive session. It gets even worse if we do the computation using the
+larger evaluation point::
 
     >>> %time g.subs(x, 15**20);
     CPU times: user 9.88 s, sys: 0.04 s, total: 9.91 s
@@ -409,8 +435,8 @@ session.  It gets even worse if we do the computation using the larger evaluatio
 
 Can we do better than this? To improve this timing we need to take advantage of the structure
 of the input expressions, i.e. recognize that both $f$ and $g$ are univariate polynomial with
-a very simple kind of coefficients (integers). All this is very important information, because
-we can pick up an optimized algorithm for this particular domain of computation. A well known
+a very simple kind of coefficients --- integers. This knowledge is very important, because we
+can pick up an optimized algorithm for this particular domain of computation. A well known
 algorithm for evaluating univariate polynomial is Horner's scheme, which is implemented in
 :func:`eval` method of :class:`Poly` class. Lets rewrite $f$ and $g$ as polynomials and redo
 the timings::
@@ -430,12 +456,12 @@ the timings::
     >>> %timeit G.eval(15**20);
     100 loops, best of 3: 16.4 ms per loop
 
-We used :class:`Poly` to obtain polynomial form of $f$ and $g$, arriving with polynomials $F$
-and $G$ respectively. We can clearly see, especially in the case of large degree polynomial,
-that :func:`eval` introduced a significant improvement in computations time. This is not an
+We used :class:`Poly` to obtain polynomials form of $f$ and $g$, arriving with polynomials $F$
+and $G$ respectively. We can clearly see, especially in the case of the large degree polynomial,
+that :func:`eval` introduced a significant improvement in execution times. This is not an
 accident, because :func:`eval` uses a dedicated algorithm for the task and, what is currently
-not visible, takes advantage of GMPY library, a very efficient library for doing integer
-arithmetics. This may be considered a cheat, so lets force :class:`Poly` to compute with
+not visible, takes advantage of gmpy library, a very efficient library for doing integer
+arithmetics. This may be considered as a cheat, so lets force :class:`Poly` to compute with
 SymPy's built--in integer type::
 
     >>> from sympy.polys.algebratools import ZZ_sympy
@@ -457,8 +483,8 @@ SymPy's built--in integer type::
 
 We obtained a visible slowdown, but we are still much faster that when using :func:`subs`.
 A careful reader would argue that those timings are cheating once again, because we did not
-take in to account the construction times of :class:`Poly` instances. Lets check if this is
-significant::
+take in to account the construction times of :class:`Poly` class instances. Lets check if
+this is significant::
 
     >>> %timeit Poly(f);
     100 loops, best of 3: 6.54 ms per loop
@@ -469,9 +495,9 @@ significant::
 Indeed, construction of polynomials in this setup seems a very time consuming procedure. In
 the case of the expression $f$ we do even worse that when using :func:`subs` alone. In the
 later case we are still better, but the difference is not that impressive anymore. Although
-this timing might look fine to the reader, it is a complete non--sense in this comparison,
-because :class:`Poly` class constructor expands the input expression by default and this
-step takes majory of time::
+this timing might look fine to the reader, it is a complete non--sense in this comparison.
+This is because :class:`Poly` class constructor expands the input expression by default and
+this step takes majory of initialization time::
 
     >>> %timeit G = Poly(f, expand=False)
     1000 loops, best of 3: 209 us per loop
@@ -481,189 +507,251 @@ step takes majory of time::
 
 We know that $f$ and $g$ are already in the expanded form, so we can safely set ``expand``
 option to ``False`` and completely skip the expansion step. This gives us a significant
-speedup, when compared to the previous timing. More about constructing polynomials from
-expressions will be said later in this chapter.
+speedup, when compared to the previous timing. The reader should not get distracted by
+this issue, because the reason for which :func:`expand`, a function which is used for
+expanding expressions, is so slow, is because of its bulky implementation, which will
+change in near future. Thus, there will be no need to bother with ``expand`` option.
 
-We can obtain a lower bound on univariate polynomial evaluation time in pure Python (up to
-coefficient arithmetics), by transforming a polynomial into a string with valid Python code,
-compiling it in ``eval`` mode and, finally, evaluating it using built--in :func:`eval`. To
-do this, first we define a function :func:`poly_to_str`::
-
-    def poly_to_str(poly, point):
-        return '+'.join([ "%r*%r**%r" % (coeff, point, degree)
-            for ((degree,), coeff) in poly.rep.to_dict().iteritems() ])
-
-which will allow us to perform the conversion. Next we need to import ``mpz`` type from
-GMPY library, because this is the default coefficient representation in SymPy, when GMPY
-is available (which we assume is true)::
-
-    >>> from gmpy import mpz
-
-Normally this step would not be necessary, because ``mpz`` type is encoded in ``ZZ`` ground
-domain, however, we will be working with raw string representations of types, so we need this
-for the compilation phase. Finally we can compute the lower bound::
-
-    >>> F_string = poly_to_str(F, ZZ(15))
-
-    >>> %timeit poly_to_str(F, ZZ(15));
-
-    >>> F_compiled = compile(F_string, '<input>', 'eval')
-
-    >>>
-
-Excluding transformation and compilation steps, the lower bounds are
-
-::
-
-    In [3]: f3 = product(x-k, (k, 1, 10))
-
-    In [4]: f2 = Poly(f3)
-
-    In [5]: f1 = f2.rep
-
-    In [6]: f0 = f1.rep
-
-    In [7]: timed(lambda: factor_list(f3))
-    Out[7]: (10, 0.052675819397, 52.675819397, ms)
-
-    In [8]: from sympy.polys.factortools import dup_factor_list
-
-    In [9]: from sympy.polys.polyclasses import DMP
-
-    In [10]: timed(lambda: factor_list(f3))
-    Out[10]: (10, 0.0526403188705, 52.6403188705, ms)
-
-    In [11]: timed(lambda: f2.factor_list())
-    Out[11]: (10, 0.0243428945541, 24.3428945541, ms)
-
-    In [12]: timed(lambda: f1.factor_list())
-    Out[12]: (10, 0.024045085907, 24.045085907, ms)
-
-    In [13]: timed(lambda: dup_factor_list(f0, ZZ))
-    Out[13]: (10, 0.0238025903702, 23.8025903702, ms)
-
-    In [14]: %timeit factor_list(f3)
-    10 loops, best of 3: 53.2 ms per loop
-
-    In [15]: %timeit f2.factor_list()
-    10 loops, best of 3: 24.8 ms per loop
-
-    In [16]: %timeit f1.factor_list()
-    10 loops, best of 3: 24.2 ms per loop
-
-    In [17]: %timeit dup_factor_list(f0, ZZ)
-    10 loops, best of 3: 24.2 ms per loop
-
-    In [18]: %timeit dup_factor_list(f0, ZZ)
-    10 loops, best of 3: 24.1 ms per loop
-
-    In [19]: %timeit dup_factor_list(f0, ZZ)
-    10 loops, best of 3: 24.3 ms per loop
-
-
+Why :func:`eval` function of :class:`Poly` is so fast? One reason we already know, it
+uses an optimized algorithm for its task and it takes advantage over very fast integers.
+However, this is only a part of the story. The other is its implementation. :func:`eval`
+is implemented on the lowest level --- L0. There are no overheads that are associated
+with computations with symbolic expressions, thus we obtain very short execution times.
 
 Polynomial representations
 ==========================
 
-In the previous section, when we were discussing the multiple--level architecture of polynomials
-manipulation module, we introduced the term *polynomial representations*, however, we did not
-define it properly. Now we will fix this issue ...
+In the previous section we discussed the main feature of polynomials manipulation module ---
+the multiple--level architecture. During this discussion we introduced term *polynomial
+representations*, however, we did not define it properly. Now we will fix this issue.
 
-SymPy implements two major polynomial representations: dense and sparse. A polynomial
-representation is a specialized data structure that is used for storing the structure
-of a polynomial and its coefficients. Metadata, e.g. ground domain information, is not
-considered as a part of a polynomial representation and is stored separately.
+Raw polynomial representation is a data structure, e.g. list, dictionary, which holds complete
+information about the structure of a polynomial and all its coefficients. Metadata, e.g. the
+ground domain to which coefficients belong, it not considered as a part of a raw polynomial
+representation, however, with non--raw polynomial representations --- classes of L1 level.
+Thus we will encounter raw polynomial representations on L0 and L1, and non--raw polynomial
+representations on L1 and L2 levels. In future we will skip non--raw, simplifying the term.
 
-In the case of univariate polynomials SymPy implements both representations as true dense
-and sparse representations, i.e. as a list of all coefficients (including zeros) and a
-dictionary of exponent, non--zero coefficient pairs, respectively. The multivariate setup
-is much more complicated, because implementing a true dense representation is not feasible.
-If we have a polynomial of the total degree $n$ in $k$ variables, then the number of monomials
-of such a polynomials is as large as $\frac{(n + k)!}{n! k!}$. For example, if $n = 50$
-
-There is ultimate polynomial representation that would fit to all problems.
+SymPy implements two major polynomial representations: dense and sparse. Two representations
+are needed because there are different classes of polynomials that can be encountered in
+polynomial related problems and, depending on the choice of representation, computations can
+be either fast or slow. Thus the right choice of polynomial representation for a particular
+problem is significant to obtain satisfactory level of computations speed. We will see this
+clearly in benchmarks at the end of this section.
 
 Dense polynomial representation
 -------------------------------
 
-The univariate case
-~~~~~~~~~~~~~~~~~~~
+It is worthwhile to define dense polynomial representation only for univariate polynomials.
+In this case the representation of a polynomial of degree $n$ is a list with $n+1$ elements:
 
-The multivariate case
-~~~~~~~~~~~~~~~~~~~~~
+.. math::
 
-..
-    1. GFP repr: [c_n, ..., c_0]
-         spec: gf_some_function(f, g, p, K)
-         where p is prime >= 2, type int
-               K is any ZZ algebra
-    2. DUP repr: [c_n, ..., c_0]
-         spec: dup_some_function(f, g, K)
-         where K is any algebra
-    3. DMP repr: [[...], [...], ..., [...]]
-         spec: dup_some_function(f, g, u, K)
-         where u is number of nested levels - 1
-               K is any algebra
-         DMP for u = 0 is DUP
+    \left[\mbox{coeff}_n, \ldots, \mbox{coeff}_1, \mbox{coeff}_0\right]
+
+Those elements are all coefficients, including zeros, of a polynomial, in order from the term
+with the highest degree ($\mbox{coeff}_n \cdot x^n$) to the constant term ($\mbox{coeff}_0$).
+Thus, if we ask for the leading coefficients (or monomial, or term), then this is always the first
+element of dense univariate polynomial representation. If a polynomial is the zero polynomial, i.e.
+it has negative degree, then the representation is simply the empty list. This is useful attitude,
+because we can check very efficiently if we obtained the zero polynomial during computations. Dense
+univariate representation is a very important tool in applications were all or most terms of polynomials
+are non--zero. This behaviour happens when computing with special polynomials, e.g. truncated power
+series or orthogonal polynomials.
+
+Defining a true dense multivariate polynomial representation  is a non--sense, because the numer
+of terms of a dense multivariate polynomial is huge. Lets consider a completely dense polynomial
+in $k$ variables of total degree $n = n_1 + \ldots + n_k$. Then the number of terms of this
+polynomial is as large as $\frac{(n + k)!}{n! k!}$. Suppose $k = 5$ and $n = 50$, assuming
+that coefficients are native 32--bit integers and are stored in an array, then we would need
+almost 80 GiB of memory to hold this kind of polynomial in a true dense representation. In
+practise, completely dense multivariate polynomials are rarely encountered, thus we do not
+have to care about this special case.
+
+However, as we have dense univariate representation, it would be convenient to somehow extend it
+to the multivariate case. This can be done by introducing dense recursive representation, where
+coefficients $\mbox{coeff}_n$, $\ldots$, $\mbox{coeff}_0$ are themselves dense polynomials. For
+example, if they are univariate, then we obtain a bivariate polynomial altogether. This way, all
+algorithms implemented for the univariate case generalize to the multivariate case by replacing
+coefficient arithmetics with dense polynomial arithmetics. To terminate recurrence the univariate
+case is used.
+
+Dense recursive polynomial representation proved very useful during development of algorithms of
+polynomials manipulation module for the multivariate case. It happens that many of them are very
+easily expressed in terms of recursive function invocations. The unfortunate thing is that dense
+multivariate representation suffers from a nasty behaviour when the number of variable is getting
+big. The more variables there are the more sparse a polynomial is, thus its representation is
+growing fast, taking a lot of storage but also requiring significant amount of time to be spent
+on traversal of the data structure. This makes dense recursive representation a non--acceptable
+solution for sparse computations in many variables, which are actually the most common ones in
+symbolic mathematics.
 
 Sparse polynomial representation
 --------------------------------
 
-Currently this is the auxiliary polynomial representation that is mainly used for computing
-|groebner| bases. This is because it allows for using different orderings of monomials, which
-is an important part of Buchberger algorithm.
+To solve the problem with rapid grow up of dense polynomial representation data structure in
+the sparse case, we need to introduce sparse polynomial representation. To achieve this, we
+could simply modify recursive representation and replace list of lists data structure with
+dictionary of dictionaries. This would help to reduce memory footprint, but it would still
+suffer from data structure long traversal times.
 
-The univariate case
-~~~~~~~~~~~~~~~~~~~
+A remedy for both those problems is a non--recursive representation which stores all terms
+with non--zero coefficients as a list of tuples:
 
-The multivariate case
-~~~~~~~~~~~~~~~~~~~~~
+.. math::
 
-..
-    4. SDP repr: [(M_n, c_n), ..., (M_0, c_0)]
-         spec: dup_some_function(f, g, u, O, K)
-         where u is number of variables - 1
-               O is monomial order function
-               K is any algebra
+    \left[\left(monom_n, coeff_n\right), \ldots, \left(monom_0, coeff_0\right)\right]
+
+where $monom_i$, for $i \in \{0, \ldots, n\}$, is a tuple consisting of exponents of
+all variables --- a monomial; and $coeff_i$ is the coefficient which stands towards
+the $i$--th monomial. This is called sparse distributed polynomial representation,
+but as we have only one sparse representation, we usually skip distributed in its name.
+We can not use dictionaries instead of lists, because dictionaries are unordered in
+Python and we would have to suffer from linear access to terms, e.g. the leading term.
+To avoid this odd and slow behaviour, we lists to store sparse representation and we
+keep their elements ordered. This is an additional but insignificant cost because often
+we case replace sorting by bisection algorithm and soring is fast in Python because it
+is implemented in the interpreter (on C level).
+
+As we use soring, we can provide different comparison functions (or key functions) to
+customize the output of soring algorithm. This way we can have different orderings of
+terms of a single polynomial, leading to different behaviour of certain methods, for
+example the |groebner| bases methods, which is the biggest beneficent of this feature
+(more on this will be said in section :ref:`thesis-orderings`). The reader should note
+that in dense recursive representation there is a fixed ordering in all cases --- the
+lexicographic ordering.
+
+Sparse polynomial representation is currently used mainly when computing with |groebner|
+bases and otherwise is treated as an auxiliary data structure, and the default is dense
+recursive representation. As we will see in the following section, this will have to be
+changed, because sparse representation is superior to the dense one.
 
 Benchmarking polynomial representations
 ---------------------------------------
+
+So far we described dense and sparse polynomial representations, and we said that the
+other representation should be the default one in |sympy|, because it is just better
+than the former one. Lets now prove that this is actually the case. For this purpose
+we will construct three polynomials: 100% dense, 50% dense and sparse. To construct
+the first one we will use :func:`monomials` function, which generates all monomials
+in the given variables up to the given total degree. To make the timings feasible and
+to prove a point, we will use three variables $x,y,z$ of total degree also three. The
+50% dense polynomial will be generated by taking odd terms of the former polynomial,
+given that the ordering of monomials in the lexicographic one. Sparse polynomial will
+be simply the sum of $x,y,z$ variables. For the benchmark we exponentiated all three
+polynomials for various exponents. Results of execution time measurements were collected
+in plots of figures :ref:`fig-100-dense-power`, :ref:`fig-100-dense-power` and
+:ref:`fig-sparse-power`.
 
 .. _fig-100-dense-power:
 .. figure:: ../img/plot/100-dense-power.*
     :align: center
 
-    Benchmark:
+    Benchmark: Exponentiation of 100% dense polynomial in $x,y,z$ of total degree 3
 
 .. _fig-50-dense-power:
 .. figure:: ../img/plot/50-dense-power.*
     :align: center
 
-    Benchmark:
+    Benchmark: Exponentiation of 50% dense polynomial in $x,y,z$ of total degree 3
 
 .. _fig-sparse-power:
 .. figure:: ../img/plot/sparse-power.*
     :align: center
 
-    Benchmark:
+    Benchmark: Exponentiation of sparse polynomial $x + y + z$
 
-This clearly indicates that sparse representation should be used as the main polynomial
-representation in near future, because it works better sparse and semi--dense inputs,
-thus covers most polynomials which can be encountered in real--life symbolic problems.
-However, one should not go int a conclusion that dense representation is completely
-useless, because, for example, truncated power series (Taylor series) tend to be dense,
-so in this case a dense polynomial representation is beneficial.
+From those measures we can clearly see that sparse representation should be used as the main
+polynomial representation in near future, because it works better sparse and semi--dense inputs,
+thus covers most polynomials that can be encountered in real--life problems of symbolic mathematics.
+However, one should not go into a conclusion that dense representation is completely useless, because,
+as we already said, there are application in which dense polynomials can be found and thus |sympy| and
+its users can still benefit from it.
 
-Categories, domains and types
-=============================
+.. _thesis-ground:
 
-To understand and use the properties of the coefficient domain (computation domain, ground domain)
-we need to somehow extract information about the common nature of all coefficients and store this
-information in some data structures. This is crucial for optimizing speed of computations, because
-the more we know about the domain, the better algorithms we can pick up for doing the computations.
+Categories, domains and ground types
+====================================
+
+To understand and use the properties of the coefficient domain (also known as domain of computation
+or ground domain, following Axiom's naming convention) we need to somehow extract information about
+the common nature of all coefficients and store this information in some data structures. This is
+crucial for optimizing speed of computations, because the more we know about the domain, the better
+algorithms we can pick up for doing the computations. We can also take advantage of various data
+types for doing coefficient arithmetics. In this section we ill show how we can achieve this.
+
+Originally |sympy| only supported expressions as coefficients and enhanced expressions arithmetics
+for coefficient arithmetics. By enhanced we mean arithmetics in which we try solve zero equivalence
+problem [Richardson1997zero]_ in as many cases as possible. Given an expression $f$, zero equivalence
+problem is the problem of determining if $f \equiv 0$ is true or false statement. As we know, the same
+expression can be given in different forms, all of which may be equivalent, sharing one canonical form.
+Zero equivalence is a very important problem, because many algorithms, for example polynomial division
+algorithm, to work properly, require to determine with certainty if a coefficient is zero or not. Thus,
+if we fail to recognize zero, division algorithm may run forever, which is surely no what we expect.
+There are domains in which zero equivalence is trivial, for example in the ring of integers or the field
+of rational numbers. There are domains in which zero equivalence problem is solvable but requires some
+effort. The best example of domain which posses this property is the field of rational functions. If we
+perform arithmetics in this domain and not simplify the results, coefficient will grow and we will not
+be able to recognize zeros. The solution is simple --- simplify the intermediate results; and this is
+what we did previously. However, if we do not have *a prior* knowledge about the domain, we have to infer
+this knowledge with every operation we perform and, thus, we lose a lot of precious time. At the very end
+there are domains in which zero equivalence in undecidable. There are two reasons for this. A domain may
+be so complex that there is no simplification algorithm that could be used to transform an expression of
+this domain to zero. The other case are inexact domains, for examples fixed precision approximations of
+real numbers. In this case we can force zero equivalence by setting a threshold value below which (up to
+a sign) everything is treated as zero.
+
+To introduce structure in the world of categories of domains that can be used as ground domains to describe
+coefficients of polynomial representations, we implemented in |sympy| two levels of classes for representing
+knowledge about the ground domain: categories and domains. Category is an abstract class which reflects an
+abstract mathematical structure, which posses some operations and properties (axioms). Category classes can
+never be instantiated directly. For actual usage, domain classes were added which are specializations of
+categories for different data types (ground types) which implement arithmetics and algebra. Thus we can say
+that domains provide a unified, concrete API, implementing interface of their categories. For example there
+is :class:`Ring` category which captures the properties and operations of Ring mathematical structure. Then
+there is :class:`IntegerRing` category which special--cases :class:`Ring`. Finally there are several domains,
+:class:`ZZ_sympy`, :class:`ZZ_python` and :class:`ZZ_gmpy`, which implement the interface of :class:`IntegerRing`
+using appropriate ground types: ``Integer``, ``int`` and ``mpz``, respectively.
+
+Ground type is a data type which implements actual arithmetics and algebra of a domain and provides all its
+functionality via some interface. Different types have different interfaces, procedural, object--oriented or
+mixed. They may implement some functionality but not the other. This way direct usage of different ground
+types is non--trivial, because we have to accommodate for all those differences. In |sympy| this is no more
+an issue, as we have domains which provide a single interface over all data types from one category. The
+reader may ask why we chose to this approach. Alternatively we could create a common ground type for all
+ground types from a particular category and also have a unified interface. However, this way we introduce
+a very heavy layer which adds too much overhead. In our approach we make an assumptions that every ground
+type has to provide some most common methods, which can later can be directly used without any additional
+overhead. The observation we made in the case of integer (and also rational and inexact) ground types, is
+that there is always a common core of methods implemented in each type: unary and binary operators, excluding
+division. Those listed are the most often used so it is very beneficial that we can use them directly. On
+the other hand, division is not that often operation so we can add minimal overhead of additional function
+call, to make the interface cross--type compatible.
+
+Besides all the benefits concerning zero equivalence and speed related issues, introduction of categories,
+domains and ground types had one additional and very simple reason. Python is a dynamically typed programming
+language, thus it not allows us to declare types of variables and type inference is done at runtime. This also
+implies that the language is missing a very important feature --- templates. With templates we could easily
+have a single source base and code capable of running with different types of coefficients. By introducing
+infrastructure of this section, we try to simulate templates in Python. Of course, our templates machinery
+does its work at runtime, but the overhead is small and we can in future add some optimisations at module
+initialization time, e.g. automatic generation of different versions of functions depending on the domain
+of computation.
+
+The idea, to model mathematical structures in |sympy| this way, came after studying Aldor --- a compiled
+language for implementing mathematics, which has a very strong static typing engine [Aldor2000guide]_.
+There is a library for Aldor called Algebra [Bronstein2004algebra]_, which implements most mathematical
+structures that are needed in symbolic mathematics software. The structure of this library was an
+inspiration for the design of categories and domains in |sympy|.
 
 Benchmarking ground types
 -------------------------
+
+Enough was said about the theory of ground types, so lets now benchmark some examples and verify
+if this infrastructure gives any befits at all. We will solve two factorization problems over the
+integers: one with small coefficients ($\pm 1$) and the other with large coefficients (at most $56$
+digits). Results of this benchmark were collected in plots of figures :ref:`fig-ground-factor-small`
+and :ref:`fig-ground-factor-large`.
 
 .. _fig-ground-factor-small:
 .. figure:: ../img/plot/ground-factor-small.*
@@ -677,17 +765,20 @@ Benchmarking ground types
 
     Benchmark: factorization of $(1234 x + 123 y + 12 z + 1)^n$ (large coefficients)
 
-Transforming expressions into polynomials
-=========================================
+In the case of both benchmarks we see that computations with coefficients based on |sympy|'s
+``Integer`` type are the slowest. This is because, ``Integer`` is a wrapper if Python's ``int``
+type and, thus, it adds significant overhead. From :ref:`fig-ground-factor-small` we see that
+``int`` is a little better for small coefficients than gmpy's ``mpz`` type. A reason for this
+might be that attribute access for the built--in type is highly optimized, whereas ``mpz`` has
+to use more general ways to access attributes. We did not investigate this, so there might be
+other explanations for this behaviour. However, for large coefficients ``mpz`` is unbeatable,
+because it implements asymptotically faster algorithms for integer arithmetics than ``int`` has.
 
-Before the user can take advantage of efficient algorithms and data structures for polynomials
-manipulation, expressions that are involved in computations have to be transformed to a form
-that is understood in polynomials manipulation module. This transformation is called expression
-parsing. The reason why such step is necessary, when constructing polynomials, is that the
-internal representation of an expression is different from a representation of a polynomial
-representing this expression and does not take into account many polynomial related properties,
-like generators or coefficient domain. With expression parser we can understand the structure
-of an expression and construct a polynomial representation for it.
+In |sympy| we use by default gmpy's ground type, if the library is available on the system. When
+this is not the case, |sympy| switches to Python's ground types. |sympy|'s ground types are used
+usually for benchmarks, although, in the case of obsolete Python 2.4 and 2.5, which are still
+supported by |sympy|, there is a need to use |sympy|'s ``Rational`` type to implement rational
+number domain, because ``Fraction`` type was introduced in Python 2.6.
 
 .. _thesis-cython:
 
@@ -878,4 +969,11 @@ is a subject for future discussion.
 
 Conclusions
 ===========
+
+In this chapter we showed how to make pure Python approach to computations with polynomials fast.
+This was done in three steps, by introducing multiple--level structure, using various ground types
+and taking advantage of pure mode Cython. The approach we utilized in polynomials manipulation module
+was a success and was an important improvement to |sympy| in general. In future we may employ similar
+techniques in other parts of our library, for example to improve linear algebra module, which has
+shares many similarities of polynomials module.
 
