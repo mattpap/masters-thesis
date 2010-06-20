@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Final words and conclusions &mdash; Polynomials Manipulation Module v1.0 documentation</title>
+    <link rel="stylesheet" href="../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/jsMath-3.6e/easy/load.js"></script>
+    <link rel="top" title="Polynomials Manipulation Module v1.0 documentation" href="../index.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Gröbner bases and their applications" href="groebner.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="groebner.html" title="Gröbner bases and their applications"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="final-words-and-conclusions">
+<span id="thesis-conclusions"></span><h1>Final words and conclusions<a class="headerlink" href="#final-words-and-conclusions" title="Permalink to this headline">¶</a></h1>
+<p>In this thesis the author summed up three years of his work on computer algebra module for
+SymPy, a library for symbolic mathematics in pure Python. We showed the state of art in
+symbolic and algebraic computing, and described SymPy and its goals as a side effect. We
+also introduced polynomials manipulation module, which was the central part of this thesis.
+In three chapters we described the internal design and algorithms of the module, and showed
+some practical examples of its applications. Not everything could have be written in this
+volume, due to its limited capacity, however, the author hopes that this text have given
+at least basic insight into what symbolic and algebraic computing in pure Python is. Time
+and users&#8217; interest (or not) in SymPy and its polynomials manipulation module, will show
+if it was the right decision to design and implement such software from scratch, in an
+interpreted, dynamically typed programming language. In the remainder of this chapter we
+will briefly describe the future of the module and possible further developments.</p>
+<div class="section" id="future-plans">
+<h2>Future plans<a class="headerlink" href="#future-plans" title="Permalink to this headline">¶</a></h2>
+<p>After three years of development and, especially, after such an important milestone as master&#8217;s
+thesis is, a question arises: is this the end? Or, if this is not an end, how much work is still
+in front of us? In this thesis we already often speculated about future developments that could,
+or better should, be done to improve polynomials manipulation module. In the field of symbolic
+and algebraic computing, tree years are not enough to catch up with other software that is on
+the market for 20, 30 or even 40 years. We hope that SymPy and its computer algebra module
+will steadily grow and more cutting edge algorithms will be implemented in it. To point out
+some of the future ways in which the module might be heading, we devote the rest of this section
+to list some ideas for future development. This is obviously and more ideas can be found in
+the source code, documentation and SymPy&#8216;s web pages, especially those concerning Google
+Summer of Code program.</p>
+<div class="section" id="polynomial-arithmetics">
+<h3>Polynomial arithmetics<a class="headerlink" href="#polynomial-arithmetics" title="Permalink to this headline">¶</a></h3>
+<p>We already said quite a lot about arithmetics of polynomials, also about possible improvements
+in this area. Improvements that are commonly known the many people, not necessarily interested
+very much in computer algebra. However, there are other, less familiar algorithms for doing
+polynomial arithmetics, especially of large sparse multivariate polynomials, which are not
+limited to integer or rational domains. A nice example are algorithms for polynomial multiplication
+and division based on heaps <a class="reference external" href="literature.html#monagan2007heaps">[Monagan2007heaps]</a>. Experimental data reveals that this is currently
+the best approach to compute with sparse polynomials in many variables (which is actually the
+most important case when computing with polynomials). The algorithm can also be relatively
+easily parallelized, see <a class="reference external" href="literature.html#monagan2009parallel">[Monagan2009parallel]</a> for detailed discussion.</p>
+</div>
+<div class="section" id="power-series-expansion">
+<h3>Power series expansion<a class="headerlink" href="#power-series-expansion" title="Permalink to this headline">¶</a></h3>
+<p>SymPy implements a very modern algorithm of Gruntz for computing limits symbolically <a class="reference external" href="literature.html#gruntz1996limits">[Gruntz1996limits]</a>,
+thus, as a side effect, SymPy is quite comprehensible in computing truncated power series of elementary
+and special functions (Taylor and Laurent series). When the algorithms for those two tasks were implemented,
+polynomials manipulation module was almost non&#8211;existent, so everything was implemented using slow symbolic
+core. This makes any computations concerning limits and power series very slow, because the underlying
+algorithms are implemented in an inefficient way. Many benchmarks show that SymPy can be enormously slow
+when computing series expansions of composite functions or when many terms are requested.</p>
+<p>It would be beneficial to improve this picture by employing efficient polynomials manipulation algorithms
+whenever possible, when computing limits and power series. Additional algorithms would have to be added
+to the module, to allow efficient compositions and reversions of power series <a class="reference external" href="literature.html#zippel1976expansions">[Zippel1976expansions]</a>,
+<a class="reference external" href="literature.html#brent1975series">[Brent1975series]</a>, <a class="reference external" href="literature.html#brent1978fps">[Brent1978fps]</a>. This would be very advantageous for SymPy, because limits and
+truncated power series are ubiquitous in other algorithms of symbolic mathematics and are also very
+useful as standalone tools in many practical problems.</p>
+</div>
+<div class="section" id="partial-fraction-decomposition">
+<h3>Partial fraction decomposition<a class="headerlink" href="#partial-fraction-decomposition" title="Permalink to this headline">¶</a></h3>
+<p>Decomposition algorithms of rational functions into partial fractions are also very useful tools
+in symbolic mathematics. In SymPy we currently implement an algorithm of Manuel Bronstein
+<a class="reference external" href="literature.html#bronstein1993partial">[Bronstein1993partial]</a>, which allows to compute full partial fraction decompositions purely
+formally, without introducing algebraic numbers. This is a spectacular approach, but also a
+quite inefficient one. It would be beneficial to incorporate modular techniques into partial
+fraction decomposition algorithms, for example using methods of <a class="reference external" href="literature.html#wang1981partial">[Wang1981partial]</a>. This would
+allow computations of partial fractions efficiently whenever possible and Bronstein&#8217;s algorithm
+would be used as a fallback.</p>
+</div>
+<div class="section" id="simplification-of-expressions">
+<h3>Simplification of expressions<a class="headerlink" href="#simplification-of-expressions" title="Permalink to this headline">¶</a></h3>
+<p>Polynomial manipulation algorithms have a natural area of application, which is simplification
+of expressions <a class="reference external" href="literature.html#moses1971simplification">[Moses1971simplification]</a>. Currently we already employ algorithms related to
+polynomials for this task, but we do not utilize their full potential in this case. Expression
+simplification is ubiquitous in symbolic mathematics systems, thus it must be general on hand but
+also very efficient on the other. One very interesting case is simplification of rational functions
+with polynomial side relations (modulo polynomial ideals), which was already studied in detail in
+literature <a class="reference external" href="literature.html#pearce2001relations">[Pearce2001relations]</a>, <a class="reference external" href="literature.html#monagan2006modulo">[Monagan2006modulo]</a>. This kind of simplification would allow
+the user to compute efficiently with expressions like trigonometric polynomials, which are an
+important tool in geometry and robotics.</p>
+</div>
+<div class="section" id="cylindrical-algebraic-decomposition">
+<h3>Cylindrical algebraic decomposition<a class="headerlink" href="#cylindrical-algebraic-decomposition" title="Permalink to this headline">¶</a></h3>
+<p>Currently one of big weaknesses of polynomials manipulation module is lack of solvers for multivariate
+polynomial inequalities and systems of polynomial inequalities. SymPy can solve many kinds of problems
+related to polynomial equations and systems of polynomial equations, thanks to the Gröbner bases
+method. It can also handle univariate inequalities via root isolation. However, multivariate inequalities,
+especially over reals, are currently a no&#8211;go for SymPy. The real case is very important, because it is
+related to the problem of quantifier elimination and theorem proving in algebraic geometry.</p>
+<p>A tool that is needed to allow SymPy for handling multivariate inequalities is cylindrical algebraic
+decomposition <a class="reference external" href="literature.html#arnon1984basic">[Arnon1984basic]</a>, <a class="reference external" href="literature.html#jirstrand1995cylindrical">[Jirstrand1995cylindrical]</a>, or CAD for short. Given a multivariate
+polynomial inequality or system of inequalities, CAD decomposes those inequalities to form a system
+of inequalities that are easier to reason about. This has many applications in, already mentioned,
+quantifier elimination and algebraic geometry, but also when evaluating multiple integrals and in
+assumptions engine.</p>
+</div>
+<div class="section" id="multiple-algebraic-extensions">
+<h3>Multiple algebraic extensions<a class="headerlink" href="#multiple-algebraic-extensions" title="Permalink to this headline">¶</a></h3>
+<p>In section <a class="reference external" href="algorithms.html#thesis-algebraic"><em>Algebraic number fields</em></a> we said that SymPy currently requires to compute a primitive
+element of a field extension if multiple extensions are provided, when computing with algebraic
+numbers. We also gave references to articles concerning polynomial factoring algorithms, which
+can work directly with multiple extensions. There are, however, algorithms for other areas of
+symbolic mathematics, for example for computing GCDs of polynomials <a class="reference external" href="literature.html#vanhoeij2002modgcd">[vanHoeij2002modgcd]</a>, that
+also do not require primitive element computations. Although, it is uncertain if those algorithms
+are truly advantageous, it might be still worthwhile to experiment with them.</p>
+</div>
+<div class="section" id="using-modular-techniques-elsewhere">
+<h3>Using modular techniques elsewhere<a class="headerlink" href="#using-modular-techniques-elsewhere" title="Permalink to this headline">¶</a></h3>
+<p>Work on polynomials manipulation module revealed that, so called, modular or p&#8211;adic techniques
+<a class="reference external" href="literature.html#yun1976padic">[Yun1976padic]</a>, give very encouraging results when concerned about speed of computations. Many
+classes of algorithms already benefit from this in SymPy, most notable are factorization and
+resultant algorithms, and other, like polynomial GCD algorithms, will be in future implemented.</p>
+<p>Following this success, we should incorporate modular techniques outside polynomials manipulation
+module. We already pointed out a method for computing partial fraction decomposition, but there
+are other areas where those methods are applicable. A good examples are algorithms for symbolic
+summation and integration <a class="reference external" href="literature.html#gerhard2006modular">[Gerhard2006modular]</a>. Modular method limit the range of application
+of algorithms to integers and rationals, but those are the most commonly used domains in SymPy,
+so the hassle is definitely worthwhile.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../static/sympy-logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Final words and conclusions</a><ul>
+<li><a class="reference external" href="#future-plans">Future plans</a><ul>
+<li><a class="reference external" href="#polynomial-arithmetics">Polynomial arithmetics</a></li>
+<li><a class="reference external" href="#power-series-expansion">Power series expansion</a></li>
+<li><a class="reference external" href="#partial-fraction-decomposition">Partial fraction decomposition</a></li>
+<li><a class="reference external" href="#simplification-of-expressions">Simplification of expressions</a></li>
+<li><a class="reference external" href="#cylindrical-algebraic-decomposition">Cylindrical algebraic decomposition</a></li>
+<li><a class="reference external" href="#multiple-algebraic-extensions">Multiple algebraic extensions</a></li>
+<li><a class="reference external" href="#using-modular-techniques-elsewhere">Using modular techniques elsewhere</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="groebner.html"
+                                  title="previous chapter">Gröbner bases and their applications</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="glossary.html"
+                                  title="next chapter">Glossary</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../sources/src/conclusions.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="groebner.html" title="Gröbner bases and their applications"
+             >previous</a> |</li>
+        <li><a href="../index.html">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Mateusz Paprocki.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

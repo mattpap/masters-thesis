@@ -21,8 +21,8 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/jsMath-3.6e/easy/load.js"></script>
     <link rel="top" title="Polynomials Manipulation Module v1.0 documentation" href="../index.html" />
-    <link rel="next" title="Algorithmics of GCD and LCM computations" href="gcd.html" />
-    <link rel="prev" title="Introduction to polynomial related algorithms in SymPy" href="algorithms.html" /> 
+    <link rel="next" title="Final words and conclusions" href="conclusions.html" />
+    <link rel="prev" title="Algorithms for algebraic computations" href="algorithms.html" /> 
   </head>
   <body>
     <div class="related">
@@ -32,10 +32,10 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="gcd.html" title="Algorithmics of GCD and LCM computations"
+          <a href="conclusions.html" title="Final words and conclusions"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="algorithms.html" title="Introduction to polynomial related algorithms in SymPy"
+          <a href="algorithms.html" title="Algorithms for algebraic computations"
              accesskey="P">previous</a> |</li>
         <li><a href="../index.html">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -50,13 +50,21 @@
 <span id="thesis-groebner"></span><h1>Gröbner bases and their applications<a class="headerlink" href="#groebner-bases-and-their-applications" title="Permalink to this headline">¶</a></h1>
 <p>The method of Gröbner bases is a powerful technique for solving problems in commutative
 algebra (polynomial ideal theory, algebraic geometry) that was introduced by Bruno Buchberger
-in his PhD thesis <a class="reference external" href="literature.html#buchberder1965thesis">[Buchberder1965thesis]</a> (for English translation see <a class="reference external" href="literature.html#abramson2006translation">[Abramson2006translation]</a>
+in his PhD thesis <a class="reference external" href="literature.html#buchberger1965thesis">[Buchberger1965thesis]</a> (for English translation see <a class="reference external" href="literature.html#abramson2006translation">[Abramson2006translation]</a>
 and for a historical background see <a class="reference external" href="literature.html#abramson2009history">[Abramson2009history]</a>). Gröbner bases provide a uniform
 approach for solving problems that can be expressed in terms of systems of multivariate polynomial
 equations. It happens that many practical problems, e.g.  in operational research (graph theory),
-can be transformed into sets of polynomials, thus solved using Gröbner bases method. In this
-chapter we will give a short theoretical background on Gröbner bases and then we will show,
-in a tutorial&#8211;like fashion on a series of examples, how to use Gröbner bases machinery in SymPy.</p>
+can be transformed into sets of polynomials, thus solved using Gröbner bases method.</p>
+<p>In this chapter we will give a short theoretical background on Gröbner bases and then we will
+show, in a tutorial&#8211;like fashion on a series of examples, how to use Gröbner bases machinery
+in SymPy. After two very theoretical chapters it is time to show that polynomials manipulation
+module, that we wrote for SymPy, is actually useful for solving practical problems. We chose
+Gröbner bases for this presentation, because the theory behind Gröbner bases is relatively
+simple and there are many non&#8211;artificial and non&#8211;trivial examples of applications of Gröbner
+bases, that can be found in literature, which do not require the reader to have extensive mathematical
+knowledge, but also touch many different areas of polynomials manipulation module. However, if some
+mathematical background will be needed in a particular example, then we will provide a short introduction
+every time additional knowledge is needed.</p>
 <div class="section" id="short-introduction-to-groebner-bases">
 <h2>Short introduction to Gröbner bases<a class="headerlink" href="#short-introduction-to-groebner-bases" title="Permalink to this headline">¶</a></h2>
 <p>The Gröbner bases method is a very attractive tool in computer algebra because it is a very
@@ -108,7 +116,7 @@ a polynomial. The definition of s&#8211;polynomials can be directly transformed 
     <span class="k">return</span> <span class="n">expand</span><span class="p">(</span><span class="n">lcm</span><span class="p">(</span><span class="n">LM</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">LM</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">LT</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">*</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">LT</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">*</span><span class="n">g</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>utilizing SymPy&#8217;s built&#8211;in polynomial manipulation functions <tt class="xref docutils literal"><span class="pre">LT()</span></tt>, <tt class="xref docutils literal"><span class="pre">LM()</span></tt>, <tt class="xref docutils literal"><span class="pre">lcm()</span></tt>
+<p>utilizing SymPy&#8216;s built&#8211;in polynomial manipulation functions <tt class="xref docutils literal"><span class="pre">LT()</span></tt>, <tt class="xref docutils literal"><span class="pre">LM()</span></tt>, <tt class="xref docutils literal"><span class="pre">lcm()</span></tt>
 and <tt class="xref docutils literal"><span class="pre">expand()</span></tt>, as well as multivariate polynomial arithmetics. For readability purpose, we
 skipped in this definition important information about the ordering of polynomials. What is an
 ordering of monomials? For now it is sufficient to assume that it exists and is fixed. In the
@@ -206,7 +214,7 @@ respect to other polynomials in <span class="math">G</span> and stop. Otherwise 
 <span class="math">f_2</span> from <span class="math">G</span>, and compute their s&#8211;polynomial. If the remainder with respect to <span class="math">G</span> of the
 s&#8211;polynomial is non&#8211;zero, then adjoin it to <span class="math">G</span>. Iterate until <span class="math">G</span> is a Gröbner basis.</p>
 <p>This simple procedure can be easily coded in Python in just a couple of minutes using previously
-defined <tt class="xref docutils literal"><span class="pre">s_polynomial()</span></tt> and SymPy&#8217;s built&#8211;in <tt class="xref docutils literal"><span class="pre">reduced()</span></tt> functions:</p>
+defined <tt class="xref docutils literal"><span class="pre">s_polynomial()</span></tt> and SymPy&#8216;s built&#8211;in <tt class="xref docutils literal"><span class="pre">reduced()</span></tt> functions:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">buchberger</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Toy implementation of Buchberger algorithm. &quot;&quot;&quot;</span>
     <span class="n">G</span><span class="p">,</span> <span class="n">pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="nb">set</span><span class="p">([])</span>
@@ -261,7 +269,7 @@ Buchberger proved that this process ends in a finite number of steps. Thus we ar
 for arbitrary set of polynomials we can compute a corresponding Gröbner basis in finite time.
 An interesting question arises: how much time is actually needed to compute such a basis? We will
 postpone answer to this question till the end of chapter, where we will discuss complexity of the
-Buchberger algorithm and efficiency of SymPy&#8217;s Gröbner bases implementation.</p>
+Buchberger algorithm and efficiency of SymPy&#8216;s Gröbner bases implementation.</p>
 </div>
 </div>
 <div class="section" id="computing-groebner-bases-with-sympy">
@@ -279,11 +287,11 @@ a Gröbner basis. This way most divisions are just <em>useless</em> and an effic
 Buchberger algorithm must accommodate for this, avoiding as many of those useless divisions as possible.</p>
 <p>Several criteria were invented by the author of the Gröbner bases method a few years after the
 algorithm was introduced. Later on, other more powerful elimination criteria were developed, for
-example, heuristic criteria for lexicographic ordering of monomials (see <a class="reference external" href="literature.html#czapor1991heuristic">[Czapor1991heuristic]</a>)
-or, so called, <em>sugar flavour</em> (see <a class="reference external" href="literature.html#giovini1991sugar">[Giovini1991sugar]</a> for details).</p>
+example, heuristic criteria for lexicographic ordering of monomials <a class="reference external" href="literature.html#czapor1991heuristic">[Czapor1991heuristic]</a> or, so
+called, <em>sugar flavour</em> (see <a class="reference external" href="literature.html#giovini1991sugar">[Giovini1991sugar]</a> for details).</p>
 </div>
 <div class="section" id="admissible-orderings-of-monomials">
-<span id="gb-order"></span><h2>Admissible orderings of monomials<a class="headerlink" href="#admissible-orderings-of-monomials" title="Permalink to this headline">¶</a></h2>
+<span id="thesis-orderings"></span><h2>Admissible orderings of monomials<a class="headerlink" href="#admissible-orderings-of-monomials" title="Permalink to this headline">¶</a></h2>
 <p>The main reason for our interest in Gröbner bases is that they have <em>nicer</em> properties, compared
 to other systems of polynomials. Depending on what properties we actually need, we can compute a
 Gröbner basis of a given system with respect to a specific ordering of monomials. The choice of
@@ -415,7 +423,7 @@ disappear in near future, when linear algebra module will be refactored (using s
 approach to what was done with polynomials manipulation module).</p>
 </div>
 <div class="section" id="special-case-2-euclid-s-algorithm">
-<h3>Special case 2: Euclid&#8217;s algorithm<a class="headerlink" href="#special-case-2-euclid-s-algorithm" title="Permalink to this headline">¶</a></h3>
+<span id="thesis-euclid"></span><h3>Special case 2: Euclid&#8217;s algorithm<a class="headerlink" href="#special-case-2-euclid-s-algorithm" title="Permalink to this headline">¶</a></h3>
 <p>Lets now focus on the other case, i.e. on computation of greatest common divisors of polynomials.
 For this, consider two univariate polynomials <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>, both in the indeterminate <tt class="docutils literal"><span class="pre">x</span></tt>,
 with coefficients in the ring of integers:</p>
@@ -443,8 +451,8 @@ Gröbner bases algorithm for computing GCDs of univariate polynomials is very fa
 are much more efficient algorithms for this purpose. In SymPy we currently use heuristic GCD
 algorithm over integers and rationals, and subresultants over other domains.</p>
 <p>Moreover, Gröbner bases can be used to compute greatest common divisors of multivariate
-polynomials (see <a class="reference external" href="literature.html#cox1997ideals">[Cox1997ideals]</a>). The algorithm reduces the problem of finding the GCD of
-two multivariate polynomials, say <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>, into the problem of finding their least
+polynomials <a class="reference external" href="literature.html#cox1997ideals">[Cox1997ideals]</a>. The algorithm reduces the problem of finding the GCD of two
+multivariate polynomials, say <tt class="docutils literal"><span class="pre">f</span></tt> and <tt class="docutils literal"><span class="pre">g</span></tt>, into the problem of finding their least
 common multiple. The final result is obtained using the well known formula that relates
 GCD with LCM:</p>
 <span class="eqno">(1)</span><div class="math" id="equation-gcdlcm">
@@ -509,8 +517,8 @@ the Gröbner bases method. Over the years, Gröbner bases theory gained a lot of
 outside the mathematical community and applications for it have been found in many areas of science
 and engineering. Bruno Buchberger, the inventor of Gröbner bases algorithm, deserves a lot of
 credit for this state of art, because of his many publications and books which popularized the method
-in scientific and engineering communities. Below is a list (following <a class="reference external" href="literature.html#buchberger1998applications">[Buchberger1998applications]</a>),
-thought incomplete, of the major areas in which Gröbner bases were applied with great success:</p>
+in scientific and engineering communities. Following <a class="reference external" href="literature.html#buchberger1998applications">[Buchberger1998applications]</a>, below we present
+a list, thought incomplete, of the major areas in which Gröbner bases were applied with great success:</p>
 <ul class="simple">
 <li>Algebraic Geometry</li>
 <li>Coding Theory</li>
@@ -526,7 +534,7 @@ thought incomplete, of the major areas in which Gröbner bases were applied with
 </ul>
 <p>In <a class="reference external" href="literature.html#buchberger2001systems">[Buchberger2001systems]</a> there is an even longer list of applications specific to systems theory.
 In the following subsections we will examine several practical applications of the Gröbner bases
-method and explain how to conduct all computations using SymPy&#8217;s polynomials manipulation module.</p>
+method and explain how to conduct all computations using SymPy&#8216;s polynomials manipulation module.</p>
 <div class="section" id="solving-systems-of-polynomial-equations">
 <h3>Solving systems of polynomial equations<a class="headerlink" href="#solving-systems-of-polynomial-equations" title="Permalink to this headline">¶</a></h3>
 <p>In the previous section we showed that Gröbner bases can be used for solving systems
@@ -641,7 +649,7 @@ we run into a little trouble because we will have to carry those square roots al
 our computations. We can&#8217;t actually complain about this because this is the nature of the
 problem we are solving and we were just lucky in the previous case, where algebraic numbers
 were introduced at the very end.</p>
-<p>There is a method <a class="reference external" href="literature.html#strzebonski1997computing">[Strzebonski1997computing]</a> to avoid computing with algebraic numbers, which
+<p>There is a method of <a class="reference external" href="literature.html#strzebonski1997computing">[Strzebonski1997computing]</a> to avoid computing with algebraic numbers, which
 requires enlarging of the input polynomial system to <tt class="xref docutils literal"><span class="pre">groebner()</span></tt>. Instead of substituting
 an algebraic number for a variable, we can instead substitute a <em>dummy</em> variable for it and add
 the minimal polynomial of the algebraic number to the system of equations. This way we have
@@ -653,8 +661,8 @@ Currently this approach isn&#8217;t implemented is SymPy although seems promisin
 <p>Many problems in applied algebra have symmetries or are invariant under certain natural
 transformations. In particular, all geometric magnitudes and properties are invariant with
 respect to the underlying transformation group, e.g. properties in Euclidean geometry are
-invariant under the Euclidean group of rotations (see <a class="reference external" href="literature.html#sturmfels2008invariant">[Sturmfels2008invariant]</a>). Analysis
-of this structure can give a deep insight into the studied problem.</p>
+invariant under the Euclidean group of rotations <a class="reference external" href="literature.html#sturmfels2008invariant">[Sturmfels2008invariant]</a>. Analysis of
+this structure can give a deep insight into the studied problem.</p>
 <p>Following <a class="reference external" href="literature.html#buchberger2001systems">[Buchberger2001systems]</a> and <a class="reference external" href="literature.html#sturmfels2008invariant">[Sturmfels2008invariant]</a> lets consider the group <span class="math">\Z_4</span>
 of rotational symmetries in the counter clockwise direction of the square. The invariant ring of
 this group is equal to:</p>
@@ -762,7 +770,7 @@ bivariate polynomial <span class="math">f = x^2 + y^2</span>. Lets compute symme
 </div>
 <p>As the resulting remainder is zero, we proved that <span class="math">f</span> is a symmetric polynomial. <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt>
 was also able to rewrite <span class="math">f</span> in terms of bivariate elementary symmetric polynomials <span class="math">s_1 = x + y</span> and
-<span class="math">s_2 = x⋅y</span>. To make this more visible, we can force <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt> to return results in a <em>formal</em>
+<span class="math">s_2 = x y</span>. To make this more visible, we can force <tt class="xref docutils literal"><span class="pre">symmetrize()</span></tt> to return results in a <em>formal</em>
 form:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">symmetrize</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">formal</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">⎛  2                                ⎞</span>
@@ -841,8 +849,8 @@ compose the requested value. We can simply take 117 pennies and we are done, as 
 many of them. Alternatively we can take 10 dimes, 3 nickels and 2 pennies, or 2 quarters, 3 dimes,
 5 nickels and 12 pennies, etc. There are quite a few combinations that can be generated to get the
 desired value. But which of those combinations leads to the minimal number of necessary coins? To
-answer this question we will take advantage of Gröbner bases computed with respect to <em>total degree</em>
-ordering of monomials (see <a class="reference external" href="literature.html#buchberger2007talk">[Buchberger2007talk]</a>).</p>
+answer this question we will take advantage of Gröbner bases computed with respect to a <em>total
+degree</em> ordering of monomials <a class="reference external" href="literature.html#buchberger2007talk">[Buchberger2007talk]</a>.</p>
 <p>First we should note that there are relations between values of particular coins, i.e. a nickel is
 equivalent to 5 pennies, a dime has the same value as 10 pennies and a quarter consists of 25 pennies.
 Those relations can be encoded as a system of polynomials. Lets introduce four variables <span class="math">p</span>, <span class="math">n</span>, <span class="math">d</span>
@@ -893,8 +901,8 @@ see <a class="reference external" href="literature.html#sturmfels1996lectures">[
 <p>One should notice that the polynomials arising in this example are of a special, binomial form, where
 there are few terms but very large exponents. Gröbner bases of systems of polynomials of this kind
 are called toric Gröbner bases and there are modifications to the Buchberger algorithm, which can
-make computations much more efficient in this special case (see <a class="reference external" href="literature.html#traverso1991integer">[Traverso1991integer]</a>). Implementation
-of algorithms for toric Gröbner bases is currently a work in progress in SymPy.</p>
+make computations much more efficient in this special case <a class="reference external" href="literature.html#traverso1991integer">[Traverso1991integer]</a>. Implementation of
+algorithms for toric Gröbner bases is currently a work in progress in SymPy.</p>
 <p>This example showed us significance of other, than <em>pure lexicographic</em>, orderings of monomials. One
 should note that in this particular case we were able to reuse <em>total degree</em> ordering. However, in
 the general case of integer optimization, one has to invent a problem specific ordering with encodes
@@ -910,10 +918,10 @@ operational research, like scheduling, resource allocation and many other. Graph
 are also very interesting on their own due to their intrinsic complexity, as in the general
 case (without any assumptions on the structure of the input graph) they are NP&#8211;hard problems,
 i.e. there are no polynomial time algorithms for finding graph colorings (for a detailed
-discussion see <a class="reference external" href="literature.html#kubale2004color">[Kubale2004color]</a>).</p>
+discussion on this subject refer to <a class="reference external" href="literature.html#kubale2004color">[Kubale2004color]</a>).</p>
 <div class="section" id="classical-vertex-coloring">
 <h4>Classical vertex coloring<a class="headerlink" href="#classical-vertex-coloring" title="Permalink to this headline">¶</a></h4>
-<p>To show how SymPy can be utilized for solving graph coloring problems using the Gröbner
+<p>To show how SymPy can be used for solving graph coloring problems using the Gröbner
 bases method, lets focus on the classical problem of vertex coloring of graphs. We follow
 <a class="reference external" href="literature.html#adams1994intro">[Adams1994intro]</a> to give a brief theoretical introduction to this subject. Given a graph
 <span class="math">\mathcal{G}(V, E)</span>, where <span class="math">V</span> is the set of vertices of <span class="math">\mathcal{G}</span> and <span class="math">E</span> is the set
@@ -954,7 +962,7 @@ less formal language, given a set of polynomial equations <span class="math">F</
 coloring constraints we look for solutions of this system of equations in <span class="math">\C^n</span>. If we can find
 solutions of any kind then the graph is colorable with <span class="math">k</span> colors.</p>
 <p>Lets now focus on a particular and well known instance of <span class="math">k</span>&#8211;coloring where <span class="math">k = 3</span>. In this
-case <span class="math">F_3 = \{ x_i^3 - 1 : i = 1, \ldots, n \}</span>. Using SymPy&#8217;s built&#8211;in multivariate polynomial
+case <span class="math">F_3 = \{ x_i^3 - 1 : i = 1, \ldots, n \}</span>. Using SymPy&#8216;s built&#8211;in multivariate polynomial
 factorization routine:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s">&#39;x_i, x_j&#39;</span><span class="p">)</span>
 <span class="go">(x_i, x_j)</span>
@@ -969,13 +977,13 @@ factorization routine:</p>
 F_{\mathcal{G}} = \{ x_i^2 + x y + x_j^2 : (i, j) \in E \}</div>
 <p>At this point it is sufficient to compute the Gröbner basis <span class="math">G</span> of <span class="math">F = F_3 \cup F_{\mathcal{G}}</span>
 to find out if a graph <span class="math">\mathcal{G}</span> is <span class="math">3</span>&#8211;colorable, or not. After this theoretical introduction
-lets consider a graph <span class="math">\mathcal{G}(V, E)</span> of figure <a class="reference internal" href="#fig-graph-nocolor"><em>The graph .</em></a> with 12 vertices and
+lets consider a graph <span class="math">\mathcal{G}(V, E)</span> of figure <a class="reference internal" href="#fig-graph-nocolor"><em>The graph </em></a> with 12 vertices and
 23 edges, to see that the described scheme works in practice. We ask if the graph is <span class="math">3</span>&#8211;colorable.
 In this example we will first show how to answer this question SymPy and then we will compare this
 with three other symbolic manipulation systems on the market: Maxima, Axiom and Mathematica.</p>
 <div align="center" class="figure" id="fig-graph-nocolor">
 <img alt="../images/graph-nocolor.png" src="../images/graph-nocolor.png" />
-<p class="caption">The graph <span class="math">\mathcal{G}(V, E)</span>.</p>
+<p class="caption">The graph <span class="math">\mathcal{G}(V, E)</span></p>
 </div>
 <p>The question, if <span class="math">\mathcal{G}</span> is <span class="math">3</span>&#8211;colorable or not, is easy to answer by trial and error. We
 are, however, an interested in algorithmic solution to the problem, so lets first encode <span class="math">V</span> and
@@ -1010,7 +1018,7 @@ non&#8211;trivial, i.e. <span class="math">G \not= \emptyset</span>, which can b
 </pre></div>
 </div>
 <p>The answer is that the graph <span class="math">\mathcal{G}</span> is colorable with <span class="math">3</span> colors. A sample coloring is shown
-in figure <a class="reference internal" href="#fig-graph-color"><em>A sample &#8211;coloring of the graph .</em></a>. Suppose we add an edge between vertices <span class="math">i = 3</span> and <span class="math">j = 4</span>. Is
+in figure <a class="reference internal" href="#fig-graph-color"><em>A sample &#8211;coloring of the graph </em></a>. Suppose we add an edge between vertices <span class="math">i = 3</span> and <span class="math">j = 4</span>. Is
 the new graph <span class="math">3</span>&#8211;colorable? To check this it is sufficient to construct <span class="math">F_{\mathcal{G'}}</span> by
 extending <span class="math">F_{\mathcal{G}}</span> with <span class="math">x_3^2 + x_3 x_4 + x_4^2</span> equation and recompute the Gröbner
 basis:</p>
@@ -1027,9 +1035,9 @@ could continue this discussion asking if <span class="math">\mathcal{G'}</span> 
 required to color the original graph could be lowered to <span class="math">2</span> colors.</p>
 <div align="center" class="figure" id="fig-graph-color">
 <img alt="../images/graph-color.png" src="../images/graph-color.png" />
-<p class="caption">A sample <span class="math">3</span>&#8211;coloring of the graph <span class="math">\mathcal{G}(V, E)</span>.</p>
+<p class="caption">A sample <span class="math">3</span>&#8211;coloring of the graph <span class="math">\mathcal{G}(V, E)</span></p>
 </div>
-<p>Before we compare SymPy&#8217;s syntax for computing Gröbner bases with other systems, let us clarify an
+<p>Before we compare SymPy&#8216;s syntax for computing Gröbner bases with other systems, let us clarify an
 issue arising around list indexing (e.g. why we write <tt class="docutils literal"><span class="pre">x3</span> <span class="pre">=</span> <span class="pre">Vx[2]</span></tt>). SymPy is a library built on top
 of Python, so it utilizes Python&#8217;s built&#8211;in data structures and their indexing schemes. Python, as a
 general purpose programming language, uses well established zero&#8211;based indexing scheme, contrary to the
@@ -1046,23 +1054,23 @@ way we could issue <tt class="docutils literal"><span class="pre">Vx</span> <spa
 </div>
 <div class="section" id="vertex-coloring-using-other-systems">
 <h4>Vertex coloring using other systems<a class="headerlink" href="#vertex-coloring-using-other-systems" title="Permalink to this headline">¶</a></h4>
-<p>We showed so far how to solve classical vertex coloring problem with SymPy. Lets now compare SymPy&#8217;s
+<p>We showed so far how to solve classical vertex coloring problem with SymPy. Lets now compare SymPy&#8216;s
 syntax and semantics of Gröbner bases functionality with three other mathematical software: Maxima,
 Axiom and Mathematica.</p>
 <p>One feature that makes SymPy different from other mathematical systems is that SymPy utilizes a general
 purpose programming language for its core, modules and interaction with the user, whereas Maxima, Axiom
 and Mathematica invent their own special languages for implementing their mathematical libraries and for
 user interaction. This will require us to make some remarks also on the syntactic level.</p>
-<p><a class="reference external" href="http://maxima.sourceforge.net">Maxima</a> implements Gröbner bases in an extension library. Detailed
-documentation can be found in <a class="reference external" href="literature.html#maximagroebner">[MaximaGroebner]</a>. We will reuse the same example and, as much as possible,
-the same computational approach. Maxima first requires us to load the Gröbner bases library. Note that
-we write <tt class="docutils literal"><span class="pre">grobner</span></tt> in this case. User should also remember about putting a semicolon at the end of every
-line. Next we define edges of the graph using a list of two element lists (there are no tuples in Maxima).
-Maxima uses very unusual syntax for variable assignment, utilizing colon for this purpose. In the next
-step we define the list of variables <tt class="docutils literal"><span class="pre">Vx</span></tt> and systems of polynomial equations <tt class="docutils literal"><span class="pre">F3</span></tt> and <tt class="docutils literal"><span class="pre">Fg</span></tt>. Instead
-of list comprehensions we use <tt class="xref docutils literal"><span class="pre">makelist()</span></tt> function. One should note that Maxima uses <tt class="docutils literal"><span class="pre">^</span></tt> symbol for
-exponentiation, whereas Python uses this symbol for bitwise XOR operation. Finally we can compute the
-Gröbner basis using <tt class="xref docutils literal"><span class="pre">poly_reduced_grobner()</span></tt>. Maxima by default assumes <em>lexicographic</em> ordering
+<p>Maxima, available at <a class="reference external" href="http://maxima.sourceforge.net">http://maxima.sourceforge.net</a>, implements Gröbner bases in an extension library.
+Detailed documentation can be found in <a class="reference external" href="literature.html#maximagroebner">[MaximaGroebner]</a>. We will reuse the same example and, as much as
+possible, the same computational approach. Maxima first requires us to load the Gröbner bases library.
+Note that we write <tt class="docutils literal"><span class="pre">grobner</span></tt> in this case. User should also remember about putting a semicolon at the end
+of every line. Next we define edges of the graph using a list of two element lists (there are no tuples in
+Maxima).  Maxima uses very unusual syntax for variable assignment, utilizing colon for this purpose. In the
+next step we define the list of variables <tt class="docutils literal"><span class="pre">Vx</span></tt> and systems of polynomial equations <tt class="docutils literal"><span class="pre">F3</span></tt> and <tt class="docutils literal"><span class="pre">Fg</span></tt>.
+Instead of list comprehensions we use <tt class="xref docutils literal"><span class="pre">makelist()</span></tt> function. One should note that Maxima uses <tt class="docutils literal"><span class="pre">^</span></tt>
+symbol for exponentiation, whereas Python uses this symbol for bitwise XOR operation. Finally we can compute
+the Gröbner basis using <tt class="xref docutils literal"><span class="pre">poly_reduced_grobner()</span></tt>. Maxima by default assumes <em>lexicographic</em> ordering
 of monomials. This information can be changed only by setting a global variable. As the last step we
 check if the computed basis is non&#8211;trivial, utilizing <tt class="xref docutils literal"><span class="pre">is()</span></tt> and <tt class="xref docutils literal"><span class="pre">notequal()</span></tt> functions. Lets
 see full source code for this example:</p>
@@ -1085,17 +1093,17 @@ see full source code for this example:</p>
 (i8) is(notequal(G, [1]));
 (o8) true</pre>
 </div>
-<p><a class="reference external" href="http://axiom-developer.org">Axiom</a> implements Gröbner bases toolkit in its core algebra library.
-The documentation on this matter, thought not very extensive, can be found in <a class="reference external" href="literature.html#daly2003horizon">[Daly2003horizon]</a>. Axiom
-uses a sophisticated autoloader of its library components, so explicit package loading in not necessary.
-As previously we start with the definition of the set of edges using a list of list. On should notice
-that, this time, the assignment operator is <tt class="docutils literal"><span class="pre">:=</span></tt>. Semicolons at the end of lines aren not obligatory,
-however, useful for preventing printing of the results of computations. Next we define <tt class="docutils literal"><span class="pre">Vx</span></tt> and <tt class="docutils literal"><span class="pre">Ex</span></tt>
-in a way very similar to Python, as Axiom supports list comprehensions. The main difference is Axiom&#8217;s
-approach to indexing lists. Axiom does not use an object oriented language, as one might presume looking
-at the source code, and it doesn&#8217;t support properties. This give opportunity for reusing the dot operator
-for indexing purpose (notice also one&#8211;base indexes). Next definitions of <tt class="docutils literal"><span class="pre">F3</span></tt> and <tt class="docutils literal"><span class="pre">Fg</span></tt> are almost
-equivalent to what we wrote using SymPy. Finally we compute the Gröbner basis using <tt class="xref docutils literal"><span class="pre">groebner()</span></tt>
+<p>Axiom, available at <a class="reference external" href="http://axiom-developer.org">http://axiom-developer.org</a>, implements Gröbner bases toolkit in its
+core algebra library. The documentation on this matter, thought not very extensive, can be found in
+<a class="reference external" href="literature.html#daly2003horizon">[Daly2003horizon]</a>. Axiom uses a sophisticated autoloader of its library components, so explicit package
+loading in not necessary.  As previously we start with the definition of the set of edges using a list of
+list. On should notice that, this time, the assignment operator is <tt class="docutils literal"><span class="pre">:=</span></tt>. Semicolons at the end of lines
+are not obligatory, however, useful for preventing printing of the results of computations. Next we define
+<tt class="docutils literal"><span class="pre">Vx</span></tt> and <tt class="docutils literal"><span class="pre">Ex</span></tt> in a way very similar to Python, as Axiom supports list comprehensions. The main difference
+is Axiom&#8217;s approach to indexing lists. Axiom does not use an object oriented language, as one might presume
+looking at the source code, and it doesn&#8217;t support properties. This give opportunity for reusing the dot
+operator for indexing purpose (notice also one&#8211;base indexes). Next definitions of <tt class="docutils literal"><span class="pre">F3</span></tt> and <tt class="docutils literal"><span class="pre">Fg</span></tt> are
+almost equivalent to what we wrote using SymPy. Finally we compute the Gröbner basis using <tt class="xref docutils literal"><span class="pre">groebner()</span></tt>
 function. Notice the <tt class="docutils literal"><span class="pre">::</span></tt> operator. It tells that the previously constructed polynomials should belong
 to the domain that is on its right hand side, i.e. distributed multivariate polynomial in symbols from
 <tt class="docutils literal"><span class="pre">Vx</span></tt> with coefficients over integers. At the end we check that the basis in non&#8211;trivial using <tt class="docutils literal"><span class="pre">~=</span></tt>
@@ -1117,11 +1125,12 @@ Here is the full source code for this example:</p>
 (7) -&gt; (G ~= [1]) @ Boolean
    (7) true</pre>
 </div>
-<p><a class="reference external" href="http://www.wolfram.com/mathematica/">Mathematica</a> has extensive built&#8211;in support for Gröbner
-bases. Detailed documentation on this matter can be found in <a class="reference external" href="literature.html#mathematicagroebner">[MathematicaGroebner]</a>. Mathematica
-has a very peculiar language for interaction with the user and its syntax, which was influence by
-the infix dialect of lisp (or m&#8211;lisp), is very different from other languages used in symbolic
-mathematics, so will skip detailed syntactic comparison and refer the reader to <a class="reference external" href="literature.html#wolfram2003book">[Wolfram2003book]</a>.</p>
+<p>Mathematica, available at <a class="reference external" href="http://www.wolfram.com/mathematica/">http://www.wolfram.com/mathematica/</a>, has extensive built&#8211;in support
+for Gröbner bases. Detailed documentation on this matter can be found in <a class="reference external" href="literature.html#mathematicagroebner">[MathematicaGroebner]</a>.
+Mathematica has a very peculiar language for interaction with the user and its syntax, which was
+influence by the infix dialect of lisp (or m&#8211;lisp), is very different from other languages used
+in symbolic mathematics, so will skip detailed syntactic comparison and refer the reader to
+<a class="reference external" href="literature.html#wolfram2003book">[Wolfram2003book]</a>.</p>
 <div class="highlight-python"><pre>In[1]:= Unprotect[E];
 In[2]:= E := {{1,2},{2,3},{1,4},{1,6},{1,12},{2,5},{2,7},
 {3,8},{3,10},{4,11},{4,9},{5,6},{6,7},{7,8},{8,9},{9,10},
@@ -1141,41 +1150,20 @@ Out[8]= True</pre>
 <p>We showed how to perform classical vertex coloring of a graph based on the Gröbner bases method
 using SymPy and three other mathematical systems. It is interesting to compare the times that were
 needed to compute the Gröbner basis <span class="math">G</span> by each of those systems. Timings (average of multiple
-runs) were stored in the following table:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="22%" />
-<col width="16%" />
-<col width="18%" />
-<col width="16%" />
-<col width="29%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">&nbsp;</th>
-<th class="head">SymPy</th>
-<th class="head">Maxima</th>
-<th class="head">Axiom</th>
-<th class="head">Mathematica</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Time [s]</td>
-<td>15.4</td>
-<td>17.6</td>
-<td>3.6</td>
-<td>0.34</td>
-</tr>
-</tbody>
-</table>
-<p>This shows that both SymPy and Maxima are significantly slower than Axiom and Mathematica. This is
-happens, because the implementation of Gröbner bases in both systems is done in an interpreted
-language (Python and Maxima language, respectively). Possibly they also implement less(&#8211;powerful)
-criteria for eliminating useless critical pairs.</p>
+runs) were collected in figure <a class="reference internal" href="#fig-groebner-time-compare"><em>Average timing for computing Gröbner basis of graph </em></a>. This simple study shows that both
+SymPy and Maxima are significantly slower than Axiom and Mathematica. This happens, because the
+implementation of Gröbner bases in both systems is done in an interpreted language (Python and
+Maxima language, respectively). Possibly they also implement less(&#8211;powerful) criteria for eliminating
+useless critical pairs.</p>
+<div align="center" class="figure" id="fig-groebner-time-compare">
+<img alt="../images/groebner-time-compare.png" src="../images/groebner-time-compare.png" />
+<p class="caption">Average timing for computing Gröbner basis of graph <span class="math">\mathcal{G}(V, E)</span></p>
+</div>
 </div>
 <div class="section" id="the-structure-of-vertex-coloring">
 <h4>The structure of vertex coloring<a class="headerlink" href="#the-structure-of-vertex-coloring" title="Permalink to this headline">¶</a></h4>
 <p>Till this point we showed how to check with SymPy that a graph is <span class="math">k</span>&#8211;colorable or not. However, using
-the Gröbner bases method, we can obtain much more exiting result. Suppose that <span class="math">G</span> is a lexicographic
+the Gröbner bases method, we can obtain a much more exciting result. Suppose that <span class="math">G</span> is a lexicographic
 Gröbner basis of a system of polynomials <span class="math">F</span> describing a vertex <span class="math">k</span>&#8211;coloring problem. To prove
 that a graph is <span class="math">k</span>&#8211;colorable we used the fact that <span class="math">G \not= \{1\}</span>. We know that <span class="math">G</span> and <span class="math">F</span> have
 the same set of solutions, however, <span class="math">G</span> has more structure than <span class="math">F</span>. We can take advantage of this
@@ -1276,7 +1264,7 @@ From the fourth group of equations from <span class="math">G</span> we know that
 same color as <span class="math">x_{12}</span>, i.e. red, and <span class="math">x_2</span>, <span class="math">x_6</span> and <span class="math">x_9</span> will have the same color as <span class="math">x_{11}</span>,
 i.e. blue. Then it is sufficient to assign other vertices, mainly <span class="math">x_1</span>, <span class="math">x_5</span>, <span class="math">x_8</span> and <span class="math">x_{10}</span>,
 with green color. This way we obtained a single admissible <span class="math">3</span>&#8211;coloring of the graph <span class="math">\mathcal{G}</span>
-(the same as the coloring of figure <a class="reference internal" href="#fig-graph-color"><em>A sample &#8211;coloring of the graph .</em></a>).</p>
+(the same as the coloring of figure <a class="reference internal" href="#fig-graph-color"><em>A sample &#8211;coloring of the graph </em></a>).</p>
 <p>What about other admissible <span class="math">3</span>&#8211;colorings? We can continue with the above procedure and generate
 more colorings. It would be, however, more interesting if we could get all solutions to our graph
 problem at once. To do this with SymPy, we will simply solve <span class="math">G</span>:</p>
@@ -1324,8 +1312,8 @@ function will do, always specify variables explicitly.</p>
 <div class="section" id="algebraic-geometry">
 <h3>Algebraic geometry<a class="headerlink" href="#algebraic-geometry" title="Permalink to this headline">¶</a></h3>
 <p>Geometry is one of the primary subjects taught during elementary mathematics classes and using SymPy for
-studying theorems of euclidean geometry seems a very promising idea. For example, lets consider a rhombus
-in a fixed coordinate system. We would like to prove a theorem, that diagonals of this rhombus are mutually
+studying theorems of Euclidean geometry seems a very promising idea. For example, lets consider a rhombus
+(in a fixed coordinate system). We would like to prove a theorem that diagonals of a rhombus are mutually
 perpendicular. We are of course interested in a purely algorithmic approach to solve this problem. To prove
 this theorem we will use the machinery of Gröbner bases.</p>
 <p>Following <a class="reference external" href="literature.html#winkler1990geometry">[Winkler1990geometry]</a>, lets consider a geometric entity which properties can be translated into a
@@ -1343,9 +1331,9 @@ Anyway, the Gröbner basis approach allows to prove theorems in algebraic geomet
 and derive automatically non&#8211;degeneracy conditions.</p>
 <div align="center" class="figure" id="fig-geometry-rhombus">
 <img alt="../images/geometry-rhombus.png" src="../images/geometry-rhombus.png" />
-<p class="caption">A rhombus in a fixed coordinate system.</p>
+<p class="caption">A rhombus in a fixed coordinate system</p>
 </div>
-<p>Lets consider the rhombus of figure <a class="reference internal" href="#fig-geometry-rhombus"><em>A rhombus in a fixed coordinate system.</em></a>. This geometric entity consists of four
+<p>Lets consider the rhombus of figure <a class="reference internal" href="#fig-geometry-rhombus"><em>A rhombus in a fixed coordinate system</em></a>. This geometric entity consists of four
 points <span class="math">A</span>, <span class="math">B</span>, <span class="math">C</span> and <span class="math">D</span>. To setup a fixed coordinate system, without loss of generality, we can
 assume that <span class="math">A = (0, 0)</span>, <span class="math">B = (x_B, 0)</span>, <span class="math">C = (x_C, y_C)</span> and <span class="math">D = (x_D, y_D)</span>. This is possible by
 taking rotational invariance of the geometric entity. We will prove that the diagonals of this rhombus,
@@ -1401,7 +1389,7 @@ us a non&#8211;degeneracy condition <span class="math">x_B y_C - a</span>.</p>
 </pre></div>
 </div>
 <p>We had to declare the additional variable <span class="math">a</span>, but we don&#8217;t consider it a variable of our problem. This
-will lead to a new case in SymPy&#8217;s implementation of Gröbner bases, because we will be computing not
+will lead to a new case in SymPy&#8216;s implementation of Gröbner bases, because we will be computing not
 over rationals, as we did in all previous examples, but the computations will be done over the field of
 univariate rational functions. Lets now define the four points <span class="math">A</span>, <span class="math">B</span>, <span class="math">C</span> and <span class="math">D</span>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -1453,8 +1441,8 @@ minimal polynomials can be relatively easily computed using PSLQ algorithm (see 
 function in mpmath library) but only in the case of real algebraic numbers. In the more general
 case of complex algebraic numbers the Gröbner bases method is the only choice.</p>
 <p>Gröbner bases can be also directly applicable in symbolic manipulation systems for computing
-factorizations of multivariate polynomials (see <a class="reference external" href="literature.html#gianni1985groebner">[Gianni1985groebner]</a>) or evaluating symbolic
-summations and integrals (see <a class="reference external" href="literature.html#chyzak1998groebner">[Chyzak1998groebner]</a>).</p>
+factorizations of multivariate polynomials <a class="reference external" href="literature.html#gianni1985groebner">[Gianni1985groebner]</a> or evaluating symbolic summations
+and integrals <a class="reference external" href="literature.html#chyzak1998groebner">[Chyzak1998groebner]</a>.</p>
 </div>
 </div>
 <div class="section" id="complexity-of-computing-groebner-bases">
@@ -1483,18 +1471,18 @@ of three polynomials in three variables:</p>
 \end{array}
 \right.\end{split}</div>
 <p>for which a Gröbner basis with respect to lexicographic ordering can&#8217;t be computed in a <em>reasonable</em>
-time in SymPy. However, if we switch to graded lexicographic ordering of monomials, SymPy requires less
-than a second to construct the basis. For comparison, Mathematica can compute both bases at glance (see
-<a class="reference external" href="literature.html#mathematica2009internal">[Mathematica2009internal]</a> for a description of its implementation of Buchberger algorithm).</p>
+time in SymPy. However, if we switch to graded lexicographic ordering of monomials, SymPy requires
+less than a second to construct the basis. For comparison, Mathematica can compute both bases at glance
+(refer to <a class="reference external" href="literature.html#mathematicainternal">[MathematicaInternal]</a> for a description of its implementation of Buchberger algorithm).</p>
 <p>However, as the examples showed us, there is often a lot of <em>structure</em> in the Gröbner bases found
 in practical applications, so many non&#8211;trivial and interesting Gröbner bases are relatively simple
 to compute.</p>
-<p>There many improvements possible to the SymPy&#8217;s implementation of Buchberger algorithm. Techniques like
+<p>There many improvements possible to the SymPy&#8216;s implementation of Buchberger algorithm. Techniques like
 Gröbner Walk, which allows to compute a basis with respect to a <em>cheaper</em> ordering of monomials first
-and then convert it to a more expensive one, or linear algebra approach (see <a class="reference external" href="literature.html#faugere1999f4">[Faugere1999f4]</a>), in which
-a polynomial algebra problem is transformed in into a linear algebra problem and solved using efficient
-algorithms available in this field, are all applicable in SymPy. Ideas for improving the Gröbner bases
-module are listed, among other, as <em>Google Summer of Code</em> proposals at <a class="reference external" href="literature.html#sympygsoc2010">[SymPyGSoC2010]</a>.</p>
+and then convert it to a more expensive one, or linear algebra approach <a class="reference external" href="literature.html#faugere1999f4">[Faugere1999f4]</a>, in which a
+polynomial algebra problem is transformed in into a linear algebra problem and solved using efficient
+algorithms available in this field, are all applicable in SymPy. Ideas for improving the Gröbner
+bases module are listed, among other, as <em>Google Summer of Code</em> proposals at <a class="reference external" href="literature.html#sympygsoc2010">[SymPyGSoC2010]</a>.</p>
 <p>Currently the most promising approach for improving the Buchberger algorithm is SymPy, which is scheduled
 for implementation in near future, is algorithm F5 due to Jean Charles Faugère (see <a class="reference external" href="literature.html#faugere2002f5">[Faugere2002f5]</a> and
 <a class="reference external" href="literature.html#stegers2006f5">[Stegers2006f5]</a>). The algorithm has the same structure as Buchberger algorithm, however it utilizes a very
@@ -1503,6 +1491,15 @@ polynomial divisions.  In practical cases there are <em>no</em> reductions to ze
 zero may happen in certain situations, however, their number is still less than in any other algorithm for
 computing Gröbner bases. Thus F5 is considered to be at least one order of magnitude faster than the
 fastest algorithm previously available.</p>
+</div>
+<div class="section" id="conclusions">
+<h2>Conclusions<a class="headerlink" href="#conclusions" title="Permalink to this headline">¶</a></h2>
+<p>The Gröbner bases method is a powerful tool in symbolic and algebraic computing, which is currently
+not yet fully utilized in SymPy. Also implementation of Buchberger&#8217;s algorithm is quite limited at
+the moment. However, as we showed in this chapter, SymPy can be used for solving practical problems
+in symbolic mathematics, specifically problems which involve solving systems of polynomials. We hope
+that, in foreseeable future, improved algorithms for computing Gröbner bases will be implemented,
+so that SymPy will be able to tackle more complex problems.</p>
 </div>
 </div>
 
@@ -1549,16 +1546,17 @@ fastest algorithm previously available.</p>
 </ul>
 </li>
 <li><a class="reference external" href="#complexity-of-computing-groebner-bases">Complexity of computing Gröbner bases</a></li>
+<li><a class="reference external" href="#conclusions">Conclusions</a></li>
 </ul>
 </li>
 </ul>
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="algorithms.html"
-                                  title="previous chapter">Introduction to polynomial related algorithms in SymPy</a></p>
+                                  title="previous chapter">Algorithms for algebraic computations</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="gcd.html"
-                                  title="next chapter">Algorithmics of GCD and LCM computations</a></p>
+            <p class="topless"><a href="conclusions.html"
+                                  title="next chapter">Final words and conclusions</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="../sources/src/groebner.txt"
@@ -1588,10 +1586,10 @@ fastest algorithm previously available.</p>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="gcd.html" title="Algorithmics of GCD and LCM computations"
+          <a href="conclusions.html" title="Final words and conclusions"
              >next</a> |</li>
         <li class="right" >
-          <a href="algorithms.html" title="Introduction to polynomial related algorithms in SymPy"
+          <a href="algorithms.html" title="Algorithms for algebraic computations"
              >previous</a> |</li>
         <li><a href="../index.html">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
       </ul>

@@ -173,18 +173,28 @@ Literature
 .. [Sturmfels2008invariant]
 .. [Kubale2004color]
 .. [Dijkstra1982zero] http://userweb.cs.utexas.edu/users/EWD/transcriptions/EWD08xx/EWD831.html
-.. [Mathematica2009internal] http://reference.wolfram.com/mathematica/note/SomeNotesOnInternalImplementation.html
-.. [Maxima2009groebner] http://maxima.sourceforge.net/docs/manual/en/maxima_54.html
+.. [MathematicaInternal] http://reference.wolfram.com/mathematica/note/SomeNotesOnInternalImplementation.html
 .. [PythonIssue1771] http://bugs.python.org/issue1771
 .. [SymPyGSoC2010] http://wiki.sympy.org/wiki/GSoC2010Ideas
 .. [PlanetMathSymmetric] http://planetmath.org/encyclopedia/ReductionAlgorithmForSymmetricPolynomials.html
 .. [MaximaGroebner] http://maxima.sourceforge.net/docs/manual/en/maxima_54.html
 .. [MathematicaGroebner] http://reference.wolfram.com/mathematica/tutorial/ComplexPolynomialSystems.html
-.. [Buchberder1965thesis]
+.. [PythonModules] http://docs.python.org/tutorial/modules.html
+.. [UnladenSwallow] http://code.google.com/p/unladen-swallow
+.. [PyPy] http://codespeak.net/pypy
+.. [KNS2009]
+.. [EuroSciPy2009]
+.. [Py4Science2010]
+.. [EuroSciPy2010]
+.. [Buchberger1965thesis]
 .. [Abramson2006translation]
 .. [Abramson2009history]
 .. [Traverso1991integer]
 .. [Winkler1990geometry]
 .. [Buchberger1998applications]
 .. [Sturmfels1996lectures]
+.. [Grabmeier2003algebra]
+.. [Graham1994concrete]
+.. [Haigh2005interview]
+.. [Hamming1987numerical]
 

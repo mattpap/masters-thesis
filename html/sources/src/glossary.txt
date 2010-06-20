@@ -46,7 +46,6 @@ Glossary
         generated in SymPy using :func:`symmetric_poly` function.
 
     monic polynomial
-
         A polynomial with the leading coefficient equal to the identity element of the
         ground domain, or to zero if the polynomial itself is zero. In SymPy this can
         can be checked using `is_monic` property on an instance of :class:`Poly` class.

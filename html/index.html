@@ -21,7 +21,7 @@
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="static/jsMath-3.6e/easy/load.js"></script>
     <link rel="top" title="Polynomials Manipulation Module v1.0 documentation" href="#" />
-    <link rel="next" title="The state of art in symbolic and algebraic computing" href="src/stateofart.html" /> 
+    <link rel="next" title="Introduction" href="src/introduction.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,7 +31,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="src/stateofart.html" title="The state of art in symbolic and algebraic computing"
+          <a href="src/introduction.html" title="Introduction"
              accesskey="N">next</a> |</li>
         <li><a href="#">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -46,8 +46,68 @@
 <span id="thesis-index"></span><h1>SymPy: Master&#8217;s Thesis<a class="headerlink" href="#sympy-master-s-thesis" title="Permalink to this headline">¶</a></h1>
 <p>Contents:</p>
 <ul>
-<li class="toctree-l1"><a class="reference external" href="src/stateofart.html">The state of art in symbolic and algebraic computing</a></li>
-<li class="toctree-l1"><a class="reference external" href="src/algorithms.html">Introduction to polynomial related algorithms in SymPy</a></li>
+<li class="toctree-l1"><a class="reference external" href="src/introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#symbolic-manipulation-systems">Symbolic manipulation systems</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#the-pure-python-approach">The pure Python approach</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#the-author-s-role">The author&#8217;s role</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#the-current-version">The current version</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#origin-of-module-s-name">Origin of module&#8217;s name</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#historical-background">Historical background</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#presentations-of-this-work">Presentations of this work</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#the-structure-of-this-thesis">The structure of this thesis</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#a-word-on-time-measurement">A word on time measurement</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/introduction.html#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="src/internals.html">Notes on the internal implementation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="src/internals.html#physical-structure-of-the-module">Physical structure of the module</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/internals.html#logical-structure-of-the-module">Logical structure of the module</a><ul>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#motivation">Motivation</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#the-zeroth-level-l0">The zeroth level: L0</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#the-first-level-l1">The first level: L1</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#the-second-level-l2">The second level: L2</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#the-third-level-l3">The third level: L3</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#multiple-levels-in-practice">Multiple&#8211;levels in practice</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="src/internals.html#polynomial-representations">Polynomial representations</a><ul>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#dense-polynomial-representation">Dense polynomial representation</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#sparse-polynomial-representation">Sparse polynomial representation</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#benchmarking-polynomial-representations">Benchmarking polynomial representations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="src/internals.html#categories-domains-and-ground-types">Categories, domains and ground types</a><ul>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#benchmarking-ground-types">Benchmarking ground types</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="src/internals.html#using-cython-internally">Using Cython internally</a><ul>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#pure-mode-cython-in-sympy">Pure mode Cython in SymPy</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/internals.html#benchmarking-pure-mode-cython">Benchmarking pure mode Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="src/internals.html#conclusions">Conclusions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="src/algorithms.html">Algorithms for algebraic computations</a><ul>
+<li class="toctree-l2"><a class="reference external" href="src/algorithms.html#arithmetics-of-polynomials">Arithmetics of polynomials</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/algorithms.html#evaluation-of-polynomials">Evaluation of polynomials</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/algorithms.html#the-greatest-common-divisor">The Greatest Common Divisor</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/algorithms.html#square-free-decomposition">Square&#8211;free decomposition</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/algorithms.html#factorization-of-polynomials">Factorization of polynomials</a><ul>
+<li class="toctree-l3"><a class="reference external" href="src/algorithms.html#finite-fields">Finite fields</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/algorithms.html#integers-and-rationals">Integers and rationals</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/algorithms.html#algebraic-number-fields">Algebraic number fields</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="src/algorithms.html#groebner-bases">Gröbner bases</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/algorithms.html#root-isolation">Root isolation</a><ul>
+<li class="toctree-l3"><a class="reference external" href="src/algorithms.html#real-roots">Real roots</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/algorithms.html#complex-roots">Complex roots</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="src/algorithms.html#conclusions">Conclusions</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference external" href="src/groebner.html">Gröbner bases and their applications</a><ul>
 <li class="toctree-l2"><a class="reference external" href="src/groebner.html#short-introduction-to-groebner-bases">Short introduction to Gröbner bases</a></li>
 <li class="toctree-l2"><a class="reference external" href="src/groebner.html#construction-of-groebner-bases">Construction of Gröbner bases</a><ul>
@@ -75,9 +135,22 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="src/groebner.html#complexity-of-computing-groebner-bases">Complexity of computing Gröbner bases</a></li>
+<li class="toctree-l2"><a class="reference external" href="src/groebner.html#conclusions">Conclusions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="src/gcd.html">Algorithmics of GCD and LCM computations</a></li>
+<li class="toctree-l1"><a class="reference external" href="src/conclusions.html">Final words and conclusions</a><ul>
+<li class="toctree-l2"><a class="reference external" href="src/conclusions.html#future-plans">Future plans</a><ul>
+<li class="toctree-l3"><a class="reference external" href="src/conclusions.html#polynomial-arithmetics">Polynomial arithmetics</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/conclusions.html#power-series-expansion">Power series expansion</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/conclusions.html#partial-fraction-decomposition">Partial fraction decomposition</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/conclusions.html#simplification-of-expressions">Simplification of expressions</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/conclusions.html#cylindrical-algebraic-decomposition">Cylindrical algebraic decomposition</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/conclusions.html#multiple-algebraic-extensions">Multiple algebraic extensions</a></li>
+<li class="toctree-l3"><a class="reference external" href="src/conclusions.html#using-modular-techniques-elsewhere">Using modular techniques elsewhere</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference external" href="src/glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference external" href="src/literature.html">Literature</a></li>
 </ul>
@@ -107,8 +180,8 @@
 </ul>
 
             <h4>Next topic</h4>
-            <p class="topless"><a href="src/stateofart.html"
-                                  title="next chapter">The state of art in symbolic and algebraic computing</a></p>
+            <p class="topless"><a href="src/introduction.html"
+                                  title="next chapter">Introduction</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="sources/index.txt"
@@ -138,7 +211,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="src/stateofart.html" title="The state of art in symbolic and algebraic computing"
+          <a href="src/introduction.html" title="Introduction"
              >next</a> |</li>
         <li><a href="#">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
       </ul>

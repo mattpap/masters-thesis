@@ -1,0 +1,413 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Polynomials Manipulation Module v1.0 documentation</title>
+    <link rel="stylesheet" href="../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/jsMath-3.6e/easy/load.js"></script>
+    <link rel="top" title="Polynomials Manipulation Module v1.0 documentation" href="../index.html" />
+    <link rel="next" title="Notes on the internal implementation" href="internals.html" />
+    <link rel="prev" title="SymPy: Master’s Thesis" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="internals.html" title="Notes on the internal implementation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="SymPy: Master’s Thesis"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="thesis-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Hamming <a class="reference external" href="literature.html#hamming1987numerical">[Hamming1987numerical]</a>, in his famous book about numerical algorithms, said that
+<em>&#8220;The purpose of computing is insight, not numbers&#8221;</em>, which means that we should not blindly
+acquire and process raw data, but we should also learn something from it, more importantly,
+something new. Numerical computing is significant in engineering and computational sciences,
+because most problems, that we encounter in real&#8211;life, do not have exact solutions, however,
+they can be solved to some desired precision using numerical methods. Methods of this kind
+give only data. We can plot this data, we can analyze it, we can analyze the outcome of the
+computations we did. But, in any case, maybe besides those trivial and not interesting at all,
+we will not learn about the nature of the studied problem. This is were exact, symbolic methods
+arise, which, when used properly, can give us this insight to problems we are solving.</p>
+<p>This is one, lets say educational reason, why engineers and scientists should be interested,
+at least partially, in symbolic methods. There is, however, another much more simple reason
+for this: numerical methods can simply fail to compute correct results. Properly implemented
+symbolic methods do not share this issue, always giving correct answers. They need, however,
+more time to find a solution, than numerical methods.</p>
+<p>We should remember that usually only small instances of particular, interesting problems can
+be solved using symbolic methods. The optimal solution is to combine both kinds of methods,
+taking advantage of symbolic algorithms as long as it is feasible, for example to pre&#8211;process
+equations of a problem to make them more easily solvable numerically, and then solve them
+using validated numerical methods.</p>
+<div class="section" id="symbolic-manipulation-systems">
+<h2>Symbolic manipulation systems<a class="headerlink" href="#symbolic-manipulation-systems" title="Permalink to this headline">¶</a></h2>
+<p>Systems which implement symbolic methods are called symbolic manipulation systems, also known
+as symbolic mathematics or computer algebra systems, or CAS for short. In this thesis we will
+use those terms interchangeably, however, some systems are more symbolic and some are more
+algebraic. First symbolic mathematics systems emerged in early 1960s as the requirement of
+theoretical physics and research into artificial intelligence. Those were very basic systems,
+usually implemented in Lisp programming language. Over the years more symbolic methods were
+invented and the design of mathematical systems improved, giving a rise to modern systems,
+amongst others Reduce, Macsyma, Axiom and Derive, and more recent including Maple, Singular,
+Mathematica, Magma, Maxima, GiNaC, and many others. For a very detailed historical insight
+refer to an interview <a class="reference external" href="literature.html#haigh2005interview">[Haigh2005interview]</a> with Gaston Gonnet, a key figure in computer
+algebra systems design, co&#8211;creator of Maple, a leading third&#8211;party mathematical software
+on the market.</p>
+<p>The typical design approach to most of those systems is to implement two levels of software.
+On the first level, called a kernel, which is usually developed in a fast, machine oriented,
+compiled programming language like Lisp, C or C++, the most commonly used, core, algorithms
+are implemented. This level is not accessible to the end user, disallowing users to investigate
+the details of the particular implementations of mathematical algorithms. On the contrary,
+the other level is usually implemented in a user&#8211;friendly programming language, which is also
+used for interaction with the user. On this level, advanced and configurable mathematical tools
+are implemented. The language for this purpose is usually a newly invented domain specific
+programming language, oriented towards the ease of expressing mathematical formulations in it,
+designed for a particular symbolic manipulation system. This adds a cost when learning such
+systems, because one has not only to understand the system it self, its semantics and behaviour,
+but has to learn yet another programming language, which will be useless outside the system.
+Those domain specific languages (DSLs) are often very fancy and hard to learn.</p>
+<p>A different approach was chosen in GiNaC a library for symbolic mathematics, which was written
+in C++ programming language <a class="reference external" href="literature.html#frink2001large">[Frink2001large]</a>. Both the kernel and mathematical libraries were
+implemented in this language, so users who are familiar with C++ can more easily use it than
+standalone systems that were described previously. Having a library has also the benefit, that
+one can easily create his own programs which simply link to a single dynamically linked library.
+GiNaC is fast, but implements only very basic algorithms of symbolic mathematics. Also, C++ is
+not a user&#8211;friendly programming language, so it might be a barier for non&#8211;programmers.</p>
+<p>An idea emerged to use a very interactive, simple and easy to learn programming language,
+Python (<a class="reference external" href="http://www.python.org">http://www.python.org</a>) and expose GiNaC functionality in it. This way we arrived
+with Pynac. At first this seemed a great approach because we use very fast C++ for the core
+and well a known language, which popularity is steadily growing, for interaction with the user.
+The disadvantage of this approach is that once again we arrive with two languages, the C++ core
+is still not easily accessible for the users. Also writing bindings to C++ libraries in Python
+is not that easy and there is a need for an intermediate programming language for this.</p>
+</div>
+<div class="section" id="the-pure-python-approach">
+<h2>The pure Python approach<a class="headerlink" href="#the-pure-python-approach" title="Permalink to this headline">¶</a></h2>
+<p>The next step in exposing internals of a symbolic manipulation system the user, was to
+write such system entirely in Python. This is how SymPy (<a class="reference external" href="http://www.sympy.org">http://www.sympy.org</a>) was born.
+The idea was very simple: lets reinvent the wheel for the 37th time and create a library
+for symbolic mathematics which will be written in pure Python. Thus, SymPy is yet another
+approach to symbolic mathematics, a library written from scratch in Python, an interactive,
+interpreted, dynamically typed, general purpose programming language. SymPy aims to become
+a full&#8211;featured symbolic mathematics package while keeping the code as simple as possible
+in order to be comprehensible and easily extensible. Moreover, SymPy does not depend, by
+default, on any external software besides a Python interpreter program, although additional
+dependencies like gmpy, Cython or Pyglet (for plotting) are optional. This way it is
+straightforward to use SymPy&#8217;s mathematical functionality in environments like Google App
+Engine or Jython (Python in Java). It is also fairly easy for people to include SymPy in
+their projects.</p>
+<p>To give SymPy a try, lets consider a simple session in a standard Python&#8217;s interpreter.
+Suppose we would like to compute the following indefinite integral:</p>
+<div class="math">
+\int \frac{x - \tan(x)}{\tan(x)^2 + \tan(x)} dx</div>
+<p>and later differentiate integration result, simplify it and check if the result from the
+integrator was correct, by comparing the outcome to the original function. A sample session
+would look as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">var</span><span class="p">,</span> <span class="n">tan</span><span class="p">,</span> <span class="n">integrate</span><span class="p">,</span> <span class="n">ratsimp</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span>
+<span class="go">x</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">tan</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">/</span> <span class="n">tan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">tan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="go">log(1 + tan(x)**2)/2 - x/tan(x) - x**2/2</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ratsimp</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">==</span> <span class="n">f</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>First we need to import all classes and functions that we will take advantage of in this
+session. We could alternatively import everything that SymPy exports by default, by issuing
+<tt class="docutils literal"><span class="pre">from</span> <span class="pre">sympy</span> <span class="pre">import</span> <span class="pre">*</span></tt>, however, this approach is not recommended if the user plans to use
+SymPy in parallel with other libraries, like NumPy, in a single session. We are using a
+general purpose programming language, so we need to declare all symbols that we will use.
+In this case we declare one symbol <tt class="docutils literal"><span class="pre">x</span></tt>, using <tt class="xref docutils literal"><span class="pre">var()</span></tt> function, which is clever enough
+to inject <tt class="docutils literal"><span class="pre">x</span></tt> into the current namespace, saving us a little typing. From this point we can
+start computing with symbolics, either by using procedural (see <tt class="xref docutils literal"><span class="pre">integrate()</span></tt>) or object
+oriented (see <tt class="xref docutils literal"><span class="pre">diff()</span></tt>) styles. For users convenience, both ways are usually available,
+as users may have different backgrounds and may be accustomed to different styles. The <tt class="docutils literal"><span class="pre">_</span></tt>
+symbol, in the last input line, stands for the previous output.</p>
+<p>The main advantage of a library written entirely in Python, is that the user have access
+to all algorithms and data structures that were implemented in SymPy. He can analyze them
+or experiment with them, or even provide his own implementations. This is straightforward
+even for non&#8211;programmers, because there is no need to learn machine depended details. A
+lot was said in the past about educational aspects of mathematical software, mostly on the
+level of solving problems with such systems <a class="reference external" href="literature.html#wang1976teaching">[Wang1976teaching]</a>. However, with SymPy we
+can achieve more, because we not only can compute with it, but we can see exactly how each
+part of SymPy does work and were the nicely formatted results come from. Thus we see
+SymPy as a promising candidate for teaching mathematics in future.</p>
+<p>The pure Python approach has also weaknesses. The biggest problem is efficiency of such
+solution. Python is an interpreted programming language, thus it is significantly slower
+than compiled languages. The question arises: is it at all feasible to solve any practical
+problems in SymPy. It happens that currently we can solve only problems of very small
+size, because of wrong design decisions in the past. With each release overall efficiency
+of SymPy increases, but we are still far from other mathematical software.</p>
+<p>There are other issues with pure Python approach. Suppose we would like to enter a fraction
+one over three into SymPy. Can we simply write <tt class="docutils literal"><span class="pre">1/3</span></tt> in an interpreter? Unfortunately
+not, because <tt class="docutils literal"><span class="pre">1</span></tt> and <tt class="docutils literal"><span class="pre">3</span></tt> are Python objects and division of those objects will either
+give an integer (floor division) or a floating&#8211;point value (this depends on the version
+of Python interpreter and its configuration). In this particular case we have to tell Python
+that at least one of <tt class="docutils literal"><span class="pre">1</span></tt> and <tt class="docutils literal"><span class="pre">3</span></tt> have to be a SymPy&#8216;s object, so we have to write
+<tt class="docutils literal"><span class="pre">S(1)/3</span></tt>, or equivalently <tt class="docutils literal"><span class="pre">S('1/3')</span></tt> or <tt class="docutils literal"><span class="pre">Rational(1,</span> <span class="pre">3)</span></tt>, where <tt class="docutils literal"><span class="pre">S</span></tt> is a shorthand
+for <tt class="xref docutils literal"><span class="pre">sympify()</span></tt> function, which converts objects and strings into SymPy&#8217;s objects. In
+other mathematical software that use Python, for example in Sage (<a class="reference external" href="http://www.sage-math.org">http://www.sage-math.org</a>),
+this problem is resolved by using a preparser, which alters Python&#8217;s semantics and allows
+for automatic conversions of this kind. However, we consider using by default a preparser
+as actually constructing a new language, because those tiny differences might be tricky
+to learn, especially for newcomers.</p>
+</div>
+<div class="section" id="the-author-s-role">
+<h2>The author&#8217;s role<a class="headerlink" href="#the-author-s-role" title="Permalink to this headline">¶</a></h2>
+<p>To solve, at least partially, the first of the listed problems and to greatly improve
+SymPy&#8216;s functionality in general, the author of this thesis started work on a computer
+algebra module for SymPy, which eventually will be described in this thesis. The task
+was relatively simple: create a new module for manipulation of polynomials, which will
+implement mathematical domains, will allow multiple representations of polynomials and,
+most importantly, will be enough fast, so that other developers could build efficient
+symbolic manipulation algorithms on top of it.</p>
+<p>This way <tt class="docutils literal"><span class="pre">sympy.polys</span></tt> module was born, which supersedes the original module for polynomials
+manipulation in SymPy &#8212; <tt class="docutils literal"><span class="pre">sympy.polynomials</span></tt>. In the rest of this thesis we will discuss
+internal implementation of the module, mathematical algorithms that were implemented and, at
+the end, we will show some practical applications of the new module. We will not provide any
+direct comparisons between those two modules, because of very different capabilities of those
+modules and the fact that the plan was to make SymPy comparable, in this area, with other
+mathematical software. Thus it was obvious that the new module has to be significantly faster
+than old one, often by orders of magnitude. This way we had much better and very effective
+motivation to make deep changes to our original approach to pure Python design.</p>
+</div>
+<div class="section" id="the-current-version">
+<h2>The current version<a class="headerlink" href="#the-current-version" title="Permalink to this headline">¶</a></h2>
+<p>Polynomials manipulation module is under continuous development, so the notion of, so called, current
+version of the module, which was used for writing this thesis, was a fluid concept and changed as this
+thesis was being written. As of the finalization of this thesis, the current version was the HEAD of
+branch <em>polys9</em> in development repository of the author, located at <a class="reference external" href="http://github.com/mattpap/sympy-polys">http://github.com/mattpap/sympy-polys</a>.
+All stable results of this branch were already merged with <em>master</em> branch of official repository of
+SymPy and are scheduled for release with the upcoming 0.7.0 release of SymPy.</p>
+</div>
+<div class="section" id="origin-of-module-s-name">
+<h2>Origin of module&#8217;s name<a class="headerlink" href="#origin-of-module-s-name" title="Permalink to this headline">¶</a></h2>
+<p>For most people, it would be more straightforward to name the module simply <em>polynomials</em>, instead
+of the shorter name <em>polys</em>, which is currently in use. There are two reasons for having the latter
+in SymPy. The first reason is that the name <em>polys</em> is just shorter and, this way, it is easier to
+use it in interactive sessions. Polynomials manipulation module has a very rich API, which makes it
+necessary, in some cases, to explicitly abbreviate function and class names with the module name.
+Alternatively, we could use module name aliases, but this would lead to inconsistent naming scheme
+and confusion for inexperienced SymPy&#8216;s users. The other reason is less trivial and has historical
+background. The first module for polynomial manipulation was developed during Google Summer of Code
+2007, and later, when a new module was under implementation, for a year there were to modules for
+polynomials manipulation in parallel, so a different name was necessary. Afterwards, the new name,
+<em>polys</em>, was kept, see next section for a more detailed discussion.</p>
+</div>
+<div class="section" id="historical-background">
+<h2>Historical background<a class="headerlink" href="#historical-background" title="Permalink to this headline">¶</a></h2>
+<p>At the very beginning, in 2006, SymPy was lacking a separate module for polynomial manipulation.
+This was not a pity, because a well established module of this kind was necessary for making SymPy
+grow and work on algorithms that depend on polynomials was a big struggle. A task for implementing
+polynomials in SymPy was proposed by a German student for Google Summer of Code 2007. The student
+was selected for the task and developed a basic module during GSoC time frame. The module was called
+<em>polynomials</em> and featured elementary polynomial arithmetics, real root counting and root finding via
+radicals, GCD and LCM algorithms, square&#8211;free decomposition, univariate and multivariate factoring
+into irreducibles over rationals (Kronecker&#8217;s algorithms) and Gröbner bases. Later the module was
+extended with fast modular factorization algorithm in the case of univariate polynomials. This was,
+unfortunately, last development in SymPy by the original author. For several months polynomials
+manipulation module was not maintained.</p>
+<p>The same year, in 2007, the author of this thesis was selected within Google Summer of Code for
+implementing, so called, <em>concrete mathematics</em> module in SymPy <a class="reference external" href="literature.html#graham1994concrete">[Graham1994concrete]</a>. At that
+time, the author was interested in automated methods for solving discrete problems, especially
+those involving recurrence relations <a class="reference external" href="literature.html#nemes1997monthly">[Nemes1997monthly]</a>. The task was to extend SymPy with
+algorithms for finding closed forms of symbolic summations and solving recurrence relations
+<a class="reference external" href="literature.html#petkovsek1997aeqb">[Petkovsek1997AeqB]</a>, <a class="reference external" href="literature.html#abramov1995rational">[Abramov1995rational]</a>, <a class="reference external" href="literature.html#petkovsek1992hyper">[Petkovsek1992hyper]</a>. Although the preliminary
+developments were possible without direct usage of polynomials manipulation algorithms, later
+on the barrier between the two modules was shrinking very rapidly as new algorithms were scheduled
+for implementation in concrete mathematics module. The author was required several times to implement
+polynomials manipulation related tools on his own. Altogether, it was a great experience for the
+author, showing him the importance of polynomials and related algorithms in a symbolic manipulation
+system, not only as a standalone tool, but also as a component of other, often very complex, algorithms.</p>
+<p>It was a natural thing to takeover polynomials manipulation module after departure of its original
+author. At first the plan was just to maintain the existing code and improve speed of the module in
+a few places (e.g. implement better polynomial arithmetics). However, as SymPy grown the need for
+more general and faster polynomial manipulation tools was also growing. The author soon realised that
+the original module didn&#8217;t provide a sufficiently strong basis for new developments in this area. The
+decision was to implement a new module for polynomials manipulation in parallel with the existing one
+and reusing as much code as possible from the <em>polynomials</em> module. By reusing we mean taking most
+algorithms to assure correctness. During later stages of development some of the original algorithms
+were replaced with more general or faster ones.  Many bugs in the original code were revealed and fixed.
+Work on the new module was carried through 2008. During that time, SymPy had two modules for polynomials
+manipulation. To avoid confusion, the new module was named <em>polys</em> and other modules were gradually
+refactored to use the new implementation.  At the end of 2008 the old module was removed and <em>polys</em>
+remained the main and the only module for polynomials manipulation. The name <em>polys</em> was kept, because
+of its short length, which is beneficial when experimenting with polynomials in interactive sessions.</p>
+<p>At that time, although the new module was a big step forward, the author realised that its design is
+still very limited and requires deep changes to make it an even better basis for future developments
+in SymPy, that require strong support for polynomials. The first few new developments were done on
+top of <em>polys</em> module and preliminary results were presented during EuroSciPy 2009 conference. After
+the conference, in two months, a completely new structure of polynomials manipulation module was
+implemented which superseded the old design. All developments were done this time gradually on the
+existing module, however, the scale of changes soon gave a rise to a completely new module, which
+is the main actor of this thesis. To keep continuity in the naming convention, the name <em>polys</em>
+remained and there are no plans, in foreseeable future, to return to the original name.</p>
+<p>Hopefully, as the author predicts, this was the last major rewrite of polynomials manipulation module.
+The new structure allows to rewrite parts of the module, introducing better quality, without touching
+other parts. Also the public API seems to be quite stable at this point, however, till major version
+1.0.0 of SymPy, significant changes to the API may still occur.</p>
+</div>
+<div class="section" id="presentations-of-this-work">
+<h2>Presentations of this work<a class="headerlink" href="#presentations-of-this-work" title="Permalink to this headline">¶</a></h2>
+<p>Early results concerning polynomials manipulation module were presented at students conference in
+2009 <a class="reference external" href="literature.html#kns2009">[KNS2009]</a>, which was held at University of Technology in Wrocław, Poland. A more extensive
+talk (including a short tutorial) was given by the author of this thesis the same year at EuroSciPy
+conference <a class="reference external" href="literature.html#euroscipy2009">[EuroSciPy2009]</a>, which was held in Leipzig, Germany. This was a general presentation
+about SymPy with some remarks concerning polynomials manipulation in pure Python. In 2010, at Python
+for Scientists (py4science) meeting, the author had a talk and a tutorial <a class="reference external" href="literature.html#py4science2010">[Py4Science2010]</a> dedicated
+to polynomials manipulation. The event took place at University of California at Berkeley, CA, USA. In
+the presentation the author showed intermediate results of his work on polynomials manipulation module
+and of this thesis. For July 2010, the author has a talk scheduled at EuroSciPy conference <a class="reference external" href="literature.html#euroscipy2010">[EuroSciPy2010]</a>,
+which will be held this time at Ecole Normale Supérieure in Paris, France. Final results will be presented
+during this talk.</p>
+</div>
+<div class="section" id="the-structure-of-this-thesis">
+<h2>The structure of this thesis<a class="headerlink" href="#the-structure-of-this-thesis" title="Permalink to this headline">¶</a></h2>
+<p>In this chapter we gave a brief introduction to SymPy and symbolic and algebraic computing in general.
+More importantly, we also described author&#8217;s input to SymPy and defined the goals of this thesis. In
+the following chapters, in three, hopefully not too overlong, steps, we will discuss the issues that
+were pointed out in this chapter and how we solved them. Thus, in the next chapter we will discuss
+the details of the internal implementation of polynomials manipulation module, i.e. the heart of the
+module. In the third chapter we will briefly describe algorithms that where implemented in the module,
+giving many references to important literature. In the fourth chapter we will show that polynomials
+manipulation module can be employed for solving practical problems. This chapter will introduce the
+reader, in a tutorial like fashion, to the theory of Gröbner bases and will examine several
+interesting examples. In the final chapter we will sum up all what was said about computer algebra
+in pure Python and discuss future plans for the module.</p>
+</div>
+<div class="section" id="a-word-on-time-measurement">
+<h2>A word on time measurement<a class="headerlink" href="#a-word-on-time-measurement" title="Permalink to this headline">¶</a></h2>
+<p>Throughout this thesis we will measure time of various functions and code blocks. For this purpose,
+we use IPython&#8217;s built&#8211;in timing functions: <tt class="docutils literal"><span class="pre">%time</span></tt> and <tt class="docutils literal"><span class="pre">%timeit</span></tt>. In the cases where we are
+only interested in approximate results to show the scale of a problem, especially when computations
+take a lot of time, about half a minute or more, we will use the first variant. For precise time
+measurement or/and when execution times are very small (micro&#8211; or milliseconds) we will use the
+other function, <tt class="docutils literal"><span class="pre">%timeit</span></tt> , which adaptively adjusts the number of required evaluations of a
+function, to give precise and valid results. In any case we can not say anything about statistics
+of such measurements, because each run is influenced but fluctuations generated by the operating
+system, as we can not guarantee that for each run, there will be exactly 100% of CPU time available.
+However, all timings were done with no background applications running, minimising risk of getting
+invalid time measurements. We used standard functionality of IPython for doing benchmarks to allow
+the reader to follow code examples that we will show in this thesis and verify them on reader&#8217;s
+computer (all benchmarks of this thesis were done on a single core Intel Pentium&#8211;M 1.7 GHz CPU
+with 1 GiB of memory, running Gentoo Linux, with kernel 2.6 series, operating system).</p>
+</div>
+<div class="section" id="acknowledgements">
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+<p>The author would like to thank members of SymPy&#8216;s development team for their support, in particular
+Aaron Meurer and Criss Smith for their important input in discussion about the module and its internals
+and for many bugfixes and patches with improvements they submitted, and Ondřej Čertík for his general
+advice. The author would also like to thank the supervisor of this thesis, Krzysztof Juszczyszyn, for
+his patience concerning author&#8217;s work on this thesis and his enthusiasm about the project.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../static/sympy-logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Introduction</a><ul>
+<li><a class="reference external" href="#symbolic-manipulation-systems">Symbolic manipulation systems</a></li>
+<li><a class="reference external" href="#the-pure-python-approach">The pure Python approach</a></li>
+<li><a class="reference external" href="#the-author-s-role">The author&#8217;s role</a></li>
+<li><a class="reference external" href="#the-current-version">The current version</a></li>
+<li><a class="reference external" href="#origin-of-module-s-name">Origin of module&#8217;s name</a></li>
+<li><a class="reference external" href="#historical-background">Historical background</a></li>
+<li><a class="reference external" href="#presentations-of-this-work">Presentations of this work</a></li>
+<li><a class="reference external" href="#the-structure-of-this-thesis">The structure of this thesis</a></li>
+<li><a class="reference external" href="#a-word-on-time-measurement">A word on time measurement</a></li>
+<li><a class="reference external" href="#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="../index.html"
+                                  title="previous chapter">SymPy: Master&#8217;s Thesis</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="internals.html"
+                                  title="next chapter">Notes on the internal implementation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../sources/src/introduction.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="internals.html" title="Notes on the internal implementation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="SymPy: Master’s Thesis"
+             >previous</a> |</li>
+        <li><a href="../index.html">Polynomials Manipulation Module v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Mateusz Paprocki.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>
