@@ -1,12 +1,11 @@
-
 Master's thesis about SymPy
 ===========================
 
 This is the thesis I'm writing at the University of Technology of
 Wrocław in Poland. The full title is as follows:
 
-    Design and Implementation Issues of a Computer Algebra System
-          in an Interpreted, Dynamically Typed Language
+   Design and Implementation Issues of a Computer Algebra System
+     in an Interpreted, Dynamically Typed Programming Language
 
 License
 -------
@@ -19,4 +18,3 @@ or any later version published by the Free Software Foundation; with
 no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
 A copy of the license is included in the section entitled "GNU Free
 Documentation License".
-
